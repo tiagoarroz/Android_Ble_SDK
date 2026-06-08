@@ -9,14 +9,14 @@
         android:id="@+id/ecg_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="开始测试ecg"
+        android:text="Iniciar teste ECG"
         android:textSize="20sp" />
 
     <Button
         android:id="@+id/ecg_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="结束测试ecg"
+        android:text="Terminar teste ECG"
         android:textSize="20sp" />
 
 

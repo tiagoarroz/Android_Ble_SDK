@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 设置来自服务器表盘UI的步骤，如下：
- * 第1步.判断是否支持表盘设置
- * 第2步.获取当前表盘信息（来自服务器的表盘）
- * 第3步.获取支持的服务器UI列表
- * 第4步.下载对应的UI文件
- * 第5步.设置UI
+ * ConfigurarUI，：
+ * 1.Configurar
+ * 2.（）
+ * 3.UI
+ * 4.UI
+ * 5.ConfigurarUI
  */
 public class UiUpdateServerActivity extends Activity {
     private final static String TAG = UiUpdateServerActivity.class.getSimpleName();
@@ -81,10 +81,10 @@ public class UiUpdateServerActivity extends Activity {
 
     public void isSupportServerUi(View view) {
         if (UiUpdateUtil.getInstance().isSupportChangeServerUi()) {
-            mUiServerSupportTV.setText("1.支持服务器表盘");
+            mUiServerSupportTV.setText("1.");
         } else {
-            mUiServerSupportTV.setText("1.不支持服务器表盘");
-            Toast.makeText(mContext, "不支持服务器表盘", Toast.LENGTH_LONG).show();
+            mUiServerSupportTV.setText("1.");
+            Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -96,7 +96,7 @@ public class UiUpdateServerActivity extends Activity {
             @Override
             public void onBaseUiInfoFormServer(UIDataServer uiDataServer) {
                 mUiDataServer = uiDataServer;
-                mUiServerBaseInfoTV.setText("2.服务器的表盘基本信息 uiDataServer:" + uiDataServer.toString());
+                mUiServerBaseInfoTV.setText("2.Informação base uiDataServer:" + uiDataServer.toString());
             }
         });
     }
@@ -105,7 +105,7 @@ public class UiUpdateServerActivity extends Activity {
     TUiTheme tUiThemeDown;
     List<TUiTheme> themeInfoList;
     /**
-     * demo为了方便，直接选中的是服务器第1个，
+     * demo，1，
      */
     public void serverUI(View view) {
         new Thread(new Runnable() {
@@ -152,8 +152,8 @@ public class UiUpdateServerActivity extends Activity {
             Logger.t(TAG).i("tUiTheme fileSave:" + fileSave);
             mUpdatefile = new File(fileSave);
             if (mUpdatefile.exists()) {
-                fileStateTv.setText("文件存在，无需下载");
-                Logger.t(TAG).i("文件存在，无需下载");
+                fileStateTv.setText("，");
+                Logger.t(TAG).i("，");
             } else {
                 new Thread(new Runnable() {
                     @Override
@@ -161,11 +161,11 @@ public class UiUpdateServerActivity extends Activity {
                         uiUpdateCheckOprate.downloadFile(fileUrl, fileSave, new OnDownLoadListener() {
                             @Override
                             public void onProgress(final float progress) {
-                                Logger.t(TAG).i("下载进度:" + progress);
+                                Logger.t(TAG).i(":" + progress);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        fileStateTv.setText("下载进度:" + progress * 100);
+                                        fileStateTv.setText(":" + progress * 100);
                                     }
                                 });
                             }
@@ -175,10 +175,10 @@ public class UiUpdateServerActivity extends Activity {
                                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        fileStateTv.setText("下载完成");
+                                        fileStateTv.setText("");
                                     }
                                 });
-                                VPLogger.i("下载完成");
+                                VPLogger.i("");
                                 mUpdatefile = new File(fileSave);
                             }
                         });
@@ -199,16 +199,16 @@ public class UiUpdateServerActivity extends Activity {
 
     public void onServerSet(View view) {
         if (mUpdatefile == null || !mUpdatefile.exists()) {
-            Logger.t(TAG).i("文件不存在");
+            Logger.t(TAG).i("");
             return;
         }
         try {
             Uri mUritempFile = Uri.fromFile(mUpdatefile);
             InputStream inputStream = mContext.getContentResolver().openInputStream(mUritempFile);
-            Logger.t(TAG).i("开始设置");
+            Logger.t(TAG).i("IniciarConfigurar");
 
             /**
-             * 升级ui步骤：开始升级-清除缓存数据-发送UI数据-结束发送
+             * ui：Iniciar atualização-dados-EnviarUIdados-TerminarEnviar
              */
             UiUpdateUtil.getInstance().startSetUiStream(EUIFromType.SERVER, inputStream, new IUiUpdateListener() {
 
@@ -235,14 +235,14 @@ public class UiUpdateServerActivity extends Activity {
                 @Override
                 public void onUiUpdateProgress(int currentBlock, int sumBlock, int progress) {
                     Logger.t(TAG).i("onUiUpdateProgress:" + currentBlock + "," + sumBlock + "," + progress + "%");
-                    sendProgressTv.setText("发送中：" + progress + "%");
+                    sendProgressTv.setText("Enviar：" + progress + "%");
                 }
 
 
                 @Override
                 public void onUiUpdateSuccess() {
                     Logger.t(TAG).i("onUiUpdateSuccess");
-                    sendProgressTv.setText("设置成功");
+                    sendProgressTv.setText("Configurar");
                 }
 
                 @Override
@@ -262,10 +262,10 @@ public class UiUpdateServerActivity extends Activity {
                         case FILE_LENGTH_NOT_4_POWER:
                             break;
                         case CHECK_CRC_FAIL:
-                            Logger.t(TAG).i("修改表盘失败，crc校验失败");
+                            Logger.t(TAG).i("，crc");
                             break;
                         case APP_CRC_SAME_DEVICE_CRC:
-                            Logger.t(TAG).i("CRC一样，不需要重复发送");
+                            Logger.t(TAG).i("CRC，Enviar");
                             break;
                     }
                 }

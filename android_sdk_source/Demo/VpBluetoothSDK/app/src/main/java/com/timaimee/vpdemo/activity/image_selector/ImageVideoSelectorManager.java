@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
 
 public class ImageVideoSelectorManager {
 
-    private static final String TAG = "图片视频选择器";
+    private static final String TAG = "";
     private int width = 360, height = 360;
     private boolean isCircle = false;
     private WeakReference<AppCompatActivity> activity = null;
@@ -36,8 +36,8 @@ public class ImageVideoSelectorManager {
     }
 
     /**
-     * 启动选择器
-     * 页面初始化的时候调用
+     * 
+     * 
      */
     private void onLaunch(AppCompatActivity activity) {
         this.activity = new WeakReference<>(activity);
@@ -50,8 +50,8 @@ public class ImageVideoSelectorManager {
     }
 
     /**
-     * 释放资源
-     * 页面销毁的时候调用
+     * 
+     * 
      */
     public void onRelease() {
         MediaPickerHelper.getInstance().release();
@@ -65,12 +65,12 @@ public class ImageVideoSelectorManager {
     }
 
     /**
-     * 选择单张图片
+     * 
      *
-     * @param width    宽
-     * @param height   高
-     * @param isCircle 是否为圆形
-     * @param listener 选择监听
+     * @param width    
+     * @param height   
+     * @param isCircle 
+     * @param listener 
      */
     public static void selectSingleImage(int width, int height, boolean isCircle, OnSingleImageSelectionListener listener) {
         MediaPickerHelper.getInstance().setSingleImageSelectionListener(listener);
@@ -105,19 +105,19 @@ public class ImageVideoSelectorManager {
 
     public void selectAndCropSingleImage(OnSingleImageSelectionListener listener) {
         if (!getInstance().isValid()) {
-            listener.onError("请设置有效的长和宽");
+            listener.onError("Configurar");
         }
         MediaPickerHelper.getInstance().setSingleImageSelectionListener(listener);
         MediaPickerHelper.getInstance().pickSingleImage(getInstance().width, getInstance().height, getInstance().isCircle);
     }
 
     /**
-     * 拍照
+     * 
      *
-     * @param width    宽
-     * @param height   高
-     * @param isCircle 是否为圆形
-     * @param listener 拍照监听
+     * @param width    
+     * @param height   
+     * @param isCircle 
+     * @param listener 
      */
     public static void takePhoto(int width, int height, boolean isCircle, OnCameraPhotoListener listener) {
         CameraPhotoHelper.getInstance().takePhoto(width, height, isCircle, listener);
@@ -125,13 +125,13 @@ public class ImageVideoSelectorManager {
 
     public void takePhotoAndCrop(OnCameraPhotoListener listener) {
         if (!isValid()) {
-            listener.onCameraError("请设置有效的长和宽");
+            listener.onCameraError("Configurar");
         }
         CameraPhotoHelper.getInstance().takePhoto(width, height, isCircle, listener);
     }
 
     /**
-     * 页面onActivityResult方法处理
+     * onActivityResult
      */
     public static void handlerActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.t("TAG").e("-handlerActivityResult-: | ");
@@ -140,7 +140,7 @@ public class ImageVideoSelectorManager {
     }
 
     /**
-     * 页面onRequestPermissionsResult方法处理
+     * onRequestPermissionsResult
      */
     public static void handleRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         CameraPhotoHelper.getInstance().handleRequestPermissionsResult(requestCode, permissions, grantResults);

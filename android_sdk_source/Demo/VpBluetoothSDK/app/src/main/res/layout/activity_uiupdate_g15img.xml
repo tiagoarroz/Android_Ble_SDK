@@ -48,7 +48,7 @@
         app:layout_constraintBottom_toBottomOf="@id/ivRed"
         app:layout_constraintLeft_toRightOf="@id/ivRed"
         android:layout_marginStart="20dp"
-        android:text="赛米加G15定制项目个人信息"
+        android:text="Projeto G15: informação pessoal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="@id/ivBlue"
         app:layout_constraintLeft_toRightOf="@id/ivBlue"
         android:layout_marginStart="20dp"
-        android:text="赛米加G15定制项目图片主题1"
+        android:text="Projeto G15: tema de imagem 1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -68,7 +68,7 @@
         app:layout_constraintBottom_toBottomOf="@id/ivGreen"
         app:layout_constraintLeft_toRightOf="@id/ivGreen"
         android:layout_marginStart="20dp"
-        android:text="图片主题2"
+        android:text="Tema de imagem 2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -78,7 +78,7 @@
         app:layout_constraintBottom_toBottomOf="@id/ivPink"
         app:layout_constraintLeft_toRightOf="@id/ivPink"
         android:layout_marginStart="20dp"
-        android:text="下载App二维码信息"
+        android:text="Informação do QR code para download da app"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

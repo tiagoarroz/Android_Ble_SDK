@@ -13,7 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="消息通知设置"
+            android:text="Configuração de notificações"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </RelativeLayout>
@@ -25,7 +25,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:gravity="center"
-        android:text="下班了，早点回家睡觉吧"
+        android:text="Fim do trabalho. Vá para casa descansar."
         android:textColor="@color/colorAccent" />
 
     <GridView

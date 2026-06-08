@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description ECG多导测量页面
+ * Description ECG
  *
  * @author KYM.
  * @date 2023/11/2 15:55
@@ -41,12 +41,12 @@ public class EcgMultiLeadDetect1Activity extends Activity implements View.OnClic
     private int allLeadOffCount = 0;
 
     /**
-     * 测量秒数
+     * 
      */
     private int detectSeconds = 0;
 
     /**
-     * 连续导联脱落次数
+     * 
      */
     private int leadOffCount = 0;
 
@@ -96,14 +96,14 @@ public class EcgMultiLeadDetect1Activity extends Activity implements View.OnClic
                 public void onEcgDetectSuccess() {
                     isDetecting = false;
                     Log.e("Test", "onEcgDetectSuccess");
-                    Toast.makeText(EcgMultiLeadDetect1Activity.this, "测量成功", Toast.LENGTH_LONG).show();
+                    Toast.makeText(EcgMultiLeadDetect1Activity.this, "", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onEcgDetectPreInfoChange(EcgMultiLeadPreInfo ecgDetectInfo) {
                     Log.e("Test", "onEcgDetectPreInfoChange:" + ecgDetectInfo.toString());
                     if (isDetecting) {
-                        tvInfo.setText("正在测量中...");
+                        tvInfo.setText("...");
                     }
                     detectSeconds = 0;
                 }
@@ -113,21 +113,21 @@ public class EcgMultiLeadDetect1Activity extends Activity implements View.OnClic
                     Log.e("Test", "onEcgDetectStateChange:" + ecgDetectState.toString());
                     tvProgress.setText(ecgDetectState.getProgress() + "%");
                     if (isDetecting) {
-                        tvInfo.setText("正在测量中...\n心率:" + ecgDetectState.getHeart() + "   QT:" + ecgDetectState.getQt() + "   HRV:" + ecgDetectState.getHrv());
+                        tvInfo.setText("...\nFrequência cardíaca:" + ecgDetectState.getHeart() + "   QT:" + ecgDetectState.getQt() + "   HRV:" + ecgDetectState.getHrv());
                     }
                     detectSeconds++;
 
-                    //前4秒不管脱落问题
+                    //4
                     if (detectSeconds > 4) {
-                        //始测量4秒后，如果I导联不脱落继续测量；I导联脱落全部脱落;
+                        //4，I；I;
                         if (ecgDetectState.getLeadI() == 1) {
-                            tvInfo.setText("导联脱落");
+                            tvInfo.setText("");
                             leadOffCount++;
-                            //4秒后如果脱落次数连续超过4次，则判断脱落
+                            //44，
                             if (leadOffCount > 4) {
                                 isDetecting = false;
                                 VPOperateManager.getInstance().stopMultiLeadDetectECG(writeResponse);
-                                tvInfo.setText("导联脱落，测量结束");
+                                tvInfo.setText("，Terminar");
                             }
                         } else {
                             leadOffCount = 0;
@@ -139,14 +139,14 @@ public class EcgMultiLeadDetect1Activity extends Activity implements View.OnClic
                 @Override
                 public void onDiseaseDiagnosisResults(EcgMultiLeadDetectResult ecgDetectResult) {
                     Log.e("Test", "onEcgDetectResultChange:" + ecgDetectResult.toString());
-                    tvInfo.setText("疾病诊断结果!\n平均心率:" + ecgDetectResult.getAvgHeart() + "   平均QT:" + ecgDetectResult.getAvgQT() + "   平均HRV:" + ecgDetectResult.getAvgHRV());
+                    tvInfo.setText("!\nFrequência cardíaca:" + ecgDetectResult.getAvgHeart() + "   QT:" + ecgDetectResult.getAvgQT() + "   HRV:" + ecgDetectResult.getAvgHRV());
                 }
 
                 @Override
                 public void onEcgDetectFail() {
                     isDetecting = false;
                     Log.e("Test", "onEcgDetectFail");
-                    tvInfo.setText("测量失败");
+                    tvInfo.setText("");
                 }
 
                 @Override
@@ -167,7 +167,7 @@ public class EcgMultiLeadDetect1Activity extends Activity implements View.OnClic
     }
 
     /**
-     * 写入的状态返回
+     * estado
      */
     class WriteResponse implements IBleWriteResponse {
 

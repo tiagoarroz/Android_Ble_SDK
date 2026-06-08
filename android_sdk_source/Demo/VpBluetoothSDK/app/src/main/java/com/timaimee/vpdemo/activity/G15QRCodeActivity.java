@@ -67,12 +67,12 @@ public class G15QRCodeActivity extends AppCompatActivity {
             }, qrCode, new IG15QRCodeSendListener() {
                 @Override
                 public void onG15QRCodeSendSuccess() {
-                    Toast.makeText(G15QRCodeActivity.this, "二维码发送成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(G15QRCodeActivity.this, "Enviar", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onG15QRCodeSendFailed() {
-                    Toast.makeText(G15QRCodeActivity.this, "二维码发送失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(G15QRCodeActivity.this, "Enviar", Toast.LENGTH_SHORT).show();
                 }
             });
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class G15QRCodeActivity extends AppCompatActivity {
         String qrGroup = etGroup.getText().toString().trim();
         try {
             G15QRCode qrCode = new G15QRCode(checkType, qrContent, qrName, qrGroup, qrNumber);
-            VPLogger.e("二维码：" + qrCode.toString());
+            VPLogger.e("：" + qrCode.toString());
             return qrCode;
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

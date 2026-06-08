@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="个人目标"
+            android:text="Objetivo pessoal"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -41,7 +41,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="性别:" />
+            android:text="Sexo:" />
 
         <RadioGroup
             android:id="@+id/aimsportcalc_person_sex"
@@ -57,13 +57,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="男" />
+                android:text="Masculino" />
 
             <RadioButton
                 android:id="@+id/aimsportcalc_person_sexw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="女" />
+                android:text="Feminino" />
         </RadioGroup>
 
     </LinearLayout>
@@ -79,7 +79,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="个人身高(cm):" />
+            android:text="Altura (cm):" />
 
         <EditText
             android:id="@+id/aimsportcalc_person_height"
@@ -103,7 +103,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="个人体重(kg):" />
+            android:text="Peso (kg):" />
 
         <EditText
             android:id="@+id/aimsportcalc_person_weight"
@@ -127,7 +127,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="步行步数:" />
+            android:text="Passos de caminhada:" />
 
         <EditText
             android:id="@+id/aimsportcalc_steps"
@@ -146,7 +146,7 @@
         android:layout_width="wrap_content"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
-        android:text="更新" />
+        android:text="Atualizar" />
 
     <ScrollView
         android:layout_width="match_parent"

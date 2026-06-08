@@ -15,8 +15,8 @@
             android:id="@+id/et_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="请输入闹钟文字"
-            android:text="大郎，该吃药了 @^_^@" />
+            android:hint="alarme"
+            android:text="Hora da medicação @^_^@" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
                 android:id="@+id/et_hour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="请输入小时"
+                android:hint=""
                 android:inputType="number"
                 android:textAlignment="textEnd" />
 
@@ -44,13 +44,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:hint="请输入分钟" />
+                android:hint="" />
 
             <Button
                 android:id="@+id/btn_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="添加闹钟" />
+                android:text="Adicionaralarme" />
         </LinearLayout>
 
 

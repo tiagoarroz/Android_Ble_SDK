@@ -23,18 +23,18 @@ public class FunctionSwitchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_function_swtich);
         tv = findViewById(R.id.tv);
         if (OperaterActivity.des != null) {
-            tv.setText(OperaterActivity.des + "::::" + (OperaterActivity.currentState == EFunctionStatus.SUPPORT_OPEN ? "开" : "关"));
+            tv.setText(OperaterActivity.des + "::::" + (OperaterActivity.currentState == EFunctionStatus.SUPPORT_OPEN ? "" : ""));
         }
         VPOperateManager.getInstance().setDeviceFunctionStatusChangeListener(new IDeviceFunctionStatusChangeListener() {
             @Override
             public void onFunctionStatusChanged(@NotNull DeviceFunction function, @NotNull EFunctionStatus status) {
-                VPLogger.e("未设置设备功能状态改变监听：" + function.getDes() + " - " + status);
+                VPLogger.e("Configurardispositivofuncionalidadeestado：" + function.getDes() + " - " + status);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         OperaterActivity.currentState = status;
                         OperaterActivity.des = function.getDes();
-                        tv.setText(OperaterActivity.des + "::::" + (OperaterActivity.currentState == EFunctionStatus.SUPPORT_OPEN ? "开" : "关"));
+                        tv.setText(OperaterActivity.des + "::::" + (OperaterActivity.currentState == EFunctionStatus.SUPPORT_OPEN ? "" : ""));
                     }
                 });
             }

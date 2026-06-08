@@ -64,7 +64,7 @@ public class HealthRemindActivity extends AppCompatActivity implements HealthRem
 
     @Override
     public void functionNotSupport() {
-        showMsg("暂不支持该功能");
+        showMsg("funcionalidade");
     }
 
     @Override
@@ -77,17 +77,17 @@ public class HealthRemindActivity extends AppCompatActivity implements HealthRem
 
     @Override
     public void onHealthRemindSettingSuccess(@NotNull HealthRemind healthRemind) {
-        showMsg("设置成功：" + healthRemind.toString());
+        showMsg("Configurar：" + healthRemind.toString());
     }
 
     @Override
     public void onHealthRemindReadFailed() {
-        showMsg("读取失败");
+        showMsg("Ler");
     }
 
     @Override
     public void onHealthRemindSettingFailed(@NotNull HealthRemindType healthRemindType) {
-        showMsg("设置失败:" + healthRemindType.getDes());
+        showMsg("Configurar:" + healthRemindType.getDes());
     }
 
     public void showMsg(String msg) {
@@ -96,12 +96,12 @@ public class HealthRemindActivity extends AppCompatActivity implements HealthRem
 
     @Override
     public void onHealthRemindReport(@NotNull HealthRemind healthRemind) {
-        showMsg("健康提醒上报:" + healthRemind.toString());
+        showMsg(":" + healthRemind.toString());
     }
 
     @Override
     public void onHealthRemindReportFailed() {
-        showMsg("健康提醒上报:failed" );
+        showMsg(":failed" );
     }
 
     @Override

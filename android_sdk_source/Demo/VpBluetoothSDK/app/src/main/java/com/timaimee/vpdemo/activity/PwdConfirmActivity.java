@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.inuker.bluetooth.library.Code;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.ICustomSettingDataListener;
@@ -39,7 +40,7 @@ import com.veepoo.protocol.model.settings.CustomSettingData;
 
 public class PwdConfirmActivity extends AppCompatActivity {
 
-    private static final String TAG = "-密码校验-";
+    private static final String TAG = "-Validação de palavra-passe-";
 
     private EditText etPassword;
     private ScrollView svInfo;
@@ -57,6 +58,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_pwd_confirm);
+        DemoStepLogger.stepStart("PWD_SCREEN_INIT", "Arranque do ecrã de validação de password");
         isOadModel = getIntent().getBooleanExtra("isoadmodel", false);
         deviceaddress = getIntent().getStringExtra("deviceaddress");
 
@@ -68,7 +70,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
         svInfo = findViewById(R.id.svInfo);
         tvDeviceInfo = findViewById(R.id.tvDeviceInfo);
         rgConnectConfirm = findViewById(R.id.rgConnectConfirm);
-        VPOperateManager.getInstance().setDeviceShowConfirm(true);//默认弹
+        VPOperateManager.getInstance().setDeviceShowConfirm(true);//
         rgConnectConfirm.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -109,28 +111,37 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 toFunctionTestPager();
             }
         });
+        DemoStepLogger.stepSuccess("PWD_SCREEN_INIT", "Ecrã de validação preparado; pronto para autenticar");
     }
 
+    /**
+     * Executa o handshake obrigatório de password com o dispositivo.
+     * Este passo também devolve as capacidades suportadas para orientar os testes seguintes.
+     */
     private void confirmPassword() {
         String password = etPassword.getText().toString().trim();
         if (password.isEmpty()) {
-            Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Introduzir palavra-passe", Toast.LENGTH_SHORT).show();
+            DemoStepLogger.stepError("PWD_VALIDATE", "Tentativa sem password");
             return;
         }
 
+        DemoStepLogger.stepStart("PWD_VALIDATE", "Envio de password e recolha de capacidades do dispositivo");
         btnConfirm.setEnabled(false);
         btn2Function.setEnabled(false);
         sb.setLength(0);
         tvDeviceInfo.setText("");
-        tvPwdInfo.setText("正在验证密码...");
+        tvPwdInfo.setText("A validar palavra-passe...");
         VPOperateManager.getInstance().confirmDevicePwd(new IBleWriteResponse() {
             @Override
             public void onResponse(int code) {
                 if (code == Code.REQUEST_SUCCESS) {
-                    tvPwdInfo.setText("密码校验指令写入成功");
+                    tvPwdInfo.setText("Validação de palavra-passe");
+                    DemoStepLogger.featureEvent("PWD_VALIDATE", "Comando de validação escrito com sucesso");
                 } else {
-                    tvPwdInfo.setText("密码校验指令写入失败");
+                    tvPwdInfo.setText("Validação de palavra-passe");
                     btn2Function.setEnabled(false);
+                    DemoStepLogger.stepError("PWD_VALIDATE", "Falha ao escrever comando de validação. code=" + code);
                 }
             }
         }, new IPwdDataListener() {
@@ -141,13 +152,15 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 deviceNumber = pwdData.getDeviceNumber();
                 deviceVersion = pwdData.getDeviceVersion();
                 deviceTestVersion = pwdData.getDeviceTestVersion();
-                sb.append("设备号：").append(deviceNumber).append(",版本号：").append(deviceVersion).append(", 测试版本号：").append(deviceTestVersion);
+                sb.append("dispositivo：").append(deviceNumber).append(",：").append(deviceVersion).append(", ：").append(deviceTestVersion);
+                DemoStepLogger.stepSuccess("PWD_VALIDATE", "Password validada e metadata do dispositivo recebida");
             }
 
             @Override
             public void onConnectionConfirmTimeout() {
-                tvPwdInfo.setText("错误:连接确认超时");
+                tvPwdInfo.setText("Erro: tempo de confirmação de ligação esgotado");
                 btn2Function.setEnabled(false);
+                DemoStepLogger.stepError("PWD_VALIDATE", "Timeout de confirmação no dispositivo");
             }
         }, new IDeviceFuctionDataListener() {
             @Override
@@ -165,53 +178,54 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 contactMsgLength = functionSupport.getContactMsgLength();
                 allMsgLenght = functionSupport.getAllMsgLength();
                 isSleepPrecision = functionSupport.getPrecisionSleep() == SUPPORT;
+                DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Pacote principal de capacidades recebido");
             }
 
             @Override
             public void onDeviceFunctionPackage1Report(DeviceFunctionPackage1 functionPackage1) {
-                String message = "【功能第1包】:\n" + functionPackage1.toString();
+                String message = "funcionalidade1:\n" + functionPackage1.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onDeviceFunctionPackage2Report(DeviceFunctionPackage2 functionPackage2) {
-                String message = "【功能第2包】:\n" + functionPackage2.toString();
+                String message = "funcionalidade2:\n" + functionPackage2.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onDeviceFunctionPackage3Report(DeviceFunctionPackage3 functionPackage3) {
-                String message = "【功能第3包】:\n" + functionPackage3.toString();
+                String message = "funcionalidade3:\n" + functionPackage3.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onDeviceFunctionPackage4Report(DeviceFunctionPackage4 functionPackage4) {
-                String message = "【功能第4包】:\n" + functionPackage4.toString();
+                String message = "funcionalidade4:\n" + functionPackage4.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onDeviceFunctionPackage5Report(DeviceFunctionPackage5 functionPackage5) {
-                String message = "【功能第5包】:\n" + functionPackage5.toString();
+                String message = "funcionalidade5:\n" + functionPackage5.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
         }, new ISocialMsgDataListener() {
             @Override
             public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
-                String message = "【消息开关第1包】:\n" + socailMsgData.toString();
+                String message = "1:\n" + socailMsgData.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
-                String message = "【消息开关第2包】:\n" + socailMsgData.toString();
+                String message = "2:\n" + socailMsgData.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -220,11 +234,12 @@ public class PwdConfirmActivity extends AppCompatActivity {
             public void OnSettingDataChange(CustomSettingData customSettingData) {
                 btnConfirm.setEnabled(true);
                 btn2Function.setEnabled(true);
-                String message = "【开关设置】:\n" + customSettingData.toString();
+                String message = "Configurar:\n" + customSettingData.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                DemoStepLogger.stepSuccess("PWD_VALIDATE", "Handshake concluído; botões de teste desbloqueados");
             }
-        }, "0000", true);
+        }, password, true);
     }
 
     private void appendDeviceInfo1(String msg) {
@@ -240,7 +255,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             String line = "########################";
             String coloredLine = "<font color='#0000FF' size='16'>" + line + "</font>";
-            String styledMsg = msg.replaceAll("【([^】]+)】", "<font color='#FF0000'><b>【$1】</b></font>");
+            String styledMsg = msg.replaceAll("([^]+)", "<font color='#FF0000'><b>$1</b></font>");
             sb.append("\n").append(coloredLine);
             sb.append("\n").append(styledMsg).append("\n");
             tvDeviceInfo.setText(android.text.Html.fromHtml(sb.toString()));
@@ -258,11 +273,12 @@ public class PwdConfirmActivity extends AppCompatActivity {
     private String deviceaddress = "";
 
     private void toFunctionTestPager() {
+        DemoStepLogger.stepStart("OPERATE_SCREEN_OPEN", "Pedido de entrada no ecrã de funcionalidades");
         new AlertDialog.Builder(this)
-                .setTitle("是否跳转功能测试页面")
-                .setMessage("【注意】：测试设备功能时，只有当前设备【支持该功能】才能测试，功能支持与否请参考【IDeviceFuctionDataListener】的功能回调接口")
-                .setPositiveButton("确定", (dialog, which) -> {
-                    // 点击确定后要做的事
+                .setTitle("Ir para teste de funcionalidades")
+                .setMessage("Nota: só pode testar funcionalidades suportadas pelo dispositivo atual. Confirme o suporte nos callbacks de IDeviceFuctionDataListener.")
+                .setPositiveButton("Confirmar", (dialog, which) -> {
+                    // Confirmar
                     Intent intent = new Intent(this, OperaterActivity.class);
                     intent.putExtra("password_confirmed", true);
                     intent.putExtra("deviceNumber", deviceNumber);
@@ -277,14 +293,15 @@ public class PwdConfirmActivity extends AppCompatActivity {
                     intent.putExtra("isOadModel", isOadModel);
                     intent.putExtra("deviceaddress", deviceaddress);
                     startActivity(intent);
+                    DemoStepLogger.stepSuccess("OPERATE_SCREEN_OPEN", "Transição para OperaterActivity concluída");
                     dialog.dismiss();
                     finish();
                 })
-                .setNegativeButton("取消", (dialog, which) -> {
-                    // 点击取消后要做的事
+                .setNegativeButton("Cancelar", (dialog, which) -> {
+                    // Cancelar
                     dialog.dismiss();
                 })
-                .setCancelable(true) // 点击空白是否能关闭
+                .setCancelable(true) // Desativar
                 .show();
     }
 }

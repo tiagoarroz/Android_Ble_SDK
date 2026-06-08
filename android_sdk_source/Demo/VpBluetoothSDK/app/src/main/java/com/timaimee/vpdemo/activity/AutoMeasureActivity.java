@@ -34,7 +34,7 @@ public class AutoMeasureActivity extends AppCompatActivity implements IAutoMeasu
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().hide(); // 隐藏ActionBar
+            getSupportActionBar().hide(); // ActionBar
         }
         setContentView(R.layout.activity_auto_measure);
         initView();
@@ -77,12 +77,12 @@ public class AutoMeasureActivity extends AppCompatActivity implements IAutoMeasu
 
     @Override
     public void onSettingDataChangeFail() {
-        showMsg("设置失败");
+        showMsg("Configurar");
     }
 
     @Override
     public void onSettingDataChangeSuccess() {
-        showMsg("设置成功");
+        showMsg("Configurar");
         adapter.notifyDataSetChanged();
     }
 

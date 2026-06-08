@@ -63,7 +63,7 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             @Override
             public void onClick(View v) {
                 if (mListData != null && mListData.size() >= 10) {
-                    showMsg("联系人已超过十个。（已满）");
+                    showMsg("Contactos（）");
                     return;
                 }
                 Intent intent = new Intent(ContactActivity.this, AddContactActivity.class);
@@ -85,7 +85,7 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             @Override
             public void onClick(View v) {
                 if (!isHasRead) {
-                    ToastUtil.show("请先读取更新联系人");
+                    ToastUtil.show("LerAtualizarContactos");
                     return;
                 }
                 int canAddSize = 10 - mListData.size();
@@ -93,12 +93,12 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
                 if (canAddSize > 0) {
                     List<Contact> canAddList = new ArrayList<>();
                     for (int i = 0; i < canAddSize; i++) {
-                        Contact contact = new Contact(idValue + i, "批量添加" + i, "110" + i, false, contactType == 2);
+                        Contact contact = new Contact(idValue + i, "Adicionar" + i, "110" + i, false, contactType == 2);
                         canAddList.add(contact);
                     }
                     VPOperateManager.getInstance().addContactList(canAddList, ContactActivity.this, response);
                 } else {
-                    ToastUtil.show("联系人已加满");
+                    ToastUtil.show("Contactos");
                 }
             }
         });
@@ -106,7 +106,7 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
         findViewById(R.id.tvRefresh).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.show("刷新");
+                ToastUtil.show("Atualizar");
                 VPOperateManager.getInstance().readContact(-1, ContactActivity.this, response);
             }
         });
@@ -114,10 +114,10 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             @Override
             public void onClick(View v) {
                 if (mListData.isEmpty()) {
-                    ToastUtil.show("列表为空");
+                    ToastUtil.show("");
                     return;
                 }
-                ToastUtil.show("删除全部");
+                ToastUtil.show("Eliminar");
                 VPOperateManager.getInstance().deleteContactList(mListData, ContactActivity.this, response);
             }
         });
@@ -150,22 +150,22 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
     ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            //首先回调的方法 返回int表示是否监听该方向
-            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;//拖拽
-            //int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;//侧滑删除
+            // int
+            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;//
+            //int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;//Eliminar
             return makeMovementFlags(dragFlags, 0);
         }
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            //侧滑事件
+            //
             mListData.remove(viewHolder.getAdapterPosition());
             mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
         }
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            //滑动事件
+            //
             int adapterPosition = viewHolder.getAdapterPosition();
             int targetAdapterPosition = target.getAdapterPosition();
             if (mFirstAdapterPosition == -1) {
@@ -201,26 +201,26 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
 
     @Override
     public void onContactOptSuccess(@NotNull EContactOpt opt, int crc) {
-        Logger.t(TAG).e("联系人操作成功：" + opt + " crc = " + crc);
-        showMsg("联系人操作成功：" + opt + " crc = " + crc);
+        Logger.t(TAG).e("Contactos：" + opt + " crc = " + crc);
+        showMsg("Contactos：" + opt + " crc = " + crc);
 //        VPOperateManager.getInstance().readContact(-1, this, response);
     }
 
     @Override
     public void onContactOptFailed(@NotNull EContactOpt opt) {
-        Logger.t(TAG).e("联系人操作失败：" + opt);
+        Logger.t(TAG).e("Contactos：" + opt);
 //        VPOperateManager.getInstance().readContact(-1, this, response);
     }
 
     @Override
     public void onContactReadSuccess(@NotNull List<Contact> contactList) {
-        Logger.t(TAG).e("读取联系人成功：" + contactList.size());
+        Logger.t(TAG).e("LerContactos：" + contactList.size());
         isHasRead = true;
         if (mListData == null) {
             mListData = new ArrayList<>();
         }
         for (Contact contact : contactList) {
-            Logger.t(TAG).d("读取联系人：" + contact.toString());
+            Logger.t(TAG).d("LerContactos：" + contact.toString());
         }
         mListData.clear();
         mListData.addAll(contactList);
@@ -235,14 +235,14 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
     @Override
     public void onContactReadASSameCRC() {
         isHasRead = true;
-        Logger.t(TAG).e("读取联系人，但CRC值一致，设备端和app端联系人列表一致(包括设备端没有数据)，无需重复读取");
-        showMsg("读取联系人，但CRC值一致，设备端和app端联系人列表一致，无需重复读取");
+        Logger.t(TAG).e("LerContactos，CRC，dispositivoappContactos(dispositivodados)，Ler");
+        showMsg("LerContactos，CRC，dispositivoappContactos，Ler");
     }
 
     @Override
     public void onContactReadFailed() {
-        Logger.t(TAG).e("读取联系失败");
-        showMsg("读取联系失败");
+        Logger.t(TAG).e("Ler");
+        showMsg("Ler");
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             contact.setSettingSOS(!contact.isSettingSOS());
             contact.setSupportSOS(true);
             mAdapter.notifyDataSetChanged();
-            Toast.makeText(this, "点击了第" + realPosition + "行SOS ->" + contact, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "" + realPosition + "SOS ->" + contact, Toast.LENGTH_SHORT).show();
             VPOperateManager.getInstance().setContactSOSState(contact.isSettingSOS(), contact, this, response);
             //saveContact();
         } else {
@@ -264,9 +264,9 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             mAdapter.notifyDataSetChanged();
 //            ContactHandler.Companion.getInstance().deleteContactList(position + 1);
             /**
-             * 删除联系人建议删除的时候 弹出加载框，成功或失败的时候再关闭加载框。防止多次快速去点击删除 导致删除失败
+             * EliminarContactosEliminar ，DesativarEliminar Eliminar
              */
-            ToastUtil.show("删除联系人建议删除的时候 弹出加载框，成功或失败的时候再关闭加载框。防止多次快速去点击删除 导致删除失败。 删除id = " + contact.getContactID());
+            ToastUtil.show("EliminarContactosEliminar ，DesativarEliminar Eliminar Eliminarid = " + contact.getContactID());
             VPOperateManager.getInstance().deleteContact(contact, this, response);
         }
     }
@@ -293,7 +293,7 @@ public class ContactActivity extends AppCompatActivity implements IContactOptLis
             String name = data.getStringExtra("name");
             String phoneNumber = data.getStringExtra("phoneNumber");
             if (TextUtils.isEmpty(name) || TextUtils.isEmpty(phoneNumber)) {
-                showMsg("联系信息不能为空");
+                showMsg("");
                 return;
             }
             int idValue = mListData.size() + 1;

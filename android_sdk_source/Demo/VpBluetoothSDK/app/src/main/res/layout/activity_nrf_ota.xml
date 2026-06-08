@@ -11,7 +11,7 @@
         android:background="#000"
         android:gravity="center"
         android:padding="10dp"
-        android:text="固件升级"
+        android:text="Atualização de firmware"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="升级文件路径：（此处用户自行修改）"
+        android:text="Caminho do ficheiro de atualização：（）"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="升级进度：0%"
+        android:text="Progresso da atualização：0%"
         android:textColor="@color/real_red"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -48,7 +48,7 @@
         android:layout_marginTop="20dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
-        android:text="开始升级"
+        android:text="Iniciar atualização"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUpgradeInfo" />

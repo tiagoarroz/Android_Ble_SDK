@@ -42,7 +42,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class TextImagePushActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String TAG = "-图文推送-";
+    private static final String TAG = "-Envio de texto e imagem-";
 
     EditText etSendContent;
     Button btnPushText;
@@ -119,7 +119,7 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
                     selectImage = "image_push_02.png";
                 }
                 pushImagePath = imageMsgPushDirPath + File.separator + selectImage;
-                tvPushInfo.setText("图片本地地址：\n" + pushImagePath);
+                tvPushInfo.setText("：\n" + pushImagePath);
             }
         });
 
@@ -127,7 +127,7 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onClick(View v) {
                 if (uiDataImage == null) {
-                    showMsg("手表尺寸无法获取");
+                    showMsg("");
                     return;
                 }
                 String widthStr = etWidth.getText().toString();
@@ -142,7 +142,7 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
     }
 
     private void selectAndCropPicture(int aspectRatioX, int aspectRatioY) {
-        Logger.t(TAG).i("selectAndCropPicture 选择和裁剪照片 aspectRatioX = " + aspectRatioX + " , aspectRatioY = " + aspectRatioY);
+        Logger.t(TAG).i("selectAndCropPicture  aspectRatioX = " + aspectRatioX + " , aspectRatioY = " + aspectRatioY);
         ImageVideoSelectorManager
                 .getInstance()
                 .width(aspectRatioX)
@@ -183,9 +183,9 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
         File targetDir = new File(externalFilesDir, SUB_PATH);
         if (!targetDir.exists()) {
             boolean ret = targetDir.mkdirs();
-            Logger.t(TAG).e("-文件夹-: | " + ret);
+            Logger.t(TAG).e("--: | " + ret);
         }
-        Logger.t(TAG).e("-文件夹-: | >>" + targetDir.getAbsolutePath());
+        Logger.t(TAG).e("--: | >>" + targetDir.getAbsolutePath());
 
         imageMsgPushDirPath = targetDir.getAbsolutePath();
         UiUpdateUtil.getInstance().init(this);
@@ -193,7 +193,7 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onBaseUiInfoFormImagePush(UIDataImagePush uiDataImage) {
                 TextImagePushActivity.this.uiDataImage = uiDataImage;
-                Logger.t(TAG).e("-获取图片推送信息-: | " + uiDataImage);
+                Logger.t(TAG).e("--: | " + uiDataImage);
                 int width = uiDataImage.getWidth();
                 int height = uiDataImage.getHeight();
                 etWidth.setText(width + "");
@@ -211,7 +211,7 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
                         ImageUtils.centerCropAndSave(imageMsgPushDirPath + File.separator + "img_push2.jpg",
                                 imageMsgPushDirPath + File.separator + "image_push_02.png", width, height);
 
-                        Logger.t(TAG).e("-copyImage2Local-: | 文件夹路径 = " + imageMsgPushDirPath);
+                        Logger.t(TAG).e("-copyImage2Local-: |  = " + imageMsgPushDirPath);
                         runOnUiThread(() -> {
                             imagePush01.setImageBitmap(BitmapFactory.decodeFile(imageMsgPushDirPath + File.separator + "image_push_01.png"));
                             imagePush02.setImageBitmap(BitmapFactory.decodeFile(imageMsgPushDirPath + File.separator + "image_push_02.png"));
@@ -235,49 +235,49 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
         if (v.getId() == R.id.btnPushText) {
             String content = etSendContent.getText().toString();
             if (TextUtils.isEmpty(content)) {
-                showMsg("内容不能为空");
+                showMsg("");
                 return;
             }
-            tvPushInfo.setText("开始文本推送");
+            tvPushInfo.setText("Iniciar");
             VPOperateManager.getInstance().pushTextMsg(content, new BleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
                     if (code != Code.REQUEST_SUCCESS) {
-                        tvPushInfo.setText("蓝牙数据发送失败");
+                        tvPushInfo.setText("dadosEnviar");
                     }
                 }
             }, new ITextMsgPushListener() {
                 @Override
                 public void onTextMsgPushSuccess() {
-                    tvPushInfo.setText("文本推送成功");
+                    tvPushInfo.setText("");
                 }
 
                 @Override
                 public void onTextMsgPushFailed() {
-                    tvPushInfo.setText("文本推送失败");
+                    tvPushInfo.setText("");
                 }
 
                 @Override
                 public void onFunctionNotSupport() {
-                    tvPushInfo.setText("不支持该功能");
+                    tvPushInfo.setText("funcionalidade");
                 }
             });
         } else if (v.getId() == R.id.btnPushImage) {
-            tvPushInfo.setText("开始图片推送");
+            tvPushInfo.setText("Iniciar");
             VPOperateManager.getInstance().pushImageMsg(pushImagePath, new IImageMsgPushListener() {
                 @Override
                 public void onImageMsgPushSuccess() {
-                    tvPushInfo.setText("图片推送成功");
+                    tvPushInfo.setText("");
                 }
 
                 @Override
                 public void onImageMsgPushProgress(int currentBlock, int sumBlock, int progress) {
-                    tvPushInfo.setText("图片推送进度：" + progress + "%");
+                    tvPushInfo.setText("：" + progress + "%");
                 }
 
                 @Override
                 public void onImageMsgPushFailed(ErrorCode errorCode) {
-                    tvPushInfo.setText("图片推送错误：" + errorCode.info);
+                    tvPushInfo.setText("：" + errorCode.info);
                 }
             });
         }
@@ -285,43 +285,43 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
 
 
     /**
-     * 将 Assets 目录下的指定文件复制到应用的外部私有文件目录下的指定子路径。
-     * * @param context 上下文对象，用于访问 Assets 和文件系统。
+     *  Assets 
+     * * @param context ， Assets 
      *
-     * @param assetFileName Assets 目录下的文件名（例如："my_image.png"）。
-     * @param subPath       目标子路径（例如："hband/jlDail"）。
-     * @return 复制成功后的目标文件的绝对路径，如果复制失败则返回 null。
+     * @param assetFileName Assets （："my_image.png"）
+     * @param subPath       （："hband/jlDail"）
+     * @return ， null
      */
     public static String copyAssetFileToExternalFilesDir(
             Context context,
             String assetFileName,
             String subPath) {
 
-        // 1. 获取外部私有文件根目录（路径如：/storage/.../Android/data/包名/files）
+        // 1. （：/storage/.../Android/data//files）
         File filesDir = context.getExternalFilesDir(null);
         if (filesDir == null) {
-            // Log.e(TAG, "无法获取外部私有文件目录。");
+            // Log.e(TAG, "");
             return null;
         }
 
-        // 2. 构建目标目录
+        // 2. 
         File targetDir = new File(filesDir, subPath);
         if (!targetDir.exists()) {
-            // 尝试创建所有必要的目录
+            // 
             if (!targetDir.mkdirs()) {
-                // Log.e(TAG, "无法创建目标目录: " + targetDir.getAbsolutePath());
+                // Log.e(TAG, ": " + targetDir.getAbsolutePath());
                 return null;
             }
         }
 
-        // 3. 构建目标文件
+        // 3. 
         File targetFile = new File(targetDir, assetFileName);
 
-        // 使用 try-with-resources 确保流的自动关闭
+        //  try-with-resources Desativar
         try (InputStream inputStream = context.getAssets().open(assetFileName);
              OutputStream outputStream = new FileOutputStream(targetFile)) {
 
-            // 4. 读取 Assets 流，并写入到目标文件流
+            // 4. Ler Assets ，
             byte[] buffer = new byte[1024];
             int read;
             while ((read = inputStream.read(buffer)) != -1) {
@@ -329,13 +329,13 @@ public class TextImagePushActivity extends AppCompatActivity implements View.OnC
             }
             outputStream.flush();
 
-            // Log.i(TAG, "文件复制成功到: " + targetFile.getAbsolutePath());
+            // Log.i(TAG, ": " + targetFile.getAbsolutePath());
             return targetFile.getAbsolutePath();
 
         } catch (IOException e) {
-            // Log.e(TAG, "复制 Assets 文件失败: " + assetFileName, e);
+            // Log.e(TAG, " Assets : " + assetFileName, e);
             e.printStackTrace();
-            return null; // 复制失败
+            return null; // 
         }
     }
 

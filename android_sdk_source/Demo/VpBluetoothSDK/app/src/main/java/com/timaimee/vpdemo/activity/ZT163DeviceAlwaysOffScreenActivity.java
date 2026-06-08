@@ -37,21 +37,21 @@ public class ZT163DeviceAlwaysOffScreenActivity extends AppCompatActivity implem
 
     @Override
     public void onZT163DeviceAlwaysOffScreenSettingSuccess(boolean isOpen) {
-        tvInfo.setText("设置成功：" + (isOpen?"开启":"关闭"));
+        tvInfo.setText("Configurar：" + (isOpen?"Ativar":"Desativar"));
     }
 
     @Override
     public void onZT163DeviceAlwaysOffScreenSettingFailed() {
-        tvInfo.setText("设置失败" );
+        tvInfo.setText("Configurar" );
     }
 
     @Override
     public void onZT163DeviceAlwaysOffScreenReport(boolean isOpen) {
-        tvInfo.setText("读取上报成功成功：" + (isOpen?"开启":"关闭"));
+        tvInfo.setText("Ler：" + (isOpen?"Ativar":"Desativar"));
     }
 
     @Override
     public void onFunctionNotSupport() {
-        tvInfo.setText("当前设备不支持改功能" );
+        tvInfo.setText("dispositivofuncionalidade" );
     }
 }

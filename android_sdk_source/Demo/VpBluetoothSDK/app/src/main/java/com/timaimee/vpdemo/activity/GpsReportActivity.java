@@ -46,7 +46,7 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
     TextView mResultTv;
 
     /**
-     * 写入的状态返回
+     * estado
      */
     static class WriteResponse implements IBleWriteResponse {
 
@@ -65,12 +65,12 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
         mResultTv = findViewById(R.id.result);
         mContext = getApplicationContext();
 
-        //获取地图控件引用
+        //
         mMapView = (MapView) findViewById(R.id.map);
-        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
+        //activityonCreatemMapView.onCreate(savedInstanceState)，
         mMapView.onCreate(savedInstanceState);
 
-        //初始化地图控制器对象
+        //
         if (aMap == null) {
             aMap = mMapView.getMap();
             setUpMap();
@@ -88,7 +88,7 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
         VPOperateManager.getMangerInstance(mContext).setReportGps(writeResponse, true, new IReportGpsDataListener() {
             @Override
             public void onReportGpsDataDataChange(ReportGpsLatLongData reportGpsLatLongData) {
-                String message = "打开Gps上传:" + reportGpsLatLongData.toString();
+                String message = "AtivarGps:" + reportGpsLatLongData.toString();
                 mResultTv.setText(message);
                 addPolyline(new LatLng(reportGpsLatLongData.getLat(), reportGpsLatLongData.getLon()));
                 Logger.t(TAG).i(message);
@@ -100,7 +100,7 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
         VPOperateManager.getMangerInstance(mContext).setReportGps(writeResponse, false, new IReportGpsDataListener() {
             @Override
             public void onReportGpsDataDataChange(ReportGpsLatLongData reportGpsLatLongData) {
-                String message = "关闭Gps上传:" + reportGpsLatLongData.toString();
+                String message = "DesativarGps:" + reportGpsLatLongData.toString();
                 mResultTv.setText(message);
                 Logger.t(TAG).i(message);
             }
@@ -131,21 +131,21 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
     void setUpMap() {
 
         MyLocationStyle myLocationStyle;
-        myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-        aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
+        myLocationStyle = new MyLocationStyle();//myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//，dispositivo，dispositivo（11）ConfigurarmyLocationType，
+        aMap.setMyLocationStyle(myLocationStyle);//ConfigurarStyle
 
-        aMap.setLocationSource(this);// 设置定位监听
+        aMap.setLocationSource(this);// Configurar
         UiSettings uiSettings = aMap.getUiSettings();
-        uiSettings.setMyLocationButtonEnabled(false);// 设置默认定位按钮是否显示
+        uiSettings.setMyLocationButtonEnabled(false);// Configurar
 
-        aMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+        aMap.setMyLocationEnabled(false);// Configurartrue，false，false
     }
 
 
     @Override
     public void onLocationChanged(AMapLocation amapLocation) {
         Logger.t(TAG).i("onLocationChanged");
-        mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
+        mListener.onLocationChanged(amapLocation);// 
 
     }
 
@@ -198,28 +198,28 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
     @Override
     protected void onResume() {
         super.onResume();
-        //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
+        //activityonResumemMapView.onResume ()，
         mMapView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
+        //activityonPausemMapView.onPause ()，
         mMapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
+        //activityonSaveInstanceStatemMapView.onSaveInstanceState (outState)，estado
         mMapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
+        //activityonDestroymMapView.onDestroy()，
         mMapView.onDestroy();
         if (null != mlocationClient) {
             mlocationClient.onDestroy();

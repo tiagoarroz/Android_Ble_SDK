@@ -19,15 +19,15 @@ public class XmlParser {
     private static final String TAG_TIMEZONE = "TimeZoneBean";
 
     /**
-     * 解析xml配置文件成升级设备配置信息
+     * xmldispositivo
      */
     public static List<TimeZoneBean> parseXml2TimeZoneBeanList(Context context, int xmlFile) {
         List<TimeZoneBean> timeZoneBeanList = new ArrayList<>();
         XmlResourceParser xmlParser = context.getResources().getXml(xmlFile);
-        Logger.d("----------------------开始解析了 xmlParser = " + xmlParser.getName());
+        Logger.d("----------------------Iniciar xmlParser = " + xmlParser.getName());
         try {
             int type = xmlParser.getEventType();
-            Logger.d("----------------------开始解析了 type = " + getEventType(type));
+            Logger.d("----------------------Iniciar type = " + getEventType(type));
             while (type != XmlPullParser.END_DOCUMENT) {
                 type = xmlParser.next();
                 Logger.d("Start--------------------- name = " + xmlParser.getName() + " type = " + getEventType(type));
@@ -35,16 +35,16 @@ public class XmlParser {
                     switch (xmlParser.getName()) {
                         case TAG_ROOT:
                             Logger.d("ROOT--------------------- name = " + xmlParser.getName() + " type = " + getEventType(type));
-                            //开启下一个循环-->
+                            //Ativar-->
                             while (!(xmlParser.getEventType() == XmlPullParser.END_TAG && xmlParser.getName().equals(TAG_ROOT))) {
                                 type = xmlParser.nextTag();
                                 if (xmlParser.getName().equals(TAG_TIMEZONE) && xmlParser.getEventType() == XmlPullParser.START_TAG) {
                                     /*
                                      *  <TimeZoneBean
                                      *      abbreviation="GMT"
-                                     *      cityName="阿比让"
+                                     *      cityName=""
                                      *      originalTimeZoneName="Africa/Abidjan"
-                                     *      shortGenericTimeZoneName="格林尼治标准时间" />
+                                     *      shortGenericTimeZoneName="" />
                                      */
                                     String abbreviation = xmlParser.getAttributeValue(null, "abbreviation");
                                     String cityName = xmlParser.getAttributeValue(null, "cityName");

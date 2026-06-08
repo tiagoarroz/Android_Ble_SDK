@@ -34,7 +34,7 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
     ToggleButton tbSwitch;
     Button btnSetting, btnRead;
     TextView tvHealthAlarmIntervalInfo;
-    String[] data = {"心率报警", "血压报警", "体温过高报警", "血氧过低报警"};
+    String[] data = {"Frequência cardíaca", "pressão arterial", "", "SpO2"};
     HealthAlarmInterval healthAlarmInterval;
 
     @Override
@@ -56,18 +56,18 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
     }
 
     private void initSpinner(Spinner sp) {
-        //声明一个下拉列表的数组适配器
+        //
         ArrayAdapter<String> starAdapter = new ArrayAdapter<String>(this, R.layout.item_select, data);
-        //设置数组适配器的布局样式
+        //Configurar
         starAdapter.setDropDownViewResource(R.layout.item_dropdown);
-        //从布局文件中获取名叫sp_dialog的下拉框
-        //设置下拉框的标题，不设置就没有难看的标题了
-        sp.setPrompt("请选择行星");
-        //设置下拉框的数组适配器
+        //sp_dialog
+        //Configurar，Configurar
+        sp.setPrompt("");
+        //Configurar
         sp.setAdapter(starAdapter);
-        //设置下拉框默认的显示第一项
+        //Configurar
         sp.setSelection(0);
-        //给下拉框设置选择监听器，一旦用户选中某一项，就触发监听器的onItemSelected方法
+        //Configurar，，onItemSelected
         sp.setOnItemSelectedListener(new MySelectedListener(sp));
     }
 
@@ -86,7 +86,7 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
         }
         boolean isOpen = tbSwitch.isChecked();
         if (selectIndex == 3) {
-            //无上限
+            //
             ceilingValue = 0;
         }
         return new HealthAlarmInterval(eHealthAlarmType, ceilingValue, floorValue, isOpen);
@@ -113,11 +113,11 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
             @Override
             public void onHealthAlarmIntervalSetting(@NonNull HealthAlarmInterval data, boolean isOptSuccess) {
                 if (isOptSuccess) {
-                    Logger.t(TAG).i("设置成功-" + data.toString());
-                    tvHealthAlarmIntervalInfo.setText("设置成功-" + data.toString());
+                    Logger.t(TAG).i("Configurar-" + data.toString());
+                    tvHealthAlarmIntervalInfo.setText("Configurar-" + data.toString());
                 } else {
-                    Logger.t(TAG).i("设置失败-" + data.toString());
-                    tvHealthAlarmIntervalInfo.setText("设置失败-" + data.toString());
+                    Logger.t(TAG).i("Configurar-" + data.toString());
+                    tvHealthAlarmIntervalInfo.setText("Configurar-" + data.toString());
                 }
             }
         });
@@ -140,11 +140,11 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
             @Override
             public void onHealthAlarmIntervalReadSuccess(@NonNull HealthAlarmInterval data, boolean isOptSuccess) {
                 if (isOptSuccess) {
-                    Logger.t(TAG).i("读取成功-" + data.toString());
-                    tvHealthAlarmIntervalInfo.setText("读取成功-" + data.toString());
+                    Logger.t(TAG).i("Ler-" + data.toString());
+                    tvHealthAlarmIntervalInfo.setText("Ler-" + data.toString());
                 } else {
-                    Logger.t(TAG).i("读取失败-" + data.toString());
-                    tvHealthAlarmIntervalInfo.setText("读取失败-" + data.toString());
+                    Logger.t(TAG).i("Ler-" + data.toString());
+                    tvHealthAlarmIntervalInfo.setText("Ler-" + data.toString());
                 }
             }
 
@@ -167,27 +167,27 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             if (sp == spinner) {
-                Toast.makeText(G08WHealthAlarmIntervalActivity.this, "您选择的设置是：" + data[i], Toast.LENGTH_SHORT).show();
+                Toast.makeText(G08WHealthAlarmIntervalActivity.this, "Configurar：" + data[i], Toast.LENGTH_SHORT).show();
                 if (i == 2) {
                     etSX.setText("");
-                    etSX.setHint("请输入高温报警上限值");
+                    etSX.setHint("");
                     etSX.setHintTextColor(Color.GRAY);
                     etSX.setEnabled(true);
                     etSX.setFocusable(true);
 
                     etXX.setText("");
                     etXX.setEnabled(false);
-                    etXX.setHint("高温报警下限值无需设置");
+                    etXX.setHint("Configurar");
                     etXX.setHintTextColor(Color.RED);
 
                 } else if (i == 3) {
                     etSX.setText("");
-                    etSX.setHint("低氧过低报警上限值无需设置");
+                    etSX.setHint("Configurar");
                     etSX.setHintTextColor(Color.RED);
                     etSX.setEnabled(false);
 
                     etXX.setEnabled(true);
-                    etXX.setHint("请输入低氧过低报警下限值");
+                    etXX.setHint("");
                     etXX.setHintTextColor(Color.GRAY);
                     etXX.setFocusable(true);
                 } else {
@@ -203,7 +203,7 @@ public class G08WHealthAlarmIntervalActivity extends AppCompatActivity {
 
             }
             if (sp == spinner1) {
-                Toast.makeText(G08WHealthAlarmIntervalActivity.this, "您选择的读取是：" + data[i], Toast.LENGTH_SHORT).show();
+                Toast.makeText(G08WHealthAlarmIntervalActivity.this, "Ler：" + data[i], Toast.LENGTH_SHORT).show();
             }
         }
 

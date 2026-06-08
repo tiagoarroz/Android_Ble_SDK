@@ -37,7 +37,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="取消"
+            android:text="Cancelar"
             android:textStyle="bold"
             android:textColor="#999999"
             android:textSize="18sp" />
@@ -54,7 +54,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="确认"
+            android:text=""
             android:textStyle="bold"
             android:textColor="#80ef90"
             android:textSize="18sp" />

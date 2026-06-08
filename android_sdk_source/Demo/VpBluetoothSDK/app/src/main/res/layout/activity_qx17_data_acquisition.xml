@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="QX17 数据采集流控演示"
+        android:text="QX17 dados"
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -18,7 +18,7 @@
         android:id="@+id/tv_qx17_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="状态: 未知"
+        android:text="estado: "
         android:textSize="14sp"
         android:paddingBottom="8dp"
         android:textColor="#FF1055D2" />
@@ -27,33 +27,33 @@
         android:id="@+id/btn_qx17_start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="开启数据采集" />
+        android:text="Ativardados" />
 
     <Button
         android:id="@+id/btn_qx17_stop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="关闭数据采集"
+        android:text="Desativardados"
         android:layout_marginTop="4dp" />
 
     <Button
         android:id="@+id/btn_qx17_continue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="继续数据采集(重传)"
+        android:text="dados()"
         android:layout_marginTop="4dp" />
 
     <Button
         android:id="@+id/btn_qx17_clear_log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="清空日志"
+        android:text="registo"
         android:layout_marginTop="4dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="--- 振动马达控制 ---"
+        android:text="---  ---"
         android:textSize="12sp"
         android:paddingTop="8dp"
         android:paddingBottom="4dp" />
@@ -74,7 +74,7 @@
             android:id="@+id/et_qx17_vibration_duration"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:hint="时长"
+            android:hint=""
             android:inputType="number"
             android:text="0"
             android:textSize="13sp"
@@ -86,7 +86,7 @@
             android:id="@+id/btn_qx17_send_vibration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发送"
+            android:text="Enviar"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp" />
 
@@ -95,7 +95,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="--- 数据日志 ---"
+        android:text="--- dadosregisto ---"
         android:textSize="12sp"
         android:paddingTop="8dp"
         android:paddingBottom="4dp" />

@@ -19,7 +19,7 @@ import com.veepoo.protocol.model.enums.EFunctionStatus;
 /**
  * Author: YWX
  * Date: 2022/3/17 15:36
- * Description: ecg开关状态
+ * Description: ecgestado
  */
 public class ECGSwitchActivity extends Activity implements IECGSwitchListener {
 

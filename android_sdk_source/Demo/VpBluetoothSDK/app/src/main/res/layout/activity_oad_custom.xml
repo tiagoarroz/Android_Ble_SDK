@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="固件升级"
+            android:text="Atualização de firmware"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </RelativeLayout>
@@ -116,7 +116,7 @@
                 android:layout_marginRight="40dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/login_button"
-                android:text="开始升级"
+                android:text="Iniciar atualização"
                 android:textColor="#ffffff"
                 android:textSize="20sp" />
 

@@ -68,23 +68,23 @@ public class AutoMeasureAdapter extends RecyclerView.Adapter<AutoMeasureAdapter.
         private String getAutoMeasureDataName(AutoMeasureData autoMeasureData){
             switch (autoMeasureData.getFunType()) {
                 case PULSE_RATE:
-                    return "心率";
+                    return "Frequência cardíaca";
                 case BLOOD_PRESSURE:
-                    return "血压";
+                    return "pressão arterial";
                 case BLOOD_GLUCOSE:
-                    return "血糖";
+                    return "";
                 case STRESS:
-                    return "压力";
+                    return "";
                 case BLOOD_OXYGEN:
-                    return "血氧";
+                    return "SpO2";
                 case BODY_TEMPERATURE:
-                    return "体温";
+                    return "";
                 case LORENZ:
-                    return "洛伦兹";
+                    return "";
                 case HRV:
                     return "HRV";
                 case BLOOD_COMPOSITION:
-                    return "血液成分";
+                    return "";
             }
             return "UNKNOWN";
         }
@@ -92,13 +92,13 @@ public class AutoMeasureAdapter extends RecyclerView.Adapter<AutoMeasureAdapter.
         private String getMeasureTime(AutoMeasureData autoMeasureData){
             int startTime = autoMeasureData.getCurrentStartMinute();
             int endTime = autoMeasureData.getCurrentEndMinute();
-            return String.format(Locale.CHINA,"测量时间: %02d:%02d-%02d:%02d", startTime / 60,startTime % 60,endTime / 60,endTime % 60);
+            return String.format(Locale.CHINA,": %02d:%02d-%02d:%02d", startTime / 60,startTime % 60,endTime / 60,endTime % 60);
         }
 
         public void updateUI(final AutoMeasureData autoMeasureData, final OnAutoMeasureOptListener listener) {
             tvAutoMeasureName.setText(getAutoMeasureDataName(autoMeasureData));
             tvMeasureTime.setText(getMeasureTime(autoMeasureData));
-            tvMeasureInterval.setText("测量间隔: " + autoMeasureData.getMeasureInterval() + "分钟");
+            tvMeasureInterval.setText(": " + autoMeasureData.getMeasureInterval() + "");
             sv.setOpened(autoMeasureData.isSwitchOpen());
             sv.setOnStateChangedListener(new SwitchView.OnStateChangedListener() {
                 @Override

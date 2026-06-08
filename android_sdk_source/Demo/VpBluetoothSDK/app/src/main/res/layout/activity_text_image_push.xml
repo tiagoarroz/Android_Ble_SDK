@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:background="#000"
         android:gravity="center"
-        android:text="图文推送"
+        android:text="Envio de texto e imagem"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="推送文本"
+        android:text="Enviar texto"
         android:textColor="@color/real_red"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -35,7 +35,7 @@
         android:id="@+id/etSendContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入您推送的文本信息"
+        android:hint="Introduza o texto a enviar"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvPushText" />
@@ -47,7 +47,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="40dp"
-        android:text="推送文本"
+        android:text="Enviar texto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etSendContent" />
 
@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="推送图片"
+        android:text="Enviar imagem"
         android:textColor="@color/real_red"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -114,7 +114,7 @@
         app:layout_constraintEnd_toStartOf="@id/etHeight"
         app:layout_constraintTop_toBottomOf="@id/rbImageSelect"
         android:inputType="number"
-        android:hint="请输入裁剪宽"
+        android:hint="Introduza a largura do recorte"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
@@ -124,7 +124,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rbImageSelect"
         android:inputType="number"
-        android:hint="请输入裁剪高"
+        android:hint="Introduza a altura do recorte"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
 
@@ -135,7 +135,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="40dp"
-        android:text="相册选择"
+        android:text="Selecionar da galeria"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etWidth" />
 
@@ -146,7 +146,7 @@
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="40dp"
-        android:text="推送图片"
+        android:text="Enviar imagem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnSelectImage" />
 
@@ -156,7 +156,7 @@
         android:layout_height="wrap_content"
         android:background="#000"
         android:padding="10dp"
-        android:text="推送图文信息"
+        android:text="Enviar conteúdo de texto e imagem"
         android:textColor="#fff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

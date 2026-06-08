@@ -81,7 +81,7 @@ public class CameraPhotoHelper {
     }
 
     /**
-     * 启动相机拍照
+     * 
      */
     public void takePhoto(int width, int height, boolean isCircle, ImageVideoSelectorManager.OnCameraPhotoListener listener) {
         this.width = width;
@@ -89,28 +89,28 @@ public class CameraPhotoHelper {
         this.isCircle = isCircle;
         this.listener = listener;
         if (checkCameraPermission()) {
-            Logger.t(TAG).e("-takePhoto-: | 开始拍照 dispatchTakePictureIntent");
+            Logger.t(TAG).e("-takePhoto-: | Iniciar dispatchTakePictureIntent");
             dispatchTakePictureIntent();
         } else {
-            Logger.t(TAG).e("-takePhoto-: | 开始拍照 requestCameraPermission");
+            Logger.t(TAG).e("-takePhoto-: | Iniciar requestCameraPermission");
             requestCameraPermission();
         }
     }
 
     /**
-     * 处理拍照返回结果
+     * 
      */
     public void handleActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CAMERA_CAPTURE) { //拍照
+            if (requestCode == REQUEST_CAMERA_CAPTURE) { //
                 if (currentPhotoUri != null) {
-                    // Android 10+ 使用MediaStore的方式
+                    // Android 10+ MediaStore
                     if (listener != null) {
                         listener.onPhotoCaptured(currentPhotoUri, getRealPathFromUri(currentPhotoUri));
                     }
                     startCrop(currentPhotoUri, getRealPathFromUri(currentPhotoUri));
                 } else if (currentPhotoPath != null) {
-                    // 传统方式
+                    // 
                     File photoFile = new File(currentPhotoPath);
                     if (photoFile.exists()) {
                         Uri photoUri = FileProvider.getUriForFile(activity.get(),
@@ -122,13 +122,13 @@ public class CameraPhotoHelper {
                         startCrop(photoUri, currentPhotoPath);
                     } else {
                         if (listener != null) {
-                            listener.onCameraError("照片文件不存在");
+                            listener.onCameraError("");
                         }
                     }
                 }
             }
 
-            if (requestCode == UCrop.REQUEST_CROP) { //裁剪
+            if (requestCode == UCrop.REQUEST_CROP) { //
                 Uri uri = UCrop.getOutput(data);
                 try {
                     String path = uri.getPath();
@@ -151,7 +151,7 @@ public class CameraPhotoHelper {
     }
 
     /**
-     * 处理权限请求结果
+     * 
      */
     public void handleRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
@@ -193,14 +193,14 @@ public class CameraPhotoHelper {
         Logger.t(TAG).e("-dispatchTakePictureIntent-: | 0");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // 确保有相机应用可以处理该Intent
+        // Intent
         if (takePictureIntent.resolveActivity(activity.get().getPackageManager()) != null) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    // Android 10+ 使用MediaStore
+                    // Android 10+ MediaStore
                     createImageFileForQ();
                 } else {
-                    // 传统方式创建文件
+                    // 
                     File photoFile = createImageFile();
                     if (photoFile != null) {
                         Logger.t(TAG).e("-dispatchTakePictureIntent-: | 1");
@@ -214,25 +214,25 @@ public class CameraPhotoHelper {
                 }
                 Logger.t(TAG).e("-dispatchTakePictureIntent-: | 2");
             } catch (IOException e) {
-                Log.e(TAG, "创建照片文件错误", e);
+                Log.e(TAG, "", e);
                 if (listener != null) {
-                    listener.onCameraError("无法创建照片文件");
+                    listener.onCameraError("");
                 }
             } catch (Exception e) {
-                Log.e(TAG, "启动相机错误", e);
+                Log.e(TAG, "", e);
                 if (listener != null) {
-                    listener.onCameraError("无法启动相机");
+                    listener.onCameraError("");
                 }
             }
         } else {
             if (listener != null) {
-                listener.onCameraError("没有可用的相机应用");
+                listener.onCameraError("");
             }
         }
     }
 
     private File createImageFile() throws IOException {
-        // 创建唯一的文件名
+        // 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
 
@@ -241,9 +241,9 @@ public class CameraPhotoHelper {
             storageDir = activity.get().getFilesDir();
         }
         File image = File.createTempFile(
-                imageFileName,  /* 前缀 */
-                ".jpg",         /* 后缀 */
-                storageDir       /* 目录 */
+                imageFileName,  /*  */
+                ".jpg",         /*  */
+                storageDir       /*  */
         );
         return image;
     }
@@ -255,14 +255,14 @@ public class CameraPhotoHelper {
         ContentResolver resolver = activity.get().getContentResolver();
         ContentValues contentValues = new ContentValues();
 
-        // 对于 Android Q (10) 及以上版本，使用 RELATIVE_PATH 而不是直接设置 DATA
+        //  Android Q (10) ， RELATIVE_PATH Configurar DATA
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, imageFileName);
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
         } else {
-            // 兼容旧版本
+            // 
             File imgFile = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES), imageFileName);
             contentValues.put(MediaStore.Images.Media.DATA, imgFile.getAbsolutePath());
         }
@@ -274,7 +274,7 @@ public class CameraPhotoHelper {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoUri);
             activity.get().startActivityForResult(takePictureIntent, REQUEST_CAMERA_CAPTURE);
         } else {
-            throw new IOException("无法创建照片URI");
+            throw new IOException("URI");
         }
     }
 
@@ -291,7 +291,7 @@ public class CameraPhotoHelper {
                     return cursor.getString(columnIndex);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "获取真实路径失败", e);
+                Log.e(TAG, "", e);
             }
         }
         return null;
@@ -315,25 +315,25 @@ public class CameraPhotoHelper {
 
     private UCrop.Options buildOptions(int width, int height, String outputDir, boolean isCircle) {
         UCrop.Options options = new UCrop.Options();
-        options.setHideBottomControls(false);//是否显示裁剪菜单栏
-        options.setFreeStyleCropEnabled(false);//裁剪框or图片拖动
-        options.setShowCropFrame(true);//是否显示裁剪边框
-        options.setShowCropGrid(true);//是否显示裁剪框
-        options.setCircleDimmedLayer(isCircle);//是否圆形裁剪
+        options.setHideBottomControls(false);//
+        options.setFreeStyleCropEnabled(false);//or
+        options.setShowCropFrame(true);//
+        options.setShowCropGrid(true);//
+        options.setCircleDimmedLayer(isCircle);//
         options.withAspectRatio(width, height);
         options.withMaxResultSize(width, height);
-        options.isCropDragSmoothToCenter(true);//裁剪并自动拖拽到中间
+        options.isCropDragSmoothToCenter(true);//
         options.setCropOutputPathDir(outputDir);
-        options.isUseCustomLoaderBitmap(true);//设置自定义Loader Bitmap
+        options.isUseCustomLoaderBitmap(true);//ConfigurarLoader Bitmap
         String MIME_TYPE_GIF = "image/gif";
         String MIME_TYPE_WEBP = "image/webp";
-        options.setSkipCropMimeType(MIME_TYPE_GIF, MIME_TYPE_WEBP);//设置跳过的裁剪类型
-        options.isForbidCropGifWebp(true);//设置禁止裁剪GIF
+        options.setSkipCropMimeType(MIME_TYPE_GIF, MIME_TYPE_WEBP);//Configurar
+        options.isForbidCropGifWebp(true);//ConfigurarGIF
         options.isForbidSkipMultipleCrop(false);
-        options.setMaxScaleMultiplier(4);//最大的放大倍数
+        options.setMaxScaleMultiplier(4);//
         options.isDarkStatusBarBlack(true);
-        options.setStatusBarColor(Color.parseColor("#f5f5f5"));//状态栏颜色
-        options.setToolbarColor(Color.parseColor("#f5f5f5"));//toolbar颜色
+        options.setStatusBarColor(Color.parseColor("#f5f5f5"));//estado
+        options.setToolbarColor(Color.parseColor("#f5f5f5"));//toolbar
         return options;
     }
 

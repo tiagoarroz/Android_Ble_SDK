@@ -32,7 +32,7 @@ import java.util.List;
 import tech.gujin.toast.ToastUtil;
 
 /**
- * Description 世界时钟界面
+ * Description Relógio mundial
  *
  * @author KYM.
  * @date 2024/4/10 16:05
@@ -64,7 +64,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
             @Override
             public void onClick(View v) {
                 if (mListData != null && mListData.size() >= 10) {
-                    showMsg("联系人已超过十个。（已满）");
+                    showMsg("Contactos（）");
                     return;
                 }
                 Intent intent = new Intent(WorldClockActivity.this, AddClockActivity.class);
@@ -76,7 +76,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
         findViewById(R.id.tvRefresh).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.show("刷新");
+                ToastUtil.show("Atualizar");
                 VPOperateManager.getInstance().readWorldClock(-1, response, WorldClockActivity.this);
             }
         });
@@ -84,11 +84,11 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
             @Override
             public void onClick(View v) {
                 if (mListData.isEmpty()) {
-                    ToastUtil.show("列表为空");
+                    ToastUtil.show("");
                     return;
                 }
                 isDeleteAll = true;
-                ToastUtil.show("删除全部");
+                ToastUtil.show("Eliminar");
                 VPOperateManager.getInstance().deleteWorldClocks(mListData, response, WorldClockActivity.this);
             }
         });
@@ -121,22 +121,22 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
     ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            //首先回调的方法 返回int表示是否监听该方向
-            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;//拖拽
-            //int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;//侧滑删除
+            // int
+            int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;//
+            //int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;//Eliminar
             return makeMovementFlags(dragFlags, 0);
         }
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            //侧滑事件
+            //
             mListData.remove(viewHolder.getAdapterPosition());
             mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
         }
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            //滑动事件
+            //
             int adapterPosition = viewHolder.getAdapterPosition();
             int targetAdapterPosition = target.getAdapterPosition();
             if (mFirstAdapterPosition == -1) {
@@ -196,7 +196,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
         } else {
             ivEmpty.setVisibility(View.GONE);
         }
-        ToastUtil.show("删除世界时钟建议删除的时候 弹出加载框，成功或失败的时候再关闭加载框。防止多次快速去点击删除 导致删除失败。 删除id = " + worldClock.getId());
+        ToastUtil.show("EliminarRelógio mundialEliminar ，DesativarEliminar Eliminar Eliminarid = " + worldClock.getId());
         VPOperateManager.getInstance().deleteWorldClock(worldClock, response, this);
     }
 
@@ -221,7 +221,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
                         }
                     }
                     if (isExit) {
-                        showMsg("已存在");
+                        showMsg("");
                         return;
                     }
 
@@ -237,7 +237,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
     }
 
     /**
-     * 生产世界时钟id
+     * Relógio mundialid
      */
     public int genNewId(List<WorldClock> wcList) {
         //1-10
@@ -265,7 +265,7 @@ public class WorldClockActivity extends AppCompatActivity implements IWorldClock
             mListData = new ArrayList<>();
         }
         for (WorldClock clock : worldClocks) {
-            Logger.t(TAG).d("读取世界时钟：" + clock.toString());
+            Logger.t(TAG).d("LerRelógio mundial：" + clock.toString());
         }
         mListData.clear();
         mListData.addAll(worldClocks);

@@ -19,7 +19,7 @@ import com.veepoo.protocol.model.enums.EFunctionStatus;
 /**
  * Author: YWX
  * Date: 2022/3/17 15:36
- * Description: ecg开关状态
+ * Description: ecgestado
  */
 public class F2DebugActivity extends Activity implements IF2DebugListener {
 
@@ -83,6 +83,6 @@ public class F2DebugActivity extends Activity implements IF2DebugListener {
 
     @Override
     public void onIF2DebugStatusChanged(boolean isSuccess, DebugCmd debugCmd) {
-        tvInfo.setText(debugCmd.toString() + "， 是否成功：" + isSuccess);
+        tvInfo.setText(debugCmd.toString() + "， ：" + isSuccess);
     }
 }

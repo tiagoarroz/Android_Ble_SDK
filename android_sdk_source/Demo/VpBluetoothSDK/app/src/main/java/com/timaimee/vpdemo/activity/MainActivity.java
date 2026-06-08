@@ -57,6 +57,7 @@ import com.timaimee.vpdemo.adapter.BleScanViewAdapter;
 import com.timaimee.vpdemo.adapter.CustomLogAdapter;
 import com.timaimee.vpdemo.adapter.DividerItemDecoration;
 import com.timaimee.vpdemo.adapter.OnRecycleViewClickCallback;
+import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IABleConnectStatusListener;
 import com.veepoo.protocol.listener.base.IABluetoothStateListener;
@@ -97,16 +98,21 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     TextView tvTips;
     private boolean mIsOadModel;
     BluetoothLeScannerCompat mScanner;
+    private boolean mHasActiveBleSession;
 
     @Override
     protected void onDestroy() {
         VPLocalLogger.stopMonitor();
-        VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
-            @Override
-            public void onResponse(int code) {
-
-            }
-        });
+        if (mHasActiveBleSession) {
+            VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
+                @Override
+                public void onResponse(int code) {
+                    DemoStepLogger.featureEvent("BLE_DISCONNECT", "Disconnect no onDestroy. code=" + code);
+                }
+            });
+        } else {
+            DemoStepLogger.featureEvent("BLE_DISCONNECT", "onDestroy sem sessão BLE ativa; sem disconnect");
+        }
         super.onDestroy();
     }
 
@@ -114,10 +120,11 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        DemoStepLogger.stepStart("MAIN_INIT", "Arranque da activity principal de demonstração");
         ToastUtil.initialize(this);
         VPOperateManager.getInstance().init(this);
 //        if (BuildConfig.IS_DEBUG || true) {
-        //杰理日志
+        //registo
         com.jieli.jl_rcsp.util.JL_Log.setTagPrefix("HBand-JLFace");
         com.jieli.jl_rcsp.util.JL_Log.configureLog(this, true, true);
         JL_Log.setLog(true);
@@ -134,9 +141,14 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         registerBluetoothStateListener();
         createFile();
         VPLocalLogger.startMonitor(this);
+        DemoStepLogger.stepSuccess("MAIN_INIT", "Inicialização base concluída e monitorização de logs ativa");
     }
 
 
+    /**
+     * Cria um ficheiro de suporte usado por operações GNSS/AGPS na demo.
+     * O objetivo é garantir que os fluxos que exigem este ficheiro podem arrancar de imediato.
+     */
     private void createFile() {
         String fileSDK = getExternalFilesDir(null) + File.separator + "LTEPH_GPS_1.rtcm";
         File file = new File(fileSDK);
@@ -144,11 +156,14 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
             try {
                 file.createNewFile();
                 Logger.t(TAG).i("createNewFile");
+                DemoStepLogger.stepSuccess("MAIN_FILE_PREPARE", "Ficheiro de suporte criado: " + fileSDK);
             } catch (IOException e) {
                 e.printStackTrace();
+                DemoStepLogger.stepError("MAIN_FILE_PREPARE", "Falha ao criar ficheiro de suporte: " + e.getMessage());
             }
         } else {
             Logger.t(TAG).i("exist file");
+            DemoStepLogger.featureEvent("MAIN_FILE_PREPARE", "Ficheiro de suporte já existia: " + fileSDK);
         }
     }
 
@@ -173,17 +188,17 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         bleConnectAdatpter.setBleItemOnclick(this);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mTitleTextView.setText("扫描设备 V" + getAppVersion(mContext));
+        mTitleTextView.setText("Procurar dispositivos V" + getAppVersion(mContext));
     }
 
 
     private boolean isGetPermission() {
         boolean isScanPermissionGranted;
         if (Build.VERSION.SDK_INT <= 22) {
-            isScanPermissionGranted = true; //android 6.0 以下直接通过
+            isScanPermissionGranted = true; //android 6.0 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             isScanPermissionGranted = ContextCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN)
-                    == PERMISSION_GRANTED; //android 12 需要BLUETOOTH_SCAN新权限
+                    == PERMISSION_GRANTED; //android 12 BLUETOOTH_SCAN
         } else {
             isScanPermissionGranted = ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PERMISSION_GRANTED;
@@ -193,8 +208,10 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
     private void checkPermission() {
         Logger.t(TAG).i("Build.VERSION.SDK_INT =" + Build.VERSION.SDK_INT);
+        DemoStepLogger.stepStart("MAIN_PERMISSION", "Validação de permissões BLE em runtime");
         if (Build.VERSION.SDK_INT <= 22) {
             initBLE();
+            DemoStepLogger.stepSuccess("MAIN_PERMISSION", "Sem necessidade de runtime permission (API <= 22)");
             return;
         }
 
@@ -206,10 +223,12 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
             if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
                 Logger.t(TAG).i("checkPermission,PERMISSION_GRANTED");
                 initBLE();
+                DemoStepLogger.stepSuccess("MAIN_PERMISSION", "Permissão de localização já concedida");
             } else if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-                showMsg("Android6.0-Android11 蓝牙扫描需要定位权限");
+                showMsg("Android6.0-Android11 ");
                 requestPermission();
                 Logger.t(TAG).i("checkPermission,PERMISSION_DENIED");
+                DemoStepLogger.stepError("MAIN_PERMISSION", "Permissão de localização ainda não concedida");
             }
         }
 
@@ -246,7 +265,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         TextView cancelTv = (TextView) dialogView.findViewById(R.id.dialog_cancel);
         TextView contentTv = (TextView) dialogView.findViewById(R.id.dialog_content);
 
-        contentTv.setText("扫描设备需允许应用访问周围蓝牙设备并保持蓝牙开关开启");
+        contentTv.setText("Procurar dispositivosdispositivoAtivar");
         okTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -263,19 +282,19 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     }
 
     private boolean checkBLEScanPermissionAboveAndroid11() {
-        Logger.t(TAG).e("**在Android12及以上版本检查BLE搜索权限");
+        Logger.t(TAG).e("**Android12BLE");
         if (Build.VERSION.SDK_INT < 31) {
-            Logger.t(TAG).e("当前版本低于Android12");
+            Logger.t(TAG).e("Android12");
             return false;
         }
         boolean hasScanPermission = isGetPermission();
-        Logger.t(TAG).e("**在Android12及以上版本检查BLE搜索权限 hasScanPermission = " + hasScanPermission);
+        Logger.t(TAG).e("**Android12BLE hasScanPermission = " + hasScanPermission);
         if (!hasScanPermission) {
             boolean isNeedExplanation = ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.BLUETOOTH_SCAN);
-            Logger.t(TAG).e("**在Android12及以上版本检查BLE搜索权限 hasScanPermission = false , isNeedExplanation = " + isNeedExplanation);
+            Logger.t(TAG).e("**Android12BLE hasScanPermission = false , isNeedExplanation = " + isNeedExplanation);
             if (isNeedExplanation) {
-                showMsg("您已多次拒绝了，请手动打开android12 蓝牙搜索权限");
+                showMsg("，Ativarandroid12 ");
                 mDialogBluetoothScan.show();
             } else {
                 List<String> permissionList = new ArrayList<>();
@@ -294,9 +313,11 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
                                     Logger.t(TAG).e("onPermissionsChecked:Denied::::" + deniedResponse.getRequestedPermission().toString());
                                 }
                                 if (multiplePermissionsReport.getGrantedPermissionResponses().size() == 3) {
-                                    showMsg("蓝牙相关权限已授予了");
+                                    showMsg("");
+                                    DemoStepLogger.stepSuccess("MAIN_PERMISSION", "Permissões BLE Android 12+ concedidas");
                                 } else {
-                                    showMsg("权限被拒绝了请手动授权");
+                                    showMsg("");
+                                    DemoStepLogger.stepError("MAIN_PERMISSION", "Permissões BLE Android 12+ rejeitadas parcialmente");
                                 }
                             }
 
@@ -311,6 +332,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
             }
             return false;
         } else {
+            DemoStepLogger.stepSuccess("MAIN_PERMISSION", "Permissão BLE_SCAN já concedida em Android 12+");
         }
         return false;
     }
@@ -362,6 +384,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     }
 
     private boolean scanDevice() {
+        DemoStepLogger.stepStart("BLE_SCAN", "Início de varrimento BLE");
         if (!mListAddress.isEmpty()) {
             mListAddress.clear();
         }
@@ -372,22 +395,24 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         }
 
         if (!BluetoothUtils.isBluetoothEnabled()) {
-            Toast.makeText(mContext, "蓝牙没有开启", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Bluetooth está desligado", Toast.LENGTH_SHORT).show();
+            DemoStepLogger.stepError("BLE_SCAN", "Bluetooth está desligado no dispositivo");
             return true;
         }
 //        startScan();
         VPOperateManager.getInstance().startScanDevice(mSearchResponse);
+        DemoStepLogger.featureEvent("BLE_SCAN", "Pedido de scan enviado ao SDK");
         return false;
     }
 
 
     private void startScan() {
-        //后台扫描跟前台扫描的方式不一样
+        //
         ScanSettings settings = new ScanSettings.Builder()
                 .setLegacy(false)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setReportDelay(1000)
-                .setUseHardwareBatchingIfSupported(false)//默认为true，表示如果他们支持硬件分流批处理的话，使用硬件分流批处理;false表示兼容机制
+                .setUseHardwareBatchingIfSupported(false)//true，，;false
                 .build();
         List<ScanFilter> filters = new ArrayList<>();
         ScanFilter scanFilter;
@@ -408,7 +433,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
                 Logger.t(TAG).i("onBatchScanResults:" + results.size());
                 //Logger.t(TAG).i("address," + bluetoothDevice.getAddress());
                 //05,09,42,31,35,50|03,19,41,03|02,01,06|03,03,FF,FF|09,FF,F8,F8,CF,86,07,90,82,DD,
-                //flag 03后面是服务
+                //flag 03
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -446,6 +471,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
 
     private void connectDevice(final String mac, final String deviceName) {
+        DemoStepLogger.stepStart("BLE_CONNECT", "Tentativa de ligação ao dispositivo " + mac + " (" + deviceName + ")");
 
         VPOperateManager.getInstance().registerConnectStatusListener(mac, mBleConnectStatusListener);
 
@@ -454,20 +480,25 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
             @Override
             public void connectState(int code, BleGattProfile profile, boolean isoadModel) {
                 if (code == Code.REQUEST_SUCCESS) {
-                    //蓝牙与设备的连接状态
-                    Logger.t(TAG).i("连接成功");
-                    Logger.t(TAG).i("是否是固件升级模式=" + isoadModel);
+                    //dispositivoestado
+                    Logger.t(TAG).i("");
+                    Logger.t(TAG).i("Atualização de firmware=" + isoadModel);
                     mIsOadModel = isoadModel;
+                    mHasActiveBleSession = true;
+                    DemoStepLogger.stepSuccess("BLE_CONNECT", "Ligação BLE estabelecida. isOadModel=" + isoadModel);
                 } else {
-                    Logger.t(TAG).i("连接失败");
+                    Logger.t(TAG).i("");
+                    mHasActiveBleSession = false;
+                    DemoStepLogger.stepError("BLE_CONNECT", "Falha de ligação BLE. code=" + code);
                 }
             }
         }, new INotifyResponse() {
             @Override
             public void notifyState(int state) {
                 if (state == Code.REQUEST_SUCCESS) {
-                    //蓝牙与设备的连接状态
-                    Logger.t(TAG).i("监听成功-可进行其他操作");
+                    //dispositivoestado
+                    Logger.t(TAG).i("-");
+                    DemoStepLogger.stepSuccess("BLE_NOTIFY", "Canal notify ativo; segue para validação de password");
 
                     Intent intent = new Intent(mContext, PwdConfirmActivity.class);
                     intent.putExtra("isoadmodel", mIsOadModel);
@@ -487,7 +518,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 //                            int deviceNumber = pwdData.getDeviceNumber();
 //                            String deviceVersion = pwdData.getDeviceVersion();
 //                            String deviceTestVersion = pwdData.getDeviceTestVersion();
-//                            Logger.t(TAG).e("设备号：" + deviceNumber + ",版本号：" + deviceVersion + ",\n测试版本号：" + deviceTestVersion);
+//                            Logger.t(TAG).e("dispositivo：" + deviceNumber + ",：" + deviceVersion + ",\n：" + deviceTestVersion);
 //                        }
 //                    }, new IDeviceFuctionDataListener() {
 //                        @Override
@@ -514,21 +545,22 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 //                    }, "0000", true);
 
                 } else {
-                    Logger.t(TAG).i("监听失败，重新连接");
+                    Logger.t(TAG).i("，");
+                    DemoStepLogger.stepError("BLE_NOTIFY", "Falha ao ativar notify. state=" + state);
                 }
             }
         });
     }
 
     /**
-     * 蓝牙打开or关闭状态
+     * AtivarorDesativarestado
      */
     private void registerBluetoothStateListener() {
         VPOperateManager.getInstance().registerBluetoothStateListener(mBluetoothStateListener);
     }
 
     /**
-     * 监听系统蓝牙的打开和关闭的回调状态
+     * AtivarDesativarestado
      */
     private final IABleConnectStatusListener mBleConnectStatusListener = new IABleConnectStatusListener() {
 
@@ -536,14 +568,16 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         public void onConnectStatusChanged(String mac, int status) {
             if (status == Constants.STATUS_CONNECTED) {
                 Logger.t(TAG).i("STATUS_CONNECTED");
+                mHasActiveBleSession = true;
             } else if (status == Constants.STATUS_DISCONNECTED) {
                 Logger.t(TAG).i("STATUS_DISCONNECTED");
+                mHasActiveBleSession = false;
             }
         }
     };
 
     /**
-     * 监听蓝牙与设备间的回调状态
+     * dispositivoestado
      */
     private final IABluetoothStateListener mBluetoothStateListener = new IABluetoothStateListener() {
         @Override
@@ -566,12 +600,13 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     }
 
     /**
-     * 扫描的回调
+     * 
      */
     private final SearchResponse mSearchResponse = new SearchResponse() {
         @Override
         public void onSearchStarted() {
             Logger.t(TAG).i("onSearchStarted");
+            DemoStepLogger.stepStart("BLE_SCAN", "SDK notificou início do scan");
         }
 
         @Override
@@ -596,12 +631,14 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         public void onSearchStopped() {
             refreshStop();
             Logger.t(TAG).i("onSearchStopped");
+            DemoStepLogger.stepSuccess("BLE_SCAN", "Scan terminado");
         }
 
         @Override
         public void onSearchCanceled() {
             refreshStop();
             Logger.t(TAG).i("onSearchCanceled");
+            DemoStepLogger.stepError("BLE_SCAN", "Scan cancelado");
         }
     };
 
@@ -641,7 +678,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     }
 
     /**
-     * 检测蓝牙设备是否开启
+     * dispositivoAtivar
      *
      * @return
      */
@@ -656,7 +693,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     }
 
     /**
-     * 结束刷新
+     * TerminarAtualizar
      */
     void refreshStop() {
         Logger.t(TAG).i("refreshComlete");
@@ -667,11 +704,12 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
     @Override
     public void OnRecycleViewClick(int position) {
+        DemoStepLogger.featureEvent("BLE_DEVICE_SELECT", "Dispositivo selecionado na lista. posição=" + position);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(mContext, "正在连接，请稍等...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "A ligar, aguarde...", Toast.LENGTH_SHORT).show();
             }
         });
         SearchResult searchResult = mListData.get(position);

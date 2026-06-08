@@ -89,29 +89,29 @@ public class UiUpdateCustomActivity extends Activity {
     }
 
     /**
-     * 是否支持
+     * 
      */
     public void isSupport(View view) {
         if (mUiUpdateUtil.isSupportChangeCustomUi()) {
-            mUiCustomSupportTV.setText("1.支持自定义表盘");
+            mUiCustomSupportTV.setText("1.");
             mUiUpdateUtil.init(this);
             mUiUpdateUtil.init(this);
         } else {
-            mUiCustomSupportTV.setText("1.不支持自定义表盘");
-            Toast.makeText(mContext, "不支持自定义表盘", Toast.LENGTH_LONG).show();
+            mUiCustomSupportTV.setText("1.");
+            Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
         }
     }
 
     UIDataCustom mUIDataCustom;
 
     /**
-     * 读取基本的信息(自定义表盘)
+     * Ler()
      */
     public void readBaseInfo(View view) {
         mUiUpdateUtil.getCustomWatchUiInfo(new IUIBaseInfoFormCustomListener() {
             @Override
             public void onBaseUiInfoFormCustom(UIDataCustom uiDataCustom) {
-                Logger.t(TAG).i("2.自定义表盘的基本信息 uiDataCustom:" + uiDataCustom.toString());
+                Logger.t(TAG).i("2.Informação base uiDataCustom:" + uiDataCustom.toString());
                 mUIDataCustom = uiDataCustom;
                 mUiCustomBaseInfoTV.setText(uiDataCustom.toString());
                 EWatchUIType customUIType = mUIDataCustom.getCustomUIType();
@@ -133,7 +133,7 @@ public class UiUpdateCustomActivity extends Activity {
     }
 
     /**
-     * 设置自定义表盘（自选位置以及自选元素），使用的是默认背景，可参考H Band的自定义ui界面去理解
+     * Configurar（），，H Bandui
      */
     public void setCostomUi(View view) {
         if (mWatchUIType == null) {
@@ -150,14 +150,14 @@ public class UiUpdateCustomActivity extends Activity {
         mUiUpdateUtil.setCustomWacthUi(uiCustomSetData, new IUIBaseInfoFormCustomListener() {
             @Override
             public void onBaseUiInfoFormCustom(UIDataCustom uiDataCustom) {
-                Logger.t(TAG).i("3.设置元素及其对应的位置 uiDataCustom:" + uiDataCustom.toString());
+                Logger.t(TAG).i("3.Configurar uiDataCustom:" + uiDataCustom.toString());
                 int watchColor = uiDataCustom.getColor888();
                 String hexColor = ColorUtil.intColorToHexStr(watchColor);
                 /**
-                 * app上颜色跟设备的颜色虽然是同一个颜色值，但是显示上会有差别
-                 * 因为App上可以显示RCG_888,设备只能显示RGB_565
-                 * 所以为了显示效果，最好是自己做一个映射表，
-                 * 比如app上的A1和设备上的A2颜色相近,那么在app上显示A1颜色，下发给设备的是A2颜色。
+                 * appdispositivo，
+                 * AppRCG_888,dispositivoRGB_565
+                 * ，，
+                 * appA1dispositivoA2,appA1，dispositivoA2
                  */
                 Logger.t(TAG).i(watchColor + "->" + hexColor);
                 mUiCustomSetCallbackTV.setTextColor(Color.parseColor(hexColor));
@@ -230,33 +230,33 @@ public class UiUpdateCustomActivity extends Activity {
     }
 
     /**
-     * 获取随机的位置（时间元素放的位置）
+     * （）
      *
      * @return
      */
     private EWatchUIElementPosition getRandomPosition(WatchUIType customWatchUI) {
-        //获取表盘支持设置的位置列表
+        //Configurar
         List<EWatchUIElementPosition> supportPosition = customWatchUI.getSupportPosition();
         for (EWatchUIElementPosition position : supportPosition) {
             Logger.t(TAG).i("supportPosition" + position);
         }
 
-        //所有的表盘可设置的位置一共有7种
+        //Configurar7
         int random = new Random().nextInt(7) + 1;//(1-7)
         EWatchUIElementPosition watchUIElementPosition = EWatchUIElementPosition.getWatchUIElementPosition(random);
 
         if (customWatchUI.isSupportPosition(watchUIElementPosition)) {
-            //当前的表盘刚好支持随机生成的位置
+            //
             return watchUIElementPosition;
         } else {
-            //当前的表盘不支持随机生成的位置，为了demo方便就取支持列表的第一个
+            //，demo
             return supportPosition.get(0);
         }
 
     }
 
     /**
-     * 获取随机的元素
+     * 
      *
      * @return
      */
@@ -266,7 +266,7 @@ public class UiUpdateCustomActivity extends Activity {
     }
 
     /**
-     * 获取随机的颜色
+     * 
      *
      * @return
      */
@@ -300,13 +300,13 @@ public class UiUpdateCustomActivity extends Activity {
             case RECT_172_320_QFN:
                 if (i % 3 == 1) {
                     fileName = "20230217103821.png_31140.png";
-                    Toast.makeText(this, "彩花壁纸", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
                 } else if (i % 3 == 2) {
                     fileName = "20230217104452.png_16165.png";
-                    Toast.makeText(this, "超人壁纸", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
                 } else if (i % 3 == 0) {
                     fileName = "20230217112135.png_41670.png";
-                    Toast.makeText(this, "裁剪照片", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -321,11 +321,11 @@ public class UiUpdateCustomActivity extends Activity {
     }
 
     /**
-     * 使用的是自选图片
+     * 
      */
     public void changeImgToSet(View view) {
 
-        //20210128143910.png是个240*240的bitmap
+        //20210128143910.png240*240bitmap
 //        String filePath = getExternalFilesDir(null) + File.separator + "20210522164329_52519.png";
 //        String filePath =  "file:///android_asset/custom_round_360_360_bg.png";
 //        File file = new File(filePath);
@@ -334,7 +334,7 @@ public class UiUpdateCustomActivity extends Activity {
             InputStream inputStream = null;
             try {
                 inputStream = getResources().getAssets().open(fileName);
-                Bitmap bmp = BitmapFactory.decodeStream(inputStream);//原图
+                Bitmap bmp = BitmapFactory.decodeStream(inputStream);//
                 Logger.t(TAG).i("get BitMap");
                 InputStream sendInputStream = mWatchUIType.getSendInputStream(mContext, bmp);
                 mUiUpdateUtil.startSetUiStream(EUIFromType.CUSTOM, sendInputStream, new IUiUpdateListener() {
@@ -362,14 +362,14 @@ public class UiUpdateCustomActivity extends Activity {
                     @Override
                     public void onUiUpdateProgress(int currentBlock, int sumBlock, int progress) {
                         Logger.t(TAG).i("onUiUpdateProgress:" + currentBlock + "," + sumBlock + "," + progress + "%");
-                        mSendProgressTv.setText("发送中：" + progress + "%");
+                        mSendProgressTv.setText("Enviar：" + progress + "%");
                     }
 
 
                     @Override
                     public void onUiUpdateSuccess() {
                         Logger.t(TAG).i("onUiUpdateSuccess");
-                        mSendProgressTv.setText("设置成功");
+                        mSendProgressTv.setText("Configurar");
                     }
 
                     @Override

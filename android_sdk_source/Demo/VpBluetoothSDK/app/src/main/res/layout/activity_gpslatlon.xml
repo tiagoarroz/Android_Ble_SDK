@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="GPS时区设置"
+            android:text="Configuração de fuso GPS"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -41,7 +41,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="经度:" />
+            android:text="Longitude:" />
 
 
         <EditText
@@ -65,7 +65,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="纬度:" />
+            android:text="Latitude:" />
 
         <EditText
             android:id="@+id/gps_latv"
@@ -88,7 +88,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="时区:" />
+            android:text="Fuso horário:" />
 
         <EditText
             android:id="@+id/gps_timezone"
@@ -112,7 +112,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="时间戳:" />
+            android:text="Timestamp:" />
 
         <EditText
             android:id="@+id/gps_timestamp"
@@ -136,7 +136,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="海拔:" />
+            android:text="Altitude:" />
 
         <EditText
             android:id="@+id/gps_altitude"
@@ -154,7 +154,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
-        android:text="调用GPS时区设置" />
+        android:text="Configuração de fuso GPS" />
 
     <Button
         android:id="@+id/kaaba_update"
@@ -163,7 +163,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:text="调用克尔白设置" />
+        android:text="Aplicar configuração Qibla" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -171,7 +171,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
-        android:text="另外一种要求，设备主动要求app下发gps数据，先设置监听，接收到监听后，调用gps设置"
+        android:text="Modo alternativo: o dispositivo solicita dados GPS à app. Registe o listener e depois aplique a configuração GPS."
         android:textSize="12sp" />
     <LinearLayout
         android:layout_width="match_parent"
@@ -185,7 +185,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:layout_marginLeft="10dp"
-            android:text="1.监听设备回调" />
+            android:text="1.Escutar callback do dispositivo" />
 
         <Button
             android:id="@+id/set_gps_from_app"
@@ -193,7 +193,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:text="2.调用gps设置" />
+            android:text="2.Aplicar configuração GPS" />
     </LinearLayout>
 
     <LinearLayout

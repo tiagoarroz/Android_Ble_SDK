@@ -137,9 +137,9 @@ public class GpsLatlonActivity extends Activity implements View.OnClickListener 
                 public void onReportGpsDataDataChange(ReportGpsData reportGpsData) {
                     boolean isReport = reportGpsData.isReport();
                     if (isReport) {
-                        Logger.t(TAG).i("请 app 开始上传 gps数据");
+                        Logger.t(TAG).i(" app Iniciar gpsdados");
                     } else {
-                        Logger.t(TAG).i("请 app 结束上传 gps数据");
+                        Logger.t(TAG).i(" app Terminar gpsdados");
                     }
                 }
             });
@@ -162,7 +162,7 @@ public class GpsLatlonActivity extends Activity implements View.OnClickListener 
             stringBuffer.append(gpsLatLongSetting.toString());
             stringBuffer.append("\n");
             stringBuffer.append(VpBleByteUtil.byte2HexForShow(gpsLatlongCmd));
-            gps_send_text.setText("请求值:" + stringBuffer);
+            gps_send_text.setText(":" + stringBuffer);
 
             VPOperateManager.getMangerInstance(getApplicationContext()).settingGpsLatLon(new IBleWriteResponse() {
                 @Override
@@ -176,7 +176,7 @@ public class GpsLatlonActivity extends Activity implements View.OnClickListener 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            gps_call_text.setText("响应值:" + gpsLatlonData.toString());
+                            gps_call_text.setText(":" + gpsLatlonData.toString());
                         }
                     });
                 }
@@ -189,7 +189,7 @@ public class GpsLatlonActivity extends Activity implements View.OnClickListener 
             kaaStringBuffer.append(kaabaSetting.toString());
             kaaStringBuffer.append("\n");
             kaaStringBuffer.append(VpBleByteUtil.byte2HexForShow(kaabaSettingCmd));
-            gps_send_text.setText("请求值:" + kaaStringBuffer);
+            gps_send_text.setText(":" + kaaStringBuffer);
 
             VPOperateManager.getMangerInstance(getApplicationContext()).settingKaaba(new IBleWriteResponse() {
                 @Override
@@ -203,7 +203,7 @@ public class GpsLatlonActivity extends Activity implements View.OnClickListener 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            gps_call_text.setText("响应值:" + kaaBaData.toString());
+                            gps_call_text.setText(":" + kaaBaData.toString());
                         }
                     });
                 }

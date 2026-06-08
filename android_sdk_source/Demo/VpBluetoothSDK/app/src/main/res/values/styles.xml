@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!-- 关键修复：不让布局侵入状态栏 -->
+        <!-- ：estado -->
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:fitsSystemWindows">true</item>
     </style>

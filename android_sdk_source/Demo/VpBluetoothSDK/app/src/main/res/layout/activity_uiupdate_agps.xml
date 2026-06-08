@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="传输AGPS文件"
+            android:text="Transferir ficheiro AGPS"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="1.是否支持AGPS"
+                android:text="1.Suporte a AGPS"
                 android:onClick="isSupport"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="是否支持"
+                android:text=""
                 android:textColor="@color/colorAccent"
                 android:textSize="8sp" />
 
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="2.读取基本信息"
+                android:text="2.Ler informação base"
                 android:onClick="readBaseInfo"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="基本信息"
+                android:text="Informação base"
                 android:textColor="@color/colorAccent"
                 android:textSize="8sp" />
 
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:onClick="setAgps"
-                android:text="3.设置AGPS"
+                android:text="3.Configurar AGPS"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
@@ -96,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="进度:0%"
+                android:text="Progresso:0%"
                 android:textColor="@color/colorAccent"
                 android:textSize="8sp" />
 

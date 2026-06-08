@@ -19,18 +19,18 @@ public class ImageUtils {
     private static final String TAG = "ImageUtils";
 
     /**
-     * 将本地图片居中裁剪到指定尺寸并保存到本地。
+     * 
      *
-     * @param inputPath   本地图片文件路径
-     * @param outputPath  裁剪后图片保存路径
-     * @param targetWidth 目标宽度
-     * @param targetHeight 目标高度
-     * @return 成功返回 true，失败返回 false
+     * @param inputPath   
+     * @param outputPath  
+     * @param targetWidth 
+     * @param targetHeight 
+     * @return  true， false
      */
     public static boolean centerCropAndSave(String inputPath, String outputPath, int targetWidth, int targetHeight) {
         Bitmap sourceBitmap = BitmapFactory.decodeFile(inputPath);
         if (sourceBitmap == null) {
-            Log.e(TAG, "无法加载源图片: " + inputPath);
+            Log.e(TAG, ": " + inputPath);
             return false;
         }
 
@@ -40,10 +40,10 @@ public class ImageUtils {
                 return false;
             }
 
-            // 保存裁剪后的图片
+            // 
             return saveBitmap(croppedBitmap, outputPath);
         } finally {
-            // 释放源Bitmap，如果它没有被复用
+            // Bitmap，
             if (sourceBitmap != null && !sourceBitmap.isRecycled()) {
                 sourceBitmap.recycle();
             }
@@ -51,12 +51,12 @@ public class ImageUtils {
     }
 
     /**
-     * 对给定的Bitmap进行居中裁剪和缩放。
+     * Bitmap
      *
-     * @param sourceBitmap 源Bitmap
-     * @param targetWidth 目标宽度
-     * @param targetHeight 目标高度
-     * @return 裁剪并缩放后的Bitmap
+     * @param sourceBitmap Bitmap
+     * @param targetWidth 
+     * @param targetHeight 
+     * @return Bitmap
      */
     private static Bitmap centerCrop(Bitmap sourceBitmap, int targetWidth, int targetHeight) {
         int sourceWidth = sourceBitmap.getWidth();
@@ -71,25 +71,25 @@ public class ImageUtils {
         int cropHeight = sourceHeight;
 
         if (sourceRatio > targetRatio) {
-            // 源图片比目标尺寸宽（水平方向需要裁剪）
-            // 需要裁剪的高度保持不变，宽度按比例缩放
+            // （）
+            // ，
             cropWidth = (int) (sourceHeight * targetRatio);
             cropX = (sourceWidth - cropWidth) / 2;
         } else if (sourceRatio < targetRatio) {
-            // 源图片比目标尺寸高（垂直方向需要裁剪）
-            // 需要裁剪的宽度保持不变，高度按比例缩放
+            // （）
+            // ，
             cropHeight = (int) (sourceWidth / targetRatio);
             cropY = (sourceHeight - cropHeight) / 2;
         }
 
-        // 1. 裁剪操作 (Creates a sub-bitmap)
+        // 1.  (Creates a sub-bitmap)
         Bitmap cropped = Bitmap.createBitmap(sourceBitmap, cropX, cropY, cropWidth, cropHeight);
 
-        // 2. 缩放操作 (Resize to final target dimensions)
-        // 裁剪后的图片尺寸可能不完全等于目标尺寸，需要最终缩放
+        // 2.  (Resize to final target dimensions)
+        // ，
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(cropped, targetWidth, targetHeight, true);
 
-        // 释放中间裁剪的Bitmap（如果它不是源Bitmap本身）
+        // Bitmap（Bitmap）
         if (cropped != sourceBitmap && !cropped.isRecycled()) {
             cropped.recycle();
         }
@@ -98,25 +98,25 @@ public class ImageUtils {
     }
 
     /**
-     * 将 Bitmap 保存到本地文件。
+     *  Bitmap 
      */
     public static boolean saveBitmap(Bitmap bitmap, String outputPath) {
         FileOutputStream out = null;
         try {
             File outputFile = new File(outputPath);
-            // 确保目录存在
+            // 
             if (outputFile.getParentFile() != null && !outputFile.getParentFile().exists()) {
                 outputFile.getParentFile().mkdirs();
             }
 
             out = new FileOutputStream(outputFile);
-            // 通常使用 JPEG 格式，压缩质量为 90
+            //  JPEG ， 90
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
-            Log.d(TAG, "图片裁剪并保存成功: " + outputPath);
+            Log.d(TAG, ": " + outputPath);
             return true;
         } catch (IOException e) {
-            Log.e(TAG, "保存图片失败", e);
+            Log.e(TAG, "", e);
             return false;
         } finally {
             if (out != null) {
@@ -126,7 +126,7 @@ public class ImageUtils {
                     e.printStackTrace();
                 }
             }
-            // 释放最终的Bitmap
+            // Bitmap
 //            if (bitmap != null && !bitmap.isRecycled()) {
 //                bitmap.recycle();
 //            }
@@ -134,10 +134,10 @@ public class ImageUtils {
     }
 
     /**
-     * 获得圆角图片的方法
+     * 
      *
      * @param bitmap
-     * @param roundPx 一般设成14
+     * @param roundPx 14
      * @return
      */
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float roundPx) {
@@ -163,20 +163,20 @@ public class ImageUtils {
     }
 
     public static Bitmap getCircularBitmap(Bitmap bitmap) {
-        // 创建一个与原始 Bitmap 相同大小的空白 Bitmap
+        //  Bitmap  Bitmap
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        // 创建画布来绘制 Bitmap
+        //  Bitmap
         Canvas canvas = new Canvas(output);
-        // 设置画笔
+        // Configurar
         Paint paint = new Paint();
-        paint.setAntiAlias(true);  // 开启抗锯齿
-        // 创建一个圆形路径
+        paint.setAntiAlias(true);  // Ativar
+        // 
         Path path = new Path();
         path.addCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
                 Math.min(bitmap.getWidth(), bitmap.getHeight()) / 2, Path.Direction.CCW);
-        // 裁剪画布
+        // 
         canvas.clipPath(path);
-        // 在画布上绘制原始 Bitmap
+        //  Bitmap
         canvas.drawBitmap(bitmap, 0, 0, paint);
         return output;
     }

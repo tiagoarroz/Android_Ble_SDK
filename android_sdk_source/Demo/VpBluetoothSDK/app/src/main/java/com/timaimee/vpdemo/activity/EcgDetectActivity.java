@@ -80,7 +80,7 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
 
                 @Override
                 public void onEcgDetectDiagnosisChange(EcgDiagnosis ecgDiagnosis) {
-                    Logger.t(TAG).i("ecg多诊断 :: = " + ecgDiagnosis.toString());
+                    Logger.t(TAG).i("ecg :: = " + ecgDiagnosis.toString());
                 }
 
                 @Override
@@ -114,7 +114,7 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
     }
 
     /**
-     * 写入的状态返回
+     * estado
      */
     class WriteResponse implements IBleWriteResponse {
 

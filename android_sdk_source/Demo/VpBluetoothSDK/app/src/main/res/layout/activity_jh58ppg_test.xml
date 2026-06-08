@@ -11,7 +11,7 @@
         android:layout_centerInParent="true"
         android:background="#000"
         android:gravity="center"
-        android:text="JH58PPG测试"
+        android:text="Teste JH58PPG"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="读取PPG开关状态"
+        android:text="Ler estado do PPG"
         android:background="#FFF000"
         android:textColor="#000FFF"
         android:textSize="18sp"
@@ -35,7 +35,7 @@
         android:id="@+id/btnReadPPGTestStatus"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:text="读取PPG测量模式"
+        android:text="Ler modo de medição PPG"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvReadPPGTestSwitch" />
 
@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="设置PPG开关状态"
+        android:text="Configurar estado do PPG"
         android:textColor="#000FFF"
         android:background="#FFF000"
         android:textSize="18sp"
@@ -76,21 +76,21 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="全关" />
+            android:text="Desativar tudo" />
 
         <RadioButton
             android:id="@+id/rbMode1On"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="模式1" />
+            android:text="Modo 1" />
 
         <RadioButton
             android:id="@+id/rbMode2On"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="模式2" />
+            android:text="Modo 2" />
 
     </RadioGroup>
 
@@ -99,7 +99,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="读取PPG原始数据"
+        android:text="LerPPGDados brutos"
         android:textColor="#000FFF"
         android:background="#FFF000"
         android:textSize="18sp"
@@ -156,7 +156,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="模式1(每15分钟采集10秒时长)"
+            android:text="Modo 1(1510)"
             android:textSize="12sp" />
 
         <RadioButton
@@ -165,7 +165,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="模式2(每5分钟采集1分钟时长)"
+            android:text="Modo 2(51)"
             android:textSize="12sp" />
 
     </RadioGroup>
@@ -174,7 +174,7 @@
         android:id="@+id/btnReadPPGRawData"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="读取PPG原始数据"
+        android:text="LerPPGDados brutos"
         android:textSize="12sp"
         android:layout_marginTop="10dp"
         app:layout_constraintEnd_toStartOf="@id/btnShareData"
@@ -185,7 +185,7 @@
         android:id="@+id/btnShareData"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="分享读取数据"
+        android:text="Partilhar dados lidos"
         android:textSize="12sp"
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toEndOf="@id/btnReadPPGRawData"
@@ -196,7 +196,7 @@
         android:id="@+id/btnStartRealTimePPGRawDataTransfer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="开始PPG实时传输"
+        android:text="Iniciar transmissão PPG em tempo real"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnStopRealTimePPGRawDataTransfer"
@@ -206,7 +206,7 @@
         android:id="@+id/btnStopRealTimePPGRawDataTransfer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="停止PPG实时传输"
+        android:text="Parar transmissão PPG em tempo real"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/btnStartRealTimePPGRawDataTransfer"
         app:layout_constraintEnd_toEndOf="parent"
@@ -225,7 +225,7 @@
         <TextView
             android:id="@+id/tvPPGOptInfo"
             android:padding="10dp"
-            android:text="WCNM(我吃柠檬)"
+            android:text="WCNM(texto de teste)"
             android:textSize="14dp"
             android:textColor="#fff"
             android:layout_width="match_parent"

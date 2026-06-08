@@ -62,7 +62,7 @@ public class AddContactActivity extends AppCompatActivity {
                 @Override
                 public void onSOSCallTimesReadSuccess(int times, int minTimes, int maxTimes) {
                     etSOSCount.setText(times + "");
-                    tvSOSInfo.setText("呼叫次数设置范围：[" + minTimes + "-" + maxTimes + "]");
+                    tvSOSInfo.setText("Configurar：[" + minTimes + "-" + maxTimes + "]");
                 }
 
                 @Override
@@ -84,17 +84,17 @@ public class AddContactActivity extends AppCompatActivity {
                 VPOperateManager.getInstance().setSOSCallTimes(callTimes, new ISOSCallTimesListener() {
                     @Override
                     public void onSOSCallTimesSettingSuccess(int times) {
-                        Toast.makeText(AddContactActivity.this, "设置成功：" + times + "次", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddContactActivity.this, "Configurar：" + times + "", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onSOSCallTimesSettingFailed() {
-                        Toast.makeText(AddContactActivity.this, "设置失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddContactActivity.this, "Configurar", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onSOSCallTimesReadSuccess(int times, int minTimes, int maxTimes) {
-                        Toast.makeText(AddContactActivity.this, "读取成功：" + times + "-范围：[" + minTimes + "-" + maxTimes + "]", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddContactActivity.this, "Ler：" + times + "-：[" + minTimes + "-" + maxTimes + "]", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

@@ -58,7 +58,7 @@ public class MyService extends Service {
             mScanner = mBluetoothAdapter.getBluetoothLeScanner();
         }
 
-        Logger.t(TAG).e("onCreate = >>>>>>>>>>>>>>>>>>> 当前进程 = " + getCurProcessName(this));
+        Logger.t(TAG).e("onCreate = >>>>>>>>>>>>>>>>>>>  = " + getCurProcessName(this));
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -78,7 +78,7 @@ public class MyService extends Service {
     private void initNotify26() {
         Intent mIntent = new Intent(this, MainActivity.class);
         String appName = getString(R.string.app_name);
-        String msgcontent = "VpSdk 启动前台服务通知！";
+        String msgcontent = "VpSdk ！";
         msgcontent = String.format(msgcontent, appName);
         notifyApp(appName, msgcontent, mIntent, R.mipmap.ic_launcher, 0x12);
     }
@@ -106,7 +106,7 @@ public class MyService extends Service {
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             manager.createNotificationChannel(channel);
             String msgtitle = getString(R.string.app_name);
-            String msgcontent = "VpSdk 启动前台服务通知";
+            String msgcontent = "VpSdk ";
             msgcontent = String.format(msgcontent, msgtitle);
             Notification notification = new Notification.Builder(getApplicationContext(), CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
@@ -137,10 +137,10 @@ public class MyService extends Service {
     public void startScanBluetooth() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isEnable) {
-            Log.e("BluetoothLESearcher", "startScanDevice-------------> 版本>=26 开始搜索");
+            Log.e("BluetoothLESearcher", "startScanDevice-------------> >=26 Iniciar");
             startScanDevice2();
         } else {
-            Log.e("BluetoothLESearcher", "startScanBluetooth------------->startLeScan 低版本 开始搜索");
+            Log.e("BluetoothLESearcher", "startScanBluetooth------------->startLeScan  Iniciar");
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         }
     }
@@ -151,10 +151,10 @@ public class MyService extends Service {
         // TODO Auto-generated method stub
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isEnable) {
-                Log.e("BluetoothLESearcher", "stopScanBluetooth-------------> 版本>=26 搜索停止");
+                Log.e("BluetoothLESearcher", "stopScanBluetooth-------------> >=26 ");
                 mScanner.stopScan(mScanCallback);
             } else {
-                Log.e("BluetoothLESearcher", "stopScanBluetooth------------->stopLeScan 低版本 搜索停止");
+                Log.e("BluetoothLESearcher", "stopScanBluetooth------------->stopLeScan  ");
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
             }
         } catch (Exception e) {
@@ -169,11 +169,11 @@ public class MyService extends Service {
         // TODO Auto-generated method stub
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isEnable) {
-            Log.e("BluetoothLESearcher", "cancelScanBluetooth-------------> 版本>=26 搜索停止");
+            Log.e("BluetoothLESearcher", "cancelScanBluetooth-------------> >=26 ");
             mScanner.stopScan(mScanCallback);
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            Log.e("BluetoothLESearcher", "cancelScanBluetooth-------------> 低版本 搜索停止");
+            Log.e("BluetoothLESearcher", "cancelScanBluetooth------------->  ");
         }
 
     }
@@ -181,22 +181,22 @@ public class MyService extends Service {
 
     @TargetApi(Build.VERSION_CODES.O)
     private void startScanDevice2() {
-        Log.e("BluetoothLESearcher", "开始搜索设备-------------> ");
+        Log.e("BluetoothLESearcher", "Iniciardispositivo-------------> ");
         scan();
         mBluetoothAdapter.getBluetoothLeScanner().startScan(buildScanFilters(), mScanSettings, mScanCallback);
     }
 
-    //设置蓝牙扫描过滤器集合
+    //Configurar
     private List<ScanFilter> scanFilterList;
-    //设置蓝牙扫描过滤器
+    //Configurar
     private ScanFilter.Builder scanFilterBuilder;
-    //设置蓝牙扫描设置
+    //ConfigurarConfigurar
     private ScanSettings.Builder scanSettingBuilder;
 
     @TargetApi(Build.VERSION_CODES.O)
     private List<ScanFilter> buildScanFilters() {
         scanFilterList = new ArrayList<>();
-        // 通过服务 uuid 过滤自己要连接的设备   过滤器搜索GATT服务UUID
+        //  uuid dispositivo   GATTUUID
         scanFilterBuilder = new ScanFilter.Builder();
         ParcelUuid parcelUuidMask = ParcelUuid.fromString("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF");
 //        ParcelUuid parcelUuid = ParcelUuid.fromString("0000ff07-0000-1000-8000-00805f9b34fb");
@@ -205,7 +205,7 @@ public class MyService extends Service {
         scanFilterList.add(scanFilterBuilder.build());
 
         scanFilterList.add(new ScanFilter.Builder()
-                //过滤扫描蓝牙设备的主服务
+                //dispositivo
                 .setServiceUuid(ParcelUuid.fromString("0000ffff-0000-1000-8000-00805f9bfffb"))
                 .build());
         return scanFilterList;
@@ -214,14 +214,14 @@ public class MyService extends Service {
     @TargetApi(Build.VERSION_CODES.O)
     private ScanSettings buildScanSettings() {
         scanSettingBuilder = new ScanSettings.Builder();
-        //设置蓝牙LE扫描的扫描模式。
-        //使用最高占空比进行扫描。建议只在应用程序处于此模式时使用此模式在前台运行
+        //ConfigurarLE
+        //
         scanSettingBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
-        //设置蓝牙LE扫描滤波器硬件匹配的匹配模式
-        //在主动模式下，即使信号强度较弱，hw也会更快地确定匹配.在一段时间内很少有目击/匹配。
+        //ConfigurarLE
+        //，，hwConfirmar./
         scanSettingBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
-        //设置蓝牙LE扫描的回调类型
-        //为每一个匹配过滤条件的蓝牙广告触发一个回调。如果没有过滤器是活动的，所有的广告包被报告
+        //ConfigurarLE
+        //，
         scanSettingBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
         scanSettingBuilder.setLegacy(true);
         return new ScanSettings.Builder().build();
@@ -279,7 +279,7 @@ public class MyService extends Service {
                 if (front) {
                     if (null == mScanSettings) {
                         mScanSettings = new ScanSettings.Builder()
-                                //前台设置扫描模式为低时延
+                                //Configurar
                                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                                 .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
                                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -287,7 +287,7 @@ public class MyService extends Service {
                     }
                 } else {
                     mScanSettings = new ScanSettings.Builder()
-                            //退到后台时设置扫描模式为低能耗
+                            //Configurar
                             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                             .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
                             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -297,13 +297,13 @@ public class MyService extends Service {
                 if (front) {
                     if (null == mScanSettings) {
                         mScanSettings = new ScanSettings.Builder()
-                                //前台设置扫描模式为低时延
+                                //Configurar
                                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                                 .build();
                     }
                 } else {
                     mScanSettings = new ScanSettings.Builder()
-                            //退到后台时设置扫描模式为低能耗
+                            //Configurar
                             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                             .build();
                 }

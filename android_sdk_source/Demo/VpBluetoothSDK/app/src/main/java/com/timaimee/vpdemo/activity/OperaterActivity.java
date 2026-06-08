@@ -35,6 +35,7 @@ import com.jieli.jl_rcsp.model.base.BaseError;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
 import com.timaimee.vpdemo.adapter.GridAdatper;
+import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.timaimee.vpdemo.oad.activity.OadActivity;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleNotifyResponse;
@@ -286,7 +287,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
 
     /**
-     * 密码验证获取以下信息
+     * palavra-passe
      */
     int watchDataDay = 3;
     int weatherStyle = 0;
@@ -319,6 +320,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operate);
+        DemoStepLogger.stepStart("OPERATE_INIT", "Arranque do ecrã que agrega todas as operações do SDK");
         mContext = getApplicationContext();
         deviceaddress = getIntent().getStringExtra("deviceaddress");
         tv1 = (TextView) super.findViewById(R.id.tv1);
@@ -329,64 +331,64 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         initGridView();
         listenDeviceCallbackData();
         listenCamera();
-        PID = "【进程名：" + Process.myPid() + "，线程：" + Thread.currentThread().getName() + "】";
-        VPLogger.e("数据操作--->" + PID);
+        PID = "：" + Process.myPid() + "，：" + Thread.currentThread().getName() + "";
+        VPLogger.e("dados--->" + PID);
         VPOperateManager.getInstance().init(this);
         VPOperateManager.getInstance().setAutoConnectBTBySdk(false);
         VPOperateManager.getInstance().registerBTInfoListener(new IDeviceBTInfoListener() {
             @Override
             public void onDeviceBTFunctionNotSupport() {
-                Logger.t("【BT】-").d("【BT】- ---> 不支持BT功能");
-                showToast("不支持BT功能");
+                Logger.t("BT-").d("BT- ---> BTfuncionalidade");
+                showToast("BTfuncionalidade");
             }
 
             @Override
             public void onDeviceBTInfoSettingSuccess(@NotNull BTInfo btInfo) {
-                Logger.t("【BT】-").d("【BT】- ---> btInfo : " + btInfo.toString());
-                showToast("【BT】- ---> btInfo : " + btInfo.toString());
+                Logger.t("BT-").d("BT- ---> btInfo : " + btInfo.toString());
+                showToast("BT- ---> btInfo : " + btInfo.toString());
             }
 
             @Override
             public void onDeviceBTInfoSettingFailed() {
-                Logger.t("【BT】-").d("【BT】- ---> BT设置失败");
-                showToast("【BT】- ---> BT设置失败");
+                Logger.t("BT-").d("BT- ---> BTConfigurar");
+                showToast("BT- ---> BTConfigurar");
             }
 
             @Override
             public void onDeviceBTInfoReadSuccess(@NotNull BTInfo btInfo) {
-                Logger.t("【BT】-").d("【BT】- ---> BT读取成功, btInfo : " + btInfo.toString());
-                showToast("【BT】- ---> BT读取成功, btInfo : " + btInfo.toString());
+                Logger.t("BT-").d("BT- ---> BTLer, btInfo : " + btInfo.toString());
+                showToast("BT- ---> BTLer, btInfo : " + btInfo.toString());
             }
 
             @Override
             public void onDeviceBTInfoReadFailed() {
-                Logger.t("【BT】-").d("【BT】- ---> BT读取失败");
-                showToast("【BT】- ---> BT读取失败");
+                Logger.t("BT-").d("BT- ---> BTLer");
+                showToast("BT- ---> BTLer");
             }
 
             @Override
             public void onDeviceBTInfoReport(@NotNull BTInfo btInfo) {
-                Logger.t("【BT】-").d("【BT】- ---> BT上报，btInfo = " + btInfo.toString());
-                showToast("【BT】- ---> BT上报，btInfo = " + btInfo.toString());
+                Logger.t("BT-").d("BT- ---> BT，btInfo = " + btInfo.toString());
+                showToast("BT- ---> BT，btInfo = " + btInfo.toString());
             }
         });
         VPOperateManager.getInstance().registerBTConnectionListener(new IDeviceBTConnectionListener() {
             @Override
             public void onDeviceBTConnecting() {
-                Logger.t("【BT】-").d("BT设备连接中");
-                showToast("BT设备连接中");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTConnected() {
-                Logger.t("【BT】-").d("BT设备已连接");
-                showToast("BT设备已连接");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTDisconnected() {
-                Logger.t("【BT】-").d("BT设备已断开");
-                showToast("BT设备已断开");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
 //                VPOperateManager.getInstance().setBTStatus(false, true, true, false, new IBleWriteResponse() {
 //                    @Override
 //                    public void onResponse(int code) {
@@ -397,8 +399,8 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
             @Override
             public void onDeviceBTConnectTimeout() {
-                Logger.t("【BT】-").d("BT连接超时");
-                showToast("BT连接超时");
+                Logger.t("BT-").d("BT");
+                showToast("BT");
             }
         });
 
@@ -408,6 +410,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 super.onNotify(service, character, value);
             }
         });
+        DemoStepLogger.stepSuccess("OPERATE_INIT", "Grid de operações carregado e listeners de callback registados");
 
 
     }
@@ -425,7 +428,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         isSleepPrecision = getIntent().getBooleanExtra("isSleepPrecision", false);
         isNewSportCalc = getIntent().getBooleanExtra("isNewSportCalc", false);
         isOadModel = getIntent().getBooleanExtra("isOadModel", false);
-        titleBleInfo.setText("地址：" + deviceaddress + ", 设备号：" + deviceNumber + "\n版本号：" + deviceVersion + ", 测试版本号：" + deviceTestVersion);
+        titleBleInfo.setText("：" + deviceaddress + ", dispositivo：" + deviceNumber + "\n：" + deviceVersion + ", ：" + deviceTestVersion);
     }
     @Override
     protected void onResume() {
@@ -433,7 +436,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         VPOperateManager.getInstance().setDeviceFunctionStatusChangeListener(new IDeviceFunctionStatusChangeListener() {
             @Override
             public void onFunctionStatusChanged(@NotNull DeviceFunction function, @NotNull EFunctionStatus status) {
-                Logger.t(TAG).d("设备功能状态改变：" + function.getDes() + " -> " + status);
+                Logger.t(TAG).d("dispositivofuncionalidadeestado：" + function.getDes() + " -> " + status);
                 currentState = status;
                 des = function.getDes();
             }
@@ -444,6 +447,10 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
     public static String des = null;
 
+    /**
+     * Prepara o catálogo de operações no formato de grelha.
+     * Cada item corresponde a uma funcionalidade de demonstração do SDK.
+     */
     private void initGridView() {
         mGridView = (GridView) findViewById(R.id.main_gridview);
         int i = 0;
@@ -463,6 +470,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
         String oprater = mGridData.get(position).get("str");
+        DemoStepLogger.featureEvent("OPERATION_SELECT", "posição=" + position + ", operação=" + oprater);
         Toast.makeText(mContext, oprater, Toast.LENGTH_SHORT).show();
         tv1.setText("");
         tv2.setText("");
@@ -524,7 +532,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 intent.putExtra("deviceTestVersion", deviceTestVersion);
                 startActivity(intent);
             } else {
-                Toast.makeText(mContext, "不支持自定义表盘", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
             }
         } else if (oprater.equals(UI_UPDATE_CUSTOM)) {
 
@@ -537,7 +545,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 intent.putExtra("deviceTestVersion", deviceTestVersion);
                 startActivity(intent);
             } else {
-                Toast.makeText(mContext, "不支持自定义表盘", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
             }
 
         } else if (oprater.equals(SYNC_MUSIC_INFO_PLAY)) {
@@ -549,7 +557,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         } else if (oprater.equals(UI_UPDATE_SERVER)) {
 
             if (VPOperateManager.getInstance().isJLDevice()) {
-                Toast.makeText(mContext, "不支持服务器表盘", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -562,7 +570,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 intent.putExtra("deviceTestVersion", deviceTestVersion);
                 startActivity(intent);
             } else {
-                Toast.makeText(mContext, "不支持服务器表盘", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "", Toast.LENGTH_LONG).show();
             }
 
         } else if (oprater.equals(UI_UPDATE_G15IMG)) {
@@ -574,7 +582,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 intent.putExtra("deviceTestVersion", deviceTestVersion);
                 startActivity(intent);
             } else {
-                Toast.makeText(mContext, "不支持大数据传输", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "dados", Toast.LENGTH_LONG).show();
             }
         } else if (oprater.equals(WEATHER_SETTING_STATUEINFO_ON)) {
             WeatherStatusSetting weatherStatusSetting = new WeatherStatusSetting(0, true, EWeatherType.C);
@@ -660,7 +668,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             Logger.t(TAG).i("HEART_DETECT_STOP");
             VPOperateManager.getInstance().stopDetectHeart(writeResponse);
         } else if (oprater.equals(BP_DETECT_START)) {
-            tv1.setText(BP_DETECT_START + ",等待50s...");
+            tv1.setText(BP_DETECT_START + ",50s...");
             VPOperateManager.getInstance().startDetectBP(writeResponse, new IBPDetectDataListener() {
                 @Override
                 public void onDataChange(BpData bpData) {
@@ -676,7 +684,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             boolean isOpenPrivateModel = true;
             boolean isAngioAdjuste = false;
             BpSetting bpSetting = new BpSetting(isOpenPrivateModel, 111, 88);
-            //是否开启动态血压调整模式，功能标志位在密码验证的返回
+            //Ativarpressão arterial，funcionalidadepalavra-passe
             bpSetting.setAngioAdjuste(isAngioAdjuste);
             VPOperateManager.getInstance().settingDetectBP(writeResponse, new IBPSettingDataListener() {
                 @Override
@@ -701,7 +709,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             boolean isOpenPrivateModel = false;
             boolean isAngioAdjuste = true;
             BpSetting bpSetting = new BpSetting(isOpenPrivateModel, 111, 88);
-            //是否开启动态血压调整模式，功能标志位在密码验证的返回
+            //Ativarpressão arterial，funcionalidadepalavra-passe
             bpSetting.setAngioAdjuste(isAngioAdjuste);
             VPOperateManager.getInstance().settingDetectBP(writeResponse, new IBPSettingDataListener() {
                 @Override
@@ -715,7 +723,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             boolean isOpenPrivateModel = false;
             boolean isAngioAdjuste = true;
             BpSetting bpSetting = new BpSetting(isOpenPrivateModel, 111, 88);
-            //是否开启动态血压调整模式，功能标志位在密码验证的返回
+            //Ativarpressão arterial，funcionalidadepalavra-passe
             bpSetting.setAngioAdjuste(isAngioAdjuste);
             VPOperateManager.getInstance().cancelAngioAdjust(writeResponse, new IBPSettingDataListener() {
                 @Override
@@ -727,7 +735,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             }, bpSetting);
         } else if (oprater.equals(PWD_COMFIRM)) {
             boolean is24Hourmodel = false;
-            titleBleInfo.setText("开始密码校验");
+            titleBleInfo.setText("IniciarValidação de palavra-passe");
             VPOperateManager.getInstance().confirmDevicePwd(writeResponse,
                     new IPwdDataListener() {
                         @Override
@@ -737,13 +745,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                             deviceNumber = pwdData.getDeviceNumber();
                             deviceVersion = pwdData.getDeviceVersion();
                             deviceTestVersion = pwdData.getDeviceTestVersion();
-                            titleBleInfo.setText("设备号：" + deviceNumber + ",版本号：" + deviceVersion + ",\n测试版本号：" + deviceTestVersion);
+                            titleBleInfo.setText("dispositivo：" + deviceNumber + ",：" + deviceVersion + ",\n：" + deviceTestVersion);
                         }
 
                         @Override
                         public void onConnectionConfirmTimeout() {
-                            titleBleInfo.setText("错误:连接确认超时");
-                            showToast("错误:连接确认超时");
+                            titleBleInfo.setText("Erro: tempo de confirmação de ligação esgotado");
+                            showToast("Erro: tempo de confirmação de ligação esgotado");
                         }
                     },
                     new IDeviceFuctionDataListener() {
@@ -803,21 +811,21 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
         }else  if (oprater.equals(NEED_COMFIRM)) {
             VPOperateManager.getInstance().setDeviceShowConfirm(true);
-            showToast("设置需要密码确认");
+            showToast("Configurarpalavra-passe");
         } else  if (oprater.equals(UNNEED_COMFIRM)) {
             VPOperateManager.getInstance().setDeviceShowConfirm(false);
-            showToast("设置无需密码确认");
-        } else if (oprater.equals(PWD_COMFIRM_2_DISCONNECT)) { //发起BT立马断开
-            connectBT();//连接BT
+            showToast("Configurarpalavra-passe");
+        } else if (oprater.equals(PWD_COMFIRM_2_DISCONNECT)) { //BT
+            connectBT();//BT
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    VPOperateManager.getInstance().disconnectWatch(writeResponse); //去掉了BLE连接库的断开
+                    VPOperateManager.getInstance().disconnectWatch(writeResponse); //BLE
                     mHandler.postDelayed(() -> {
-                        disconnectBT(); //500ms后断开BT
+                        disconnectBT(); //500msBT
                     }, 500);
                 }
-            }, 200);//200ms后 执行断开操作
+            }, 200);//200ms 
 
         } else if (oprater.equals(PWD_COMFIRM_2_DISCONNECT_)) {
             VPOperateManager.getInstance().disconnectWatch(writeResponse);
@@ -839,7 +847,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readSportStep(writeResponse, new ISportDataListener() {
                 @Override
                 public void onSportDataChange(SportData sportData) {
-                    String message = "当前计步:\n" + sportData.toString();
+                    String message = ":\n" + sportData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -848,7 +856,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().syncPersonInfo(writeResponse, new IPersonInfoDataListener() {
                 @Override
                 public void OnPersoninfoDataChange(EOprateStauts EOprateStauts) {
-                    String message = "同步个人信息:\n" + EOprateStauts.toString();
+                    String message = ":\n" + EOprateStauts.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -885,7 +893,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingAlarm(writeResponse, new IAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListener(AlarmData alarmData) {
-                    String message = "设置闹钟:\n" + alarmData.toString();
+                    String message = "Configuraralarme:\n" + alarmData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -894,7 +902,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readAlarm(writeResponse, new IAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListener(AlarmData alarmData) {
-                    String message = "读取闹钟:\n" + alarmData.toString();
+                    String message = "Leralarme:\n" + alarmData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -903,7 +911,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readAlarm2(writeResponse, new IAlarm2DataListListener() {
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-                    String message = "读取闹钟[新版]:\n" + alarmData2.toString();
+                    String message = "Leralarme[]:\n" + alarmData2.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -915,7 +923,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().deleteAlarm2(writeResponse, new IAlarm2DataListListener() {
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-                    String message = "删除闹钟[新版]:\n" + alarmData2.toString();
+                    String message = "Eliminaralarme[]:\n" + alarmData2.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -925,7 +933,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().setOnDeviceAlarm2ChangedListener(new OnDeviceAlarm2ChangedListener() {
                 @Override
                 public void onDeviceAlarm2Changed() {
-                    sendMsg("设备端闹钟状态改变了，请调用[readAlarm2更新闹钟列表]", 1);
+                    sendMsg("dispositivoalarmeestado，[readAlarm2Atualizaralarme]", 1);
                 }
             });
 
@@ -934,7 +942,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().addAlarm2(writeResponse, new IAlarm2DataListListener() {
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-                    String message = "添加闹钟[新版]:\n" + alarmData2.toString();
+                    String message = "Adicionaralarme[]:\n" + alarmData2.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -948,7 +956,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().modifyAlarm2(writeResponse, new IAlarm2DataListListener() {
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
-                    String message = "修改闹钟[新版]:\n" + alarmData2.toString();
+                    String message = "alarme[]:\n" + alarmData2.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -959,7 +967,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingLongSeat(writeResponse, new LongSeatSetting(10, 35, 11, 45, 60, true), new ILongSeatDataListener() {
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
-                    String message = "设置久坐-打开:\n" + longSeat.toString();
+                    String message = "Configurar-Ativar:\n" + longSeat.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -969,7 +977,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
-                    String message = "设置久坐-关闭:\n" + longSeat.toString();
+                    String message = "Configurar-Desativar:\n" + longSeat.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -978,7 +986,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readLongSeat(writeResponse, new ILongSeatDataListener() {
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
-                    String message = "设置久坐-读取:\n" + longSeat.toString();
+                    String message = "Configurar-Ler:\n" + longSeat.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -987,7 +995,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingDeviceLanguage(writeResponse, new ILanguageDataListener() {
                 @Override
                 public void onLanguageDataChange(LanguageData languageData) {
-                    String message = "设置语言(中文):\n" + languageData.toString();
+                    String message = "Configurar():\n" + languageData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -996,7 +1004,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingDeviceLanguage(writeResponse, new ILanguageDataListener() {
                 @Override
                 public void onLanguageDataChange(LanguageData languageData) {
-                    String message = "设置语言(英文):\n" + languageData.toString();
+                    String message = "Configurar():\n" + languageData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1005,7 +1013,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readBattery(writeResponse, new IBatteryDataListener() {
                 @Override
                 public void onDataChange(BatteryData batteryData) {
-                    String message = "电池等级:\n" + batteryData.getBatteryLevel() + "\n" + "电量:" + batteryData.getBatteryLevel() * 25 + "%";
+                    String message = ":\n" + batteryData.getBatteryLevel() + "\n" + ":" + batteryData.getBatteryLevel() * 25 + "%";
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1014,7 +1022,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readNightTurnWriste(writeResponse, new INightTurnWristeDataListener() {
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
-                    String message = "夜间转腕-读取:\n" + nightTurnWristeData.toString();
+                    String message = "-Ler:\n" + nightTurnWristeData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1023,7 +1031,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingNightTurnWriste(writeResponse, new INightTurnWristeDataListener() {
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
-                    String message = "夜间转腕-打开:\n" + nightTurnWristeData.toString();
+                    String message = "-Ativar:\n" + nightTurnWristeData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1032,7 +1040,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingNightTurnWriste(writeResponse, new INightTurnWristeDataListener() {
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
-                    String message = "夜间转腕-关闭:\n" + nightTurnWristeData.toString();
+                    String message = "-Desativar:\n" + nightTurnWristeData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1044,7 +1052,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingNightTurnWriste(writeResponse, new INightTurnWristeDataListener() {
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
-                    String message = "夜间转腕-" + isOpen + ":\n" + nightTurnWristeData.toString();
+                    String message = "-" + isOpen + ":\n" + nightTurnWristeData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1057,7 +1065,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingNightTurnWriste(writeResponse, new INightTurnWristeDataListener() {
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
-                    String message = "夜间转腕-" + isOpen + ":\n" + nightTurnWristeData.toString();
+                    String message = "-" + isOpen + ":\n" + nightTurnWristeData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1069,7 +1077,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingFindPhoneListener(new IFindPhonelistener() {
                 @Override
                 public void findPhone() {
-                    String message = "(监听到手环要查找手机)-where is the phone,make some noise!";
+                    String message = "()-where is the phone,make some noise!";
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1083,7 +1091,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readCustomSetting(writeResponse, new ICustomSettingDataListener() {
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
-                    String message = "个性化状态-公英制/时制(12/24)/5分钟测量开关(心率/血压)-读取:\n" + customSettingData.toString();
+                    String message = "estado-/(12/24)/5(Frequência cardíaca/pressão arterial)-Ler:\n" + customSettingData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1105,15 +1113,15 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             EFunctionStatus isOpenAutoHRV = UNSUPPORT;
             EFunctionStatus isOpenDisconnectRemind = UNSUPPORT;
             EFunctionStatus isAutoTemperatureDetect = UNSUPPORT;
-            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//是否支持温度单位设置
-            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//是否支持精准睡眠
+            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//temperaturaConfigurar
+            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//
 
-            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//是否支持读取温度
-            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//是否可以通过app监测体温
-            boolean isCanDetectBloodGlucoseByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportBloodGlucoseDetect();//是否可以通过app监测血糖
-            boolean isCanDetectBloodComponentByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportBloodComponentDetect();//是否可以通过app监测血液成分
+            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//Lertemperatura
+            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//app
+            boolean isCanDetectBloodGlucoseByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportBloodGlucoseDetect();//app
+            boolean isCanDetectBloodComponentByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportBloodComponentDetect();//app
 
-            Logger.t(TAG).i("是否可以读取体温：" + isCanReadTempture + " 是否可以通过app自动检测体温");
+            Logger.t(TAG).i("Ler：" + isCanReadTempture + " app");
 
             CustomSetting customSetting = new CustomSetting(isHaveMetricSystem, isMetric, is24Hour, isOpenAutoHeartDetect,
                     isOpenAutoBpDetect, isOpenSportRemain, isOpenVoiceBpHeart, isOpenFindPhoneUI, isOpenStopWatch,
@@ -1151,7 +1159,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().changeCustomSetting(writeResponse, new ICustomSettingDataListener() {
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
-                    String message = "个性化状态-公英制/时制(12/24)/5分钟测量开关(心率/血压)-设置:\n" + customSettingData.toString();
+                    String message = "estado-/(12/24)/5(Frequência cardíaca/pressão arterial)-Configurar:\n" + customSettingData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1173,14 +1181,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             EFunctionStatus isOpenAutoHRV = UNSUPPORT;
             EFunctionStatus isOpenDisconnectRemind = UNSUPPORT;
             EFunctionStatus isAutoTemperatureDetect = UNSUPPORT;
-            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//是否支持温度单位设置
-            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//是否支持精准睡眠
+            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//temperaturaConfigurar
+            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//
 
-            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//是否支持读取温度
-            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//是否可以通过app监测体温
+            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//Lertemperatura
+            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//app
 
 
-            Logger.t(TAG).i("是否可以读取体温：" + isCanReadTempture + " 是否可以通过app自动检测体温");
+            Logger.t(TAG).i("Ler：" + isCanReadTempture + " app");
 
             CustomSetting customSetting = new CustomSetting(isHaveMetricSystem, isMetric, is24Hour, isOpenAutoHeartDetect,
                     isOpenAutoBpDetect, isOpenSportRemain, isOpenVoiceBpHeart, isOpenFindPhoneUI, isOpenStopWatch,
@@ -1204,7 +1212,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().changeCustomSetting(writeResponse, new ICustomSettingDataListener() {
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
-                    String message = "个性化状态--设置:\n" + customSettingData.toString();
+                    String message = "estado--Configurar:\n" + customSettingData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1226,14 +1234,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             EFunctionStatus isOpenAutoHRV = UNSUPPORT;
             EFunctionStatus isOpenDisconnectRemind = UNSUPPORT;
             EFunctionStatus isAutoTemperatureDetect = UNSUPPORT;
-            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//是否支持温度单位设置
-            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//是否支持精准睡眠
+            boolean isSupportSettingsTemperatureUnit = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportSettingsTemperatureUnit();//temperaturaConfigurar
+            boolean isSupportSleep = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportPreciseSleep();//
 
-            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//是否支持读取温度
-            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//是否可以通过app监测体温
+            boolean isCanReadTempture = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportReadTempture();//Lertemperatura
+            boolean isCanDetectTempByApp = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportCheckTemptureByApp();//app
 
 
-            Logger.t(TAG).i("是否可以读取体温：" + isCanReadTempture + " 是否可以通过app自动检测体温");
+            Logger.t(TAG).i("Ler：" + isCanReadTempture + " app");
 
             CustomSetting customSetting = new CustomSetting(isHaveMetricSystem, isMetric, is24Hour, isOpenAutoHeartDetect,
                     isOpenAutoBpDetect, isOpenSportRemain, isOpenVoiceBpHeart, isOpenFindPhoneUI, isOpenStopWatch,
@@ -1257,7 +1265,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().changeCustomSetting(writeResponse, new ICustomSettingDataListener() {
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
-                    String message = "个性化状态--设置:\n" + customSettingData.toString();
+                    String message = "estado--Configurar:\n" + customSettingData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1268,7 +1276,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().setttingCheckWear(writeResponse, new ICheckWearDataListener() {
                 @Override
                 public void onCheckWearDataChange(CheckWearData checkWearData) {
-                    String message = "佩戴检测-打开:\n" + checkWearData.toString();
+                    String message = "-Ativar:\n" + checkWearData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1279,7 +1287,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().setttingCheckWear(writeResponse, new ICheckWearDataListener() {
                 @Override
                 public void onCheckWearDataChange(CheckWearData checkWearData) {
-                    String message = "佩戴检测-关闭:\n" + checkWearData.toString();
+                    String message = "-Desativar:\n" + checkWearData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1288,7 +1296,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingFindDevice(writeResponse, new IFindDeviceDatalistener() {
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
-                    String message = "防丢-打开:\n" + findDeviceData.toString();
+                    String message = "-Ativar:\n" + findDeviceData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1297,7 +1305,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingFindDevice(writeResponse, new IFindDeviceDatalistener() {
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
-                    String message = "防丢-关闭:\n" + findDeviceData.toString();
+                    String message = "-Desativar:\n" + findDeviceData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1306,7 +1314,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readFindDevice(writeResponse, new IFindDeviceDatalistener() {
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
-                    String message = "防丢-读取:\n" + findDeviceData.toString();
+                    String message = "-Ler:\n" + findDeviceData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1315,14 +1323,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readSocialMsg(writeResponse, new ISocialMsgDataListener() {
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒1-读取:\n" + socailMsgData.toString();
+                    String message = " 1-Ler:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒2-读取:\n" + socailMsgData.toString();
+                    String message = " 2-Ler:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1355,14 +1363,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingSocialMsg(writeResponse, new ISocialMsgDataListener() {
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒-设置:\n" + socailMsgData.toString();
+                    String message = " -Configurar:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒-设置2:\n" + socailMsgData.toString();
+                    String message = " -Configurar2:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1396,14 +1404,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingSocialMsg(writeResponse, new ISocialMsgDataListener() {
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒-设置:\n" + socailMsgData.toString();
+                    String message = " -Configurar:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
-                    String message = " 社交信息提醒-设置2:\n" + socailMsgData.toString();
+                    String message = " -Configurar2:\n" + socailMsgData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1438,23 +1446,23 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             });
         } else if (oprater.equals(SOCIAL_MSG_SEND)) {
             startActivity(new Intent(OperaterActivity.this, NotificationSettingsActivity.class));
-//            /**电话,可以只传电话号码**/
+//            /**,**/
 //            final ContentSetting contentphoneSetting0 = new ContentPhoneSetting(ESocailMsg.PHONE, "010-6635214");
-//            /**电话,传联系人姓名以及电话号码，最终显示的联系人姓名**/
-//            ContentSetting contentphoneSetting1 = new ContentPhoneSetting(ESocailMsg.PHONE, "测试头", "010-6635214");
+//            /**,Contactos，Contactos**/
+//            ContentSetting contentphoneSetting1 = new ContentPhoneSetting(ESocailMsg.PHONE, "", "010-6635214");
 //
-//            /**短信，可以只传电话号码**/
-//            ContentSetting contentsmsSetting2 = new ContentSmsSetting(ESocailMsg.SMS, "010-6635214", "测试反馈 SMS");
-//            /**短信，传联系人姓名以及电话号码，最终显示的联系人姓名**/
-//            ContentSetting contentsmsSetting3 = new ContentSmsSetting(ESocailMsg.SMS, "测试头", "010-6635214", "测试反馈 SMS");
+//            /**，**/
+//            ContentSetting contentsmsSetting2 = new ContentSmsSetting(ESocailMsg.SMS, "010-6635214", " SMS");
+//            /**，Contactos，Contactos**/
+//            ContentSetting contentsmsSetting3 = new ContentSmsSetting(ESocailMsg.SMS, "", "010-6635214", " SMS");
 //
-//            /**第三方APP推送,发送前先通过密码验证获取FunctionSocailMsgData的状态**/
-//            ContentSetting contentsociaSetting4 = new ContentSocailSetting(ESocailMsg.SHIELD_POLICE, "警右", "坦白从宽，牢底坐穿，抗拒从严，回家过年");
+//            /**APP,Enviarpalavra-passeFunctionSocailMsgDataestado**/
+//            ContentSetting contentsociaSetting4 = new ContentSocailSetting(ESocailMsg.SHIELD_POLICE, "", "，，，");
 //            VPOperateManager.getInstance().sendSocialMsgContent(writeResponse, contentsociaSetting4);
 //            mHandler.postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
-//                    ContentSetting contentsociaSetting5 = new ContentSocailSetting(ESocailMsg.MESSENGER, "vepo", "测试反馈 MESSENGER");
+//                    ContentSetting contentsociaSetting5 = new ContentSocailSetting(ESocailMsg.MESSENGER, "vepo", " MESSENGER");
 //                    VPOperateManager.getInstance().sendSocialMsgContent(writeResponse, contentsociaSetting5);
 //
 //                }
@@ -1462,27 +1470,27 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 //            mHandler.postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
-//                    ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.PHONE, "vepo", "测试反馈 PHONE");
+//                    ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.PHONE, "vepo", " PHONE");
 //                    VPOperateManager.getInstance().sendSocialMsgContent(writeResponse, contentphoneSetting0);
 //                }
 //            }, 4000);
 //            mHandler.postDelayed(new Runnable() {
 //                @Override
 //                public void run() {
-//                    ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.CONNECTED2_ME, "vepo", "测试反馈 CONNECTED2_ME");
+//                    ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.CONNECTED2_ME, "vepo", " CONNECTED2_ME");
 //                    VPOperateManager.getInstance().sendSocialMsgContent(writeResponse, contentsociaSetting6);
 //                }
 //            }, 6000);
-//            ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.G15MSG, "G15", "ABCDEFG,今天是星期五，明天星期六");
-//            VPOperateManager.getInstance().sendG15MsgContent(writeResponse, "G15", "ABCDEFG,今天是星期五,敬挽发大水发大水发放大范德萨", new IG15MessageListener() {
+//            ContentSetting contentsociaSetting6 = new ContentSocailSetting(ESocailMsg.G15MSG, "G15", "ABCDEFG,，");
+//            VPOperateManager.getInstance().sendG15MsgContent(writeResponse, "G15", "ABCDEFG,,", new IG15MessageListener() {
 //                @Override
 //                public void onG15MessageSendSuccess() {
-//                    Toast.makeText(mContext, "收到应答", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext, "", Toast.LENGTH_SHORT).show();
 //                }
 //
 //                @Override
 //                public void onG15MessageSendFailed() {
-//                    Toast.makeText(mContext, "没有收到应答", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext, "", Toast.LENGTH_SHORT).show();
 //                }
 //            });
 
@@ -1503,85 +1511,85 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void inPttModel() {
-                    String message = "手表提示:手表进入ptt模式\n";
+                    String message = ":ptt\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void outPttModel() {
-                    String message = "手表提示:手表退出ptt模式\n";
+                    String message = ":ptt\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void rejectPhone() {
-                    String message = "手表提示:请挂断来电\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void cliencePhone() {
-                    String message = "手表提示:请来电静音\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void appAnswerCall() {
-                    String message = "手表提示:手机接听来电\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void knocknotify(int type) {
-                    String message = "手表提示:敲击提醒，1表示单击，2表示双击\n";
+                    String message = ":，1，2\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void sos() {
-                    String message = "手表提示:sos\n";
+                    String message = ":sos\n";
                     Logger.t(TAG).i(message);
                 }
 
                 public void nextMusic() {
-                    String message = "手表提示:下一曲\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                 }
 
                 public void previousMusic() {
-                    String message = "手表提示:上一曲\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                 }
 
                 public void pauseAndPlayMusic() {
-                    String message = "手表提示:暂停和播放\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void pauseMusic() {
-                    String message = "手表提示:暂停\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void playMusic() {
-                    String message = "手表提示:播放\n";
+                    String message = ":\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void voiceUp() {
-                    String message = "手表提示:调高音量\n";
+                    String message = ":volume\n";
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void voiceDown() {
-                    String message = "手表提示:调低音量\n";
+                    String message = ":volume\n";
                     Logger.t(TAG).i(message);
                 }
 
@@ -1604,7 +1612,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readHeartWarning(writeResponse, new IHeartWaringDataListener() {
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
-                    String message = "心率报警-读取:\n" + heartWaringData.toString();
+                    String message = "Frequência cardíaca-Ler:\n" + heartWaringData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1613,7 +1621,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingHeartWarning(writeResponse, new IHeartWaringDataListener() {
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
-                    String message = "心率报警-打开:\n" + heartWaringData.toString();
+                    String message = "Frequência cardíaca-Ativar:\n" + heartWaringData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1622,7 +1630,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingHeartWarning(writeResponse, new IHeartWaringDataListener() {
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
-                    String message = "心率报警-关闭:\n" + heartWaringData.toString();
+                    String message = "Frequência cardíaca-Desativar:\n" + heartWaringData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1635,14 +1643,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startDetectSPO2H(writeResponse, new ISpo2hDataListener() {
                 @Override
                 public void onSpO2HADataChange(Spo2hData spo2HData) {
-                    String message = "血氧-测量:\n" + spo2HData.toString();
+                    String message = "SpO2-:\n" + spo2HData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
             }, new ILightDataCallBack() {
                 @Override
                 public void onGreenLightDataChange(int[] data) {
-                    String message = "血氧-光电信号:\n" + Arrays.toString(data);
+                    String message = "SpO2-:\n" + Arrays.toString(data);
                     Logger.t(TAG).i(message);
                 }
             });
@@ -1650,7 +1658,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().stopDetectSPO2H(writeResponse, new ISpo2hDataListener() {
                 @Override
                 public void onSpO2HADataChange(Spo2hData spo2HData) {
-                    String message = "血氧-结束:\n" + spo2HData.toString();
+                    String message = "SpO2-Terminar:\n" + spo2HData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1659,7 +1667,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readSpo2hAutoDetect(writeResponse, new IAllSetDataListener() {
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
-                    String message = "血氧自动检测-读取\n" + allSetData.toString();
+                    String message = "SpO2-Ler\n" + allSetData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1670,7 +1678,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingSpo2hAutoDetect(writeResponse, new IAllSetDataListener() {
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
-                    String message = "血氧自动检测-打开\n" + allSetData.toString();
+                    String message = "SpO2-Ativar\n" + allSetData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1681,7 +1689,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingSpo2hAutoDetect(writeResponse, new IAllSetDataListener() {
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
-                    String message = "血氧自动检测-打开\n" + allSetData.toString();
+                    String message = "SpO2-Ativar\n" + allSetData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1690,7 +1698,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startDetectFatigue(writeResponse, new IFatigueDataListener() {
                 @Override
                 public void onFatigueDataListener(FatigueData fatigueData) {
-                    String message = "疲劳度-开始:\n" + fatigueData.toString();
+                    String message = "fadiga-Iniciar:\n" + fatigueData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1699,7 +1707,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().stopDetectFatigue(writeResponse, new IFatigueDataListener() {
                 @Override
                 public void onFatigueDataListener(FatigueData fatigueData) {
-                    String message = "疲劳度-结束:\n" + fatigueData.toString();
+                    String message = "fadiga-Terminar:\n" + fatigueData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1708,7 +1716,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingWomenState(writeResponse, new IWomenDataListener() {
                 @Override
                 public void onWomenDataChange(WomenData womenData) {
-                    String message = "女性状态-设置:\n" + womenData.toString();
+                    String message = "Femininoestado-Configurar:\n" + womenData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1717,7 +1725,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readWomenState(writeResponse, new IWomenDataListener() {
                 @Override
                 public void onWomenDataChange(WomenData womenData) {
-                    String message = "女性状态-读取:\n" + womenData.toString();
+                    String message = "Femininoestado-Ler:\n" + womenData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1730,7 +1738,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingCountDown(writeResponse, countDownSetting, new ICountDownListener() {
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
-                    String message = "倒计时-watch:\n" + countDownData.toString();
+                    String message = "contagem decrescente-watch:\n" + countDownData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1743,7 +1751,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingCountDown(writeResponse, countDownSetting, new ICountDownListener() {
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
-                    String message = "倒计时-App:\n" + countDownData.toString();
+                    String message = "contagem decrescente-App:\n" + countDownData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1756,7 +1764,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingCountDown(writeResponse, countDownSetting, new ICountDownListener() {
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
-                    String message = "倒计时-App:\n" + countDownData.toString();
+                    String message = "contagem decrescente-App:\n" + countDownData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1765,7 +1773,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readCountDown(writeResponse, new ICountDownListener() {
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
-                    String message = "倒计时-读取:\n" + countDownData.toString();
+                    String message = "contagem decrescente-Ler:\n" + countDownData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1782,7 +1790,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readChantingData(writeResponse, new ChantingSetting(timestamp), new IChantingDataListener() {
                 @Override
                 public void onChantingDataChange(ChantingData chantingData) {
-                    String message = "读取诵经计数:" + chantingData.toString();
+                    String message = "Ler:" + chantingData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1794,11 +1802,11 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             Intent intent = new Intent(OperaterActivity.this, GpsLatlonActivity.class);
             startActivity(intent);
         } else if (oprater.equals(SCREEN_LIGHT_SETTING)) {
-            //默认的是【22:00-07:00】设置成2档，其他时间设置成4档，用户可以自定义
+            //22:00-07:00Configurar2，Configurar4，
             VPOperateManager.getInstance().settingScreenLight(writeResponse, new IScreenLightListener() {
                 @Override
                 public void onScreenLightDataChange(ScreenLightData screenLightData) {
-                    String message = "屏幕调节数据-设置:" + screenLightData.toString();
+                    String message = "dados-Configurar:" + screenLightData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1807,7 +1815,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readScreenLight(writeResponse, new IScreenLightListener() {
                 @Override
                 public void onScreenLightDataChange(ScreenLightData screenLightData) {
-                    String message = "屏幕调节数据-读取:" + screenLightData.toString();
+                    String message = "dados-Ler:" + screenLightData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1816,7 +1824,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readScreenStyle(writeResponse, new IScreenStyleListener() {
                 @Override
                 public void onScreenStyleDataChange(ScreenStyleData screenLightData) {
-                    String message = "屏幕样式-读取:" + screenLightData.toString();
+                    String message = "-Ler:" + screenLightData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1826,7 +1834,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().settingScreenStyle(writeResponse, new IScreenStyleListener() {
                 @Override
                 public void onScreenStyleDataChange(ScreenStyleData screenLightData) {
-                    String message = "屏幕样式-设置:" + screenLightData.toString();
+                    String message = "-Configurar:" + screenLightData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
@@ -1846,7 +1854,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "温度数据-读取进度:" + "day=" + day + ",currentPackage=" + currentPackage + ",allPackage=" + allPackage;
+                    String message = "temperaturadados-Ler:" + "day=" + day + ",currentPackage=" + currentPackage + ",allPackage=" + allPackage;
                     Logger.t(TAG).i(message);
                 }
 
@@ -1869,9 +1877,9 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                             String message = "";
                             if (sleepData instanceof SleepPrecisionData && isSleepPrecision) {
                                 SleepPrecisionData sleepPrecisionData = (SleepPrecisionData) sleepData;
-                                message = "精准睡眠数据-返回:" + sleepPrecisionData.toString();
+                                message = "dados-:" + sleepPrecisionData.toString();
                             } else {
-                                message = "普通睡眠数据-返回:" + sleepData.toString();
+                                message = "dados-:" + sleepData.toString();
                             }
                             Logger.t(TAG).i(message);
                             sendMsg(message, 1);
@@ -1880,19 +1888,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         @Override
                         public void onSleepProgress(float progress) {
 
-                            String message = "睡眠数据-读取进度:" + "progress=" + progress;
+                            String message = "dados-Ler:" + "progress=" + progress;
                             Logger.t(TAG).i(message);
                         }
 
                         @Override
                         public void onSleepProgressDetail(String day, int packagenumber) {
-                            String message = "睡眠数据-读取进度:" + "day=" + day + ",packagenumber=" + packagenumber;
+                            String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
                             Logger.t(TAG).i(message);
                         }
 
                         @Override
                         public void onReadSleepComplete() {
-                            String message = "睡眠数据-读取结束";
+                            String message = "dados-LerTerminar";
                             Logger.t(TAG).i(message);
                         }
                     }, watchDataDay
@@ -1902,26 +1910,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readSleepDataFromDay(writeResponse, new ISleepDataListener() {
                         @Override
                         public void onSleepDataChange(String day, SleepData sleepData) {
-                            String message = getDay(day) + "-睡眠数据-返回:" + sleepData.toString();
+                            String message = getDay(day) + "-dados-:" + sleepData.toString();
                             Logger.t(TAG).i(message);
                             sendMsg(message, 1);
                         }
 
                         @Override
                         public void onSleepProgress(float progress) {
-                            String message = "睡眠数据-读取进度:" + "progress=" + progress;
+                            String message = "dados-Ler:" + "progress=" + progress;
                             Logger.t(TAG).i(message);
                         }
 
                         @Override
                         public void onSleepProgressDetail(String day, int packagenumber) {
-                            String message = "睡眠数据-读取进度:" + "day=" + day + ",packagenumber=" + packagenumber;
+                            String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
                             Logger.t(TAG).i(message);
                         }
 
                         @Override
                         public void onReadSleepComplete() {
-                            String message = "睡眠数据-读取结束";
+                            String message = "dados-LerTerminar";
                             Logger.t(TAG).i(message);
                         }
                     }
@@ -1931,26 +1939,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readSleepDataSingleDay(writeResponse, new ISleepDataListener() {
                 @Override
                 public void onSleepDataChange(String day, SleepData sleepData) {
-                    String message = getDay(day) + "-睡眠数据-返回:" + sleepData.toString();
+                    String message = getDay(day) + "-dados-:" + sleepData.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSleepProgress(float progress) {
-                    String message = "睡眠数据-读取进度:" + "progress=" + progress;
+                    String message = "dados-Ler:" + "progress=" + progress;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onSleepProgressDetail(String day, int packagenumber) {
-                    String message = "睡眠数据-读取进度:" + "day=" + day + ",packagenumber=" + packagenumber;
+                    String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadSleepComplete() {
-                    String message = "睡眠数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             }, yesterday, watchDataDay);
@@ -1958,14 +1966,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readDrinkData(writeResponse, new IDrinkDataListener() {
                 @Override
                 public void onDrinkDataChange(int packagenumber, DrinkData drinkdata) {
-                    String message = "饮酒数据-返回:" + drinkdata.toString();
+                    String message = "dados-:" + drinkdata.toString();
                     Logger.t(TAG).i(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onReadDrinkComplete() {
-                    String message = "饮酒数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             });
@@ -1975,7 +1983,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "健康数据[5分钟]-读取进度:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                    String message = "dados[5]-Ler:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                     Logger.t(TAG).i(message);
                 }
 
@@ -2003,22 +2011,22 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList) {
                     for (OriginData3 originData3 : originDataList) {
-                        Logger.t(TAG).i("五分钟数据:" + originData3);
+                        Logger.t(TAG).i("dados:" + originData3);
                     }
                 }
 
                 @Override
                 public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
-                    String message = "健康数据[30分钟]-返回:" + originHalfHourDataList.toString();
+                    String message = "dados[30]-:" + originHalfHourDataList.toString();
                     Logger.t(TAG).i(message);
-                    Logger.t(TAG).i("健康数据[30分钟]-返回:时间 = " + originHalfHourDataList.getDate());
-                    Logger.t(TAG).i("健康数据[30分钟]-返回:总步数 = " + originHalfHourDataList.getAllStep());
-                    Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的心率数据 size = " + originHalfHourDataList.getHalfHourRateDatas().size());
-                    Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的血压数据 size = " + originHalfHourDataList.getHalfHourBps().size());
-                    Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的运动数据 size = " + originHalfHourDataList.getHalfHourSportDatas().size());
+                    Logger.t(TAG).i("dados[30]-: = " + originHalfHourDataList.getDate());
+                    Logger.t(TAG).i("dados[30]-: = " + originHalfHourDataList.getAllStep());
+                    Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
+                    Logger.t(TAG).i("dados[30]-:30pressão arterialdados size = " + originHalfHourDataList.getHalfHourBps().size());
+                    Logger.t(TAG).i("dados[30]-:30dados size = " + originHalfHourDataList.getHalfHourSportDatas().size());
 
                     for (HalfHourSportData halfHourSportData : originHalfHourDataList.getHalfHourSportDatas()) {
-                        Logger.t(TAG).i("健康数据[30分钟]-halfHourSportData = " + halfHourSportData.toString());
+                        Logger.t(TAG).i("dados[30]-halfHourSportData = " + halfHourSportData.toString());
                     }
                 }
 
@@ -2026,13 +2034,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 public void onOriginHRVOriginListDataChange(List<HRVOriginData> originHrvDataList) {
                     HRVOriginData hrvOriginData = originHrvDataList.get(0);
                     String rate = hrvOriginData.getRate();
-                    /*hrv为付费项目，需要确保你们的设备在付费设备列表里面，否则改接口不会回调*/
+                    /*hrv，dispositivodispositivo，*/
                     VPOperateManager.getInstance().getHrvAnalysisReport(originHrvDataList, new IHrvAnalysisReportListener() {
                         @Override
                         public void onHrvAnalysisReport(String date, List<HrvAnalysisReport> reports) {
-                            Logger.t(TAG).i("Hrv诊断报告 =======================================================date = " + date);
+                            Logger.t(TAG).i("Hrv =======================================================date = " + date);
                             for (HrvAnalysisReport datum : reports) {
-                                Logger.t(TAG).i("Hrv诊断报告 = " + datum.toString());
+                                Logger.t(TAG).i("Hrv = " + datum.toString());
                             }
                         }
                     });
@@ -2045,20 +2053,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onReadOriginProgress(float progress) {
-                    String message = "onReadOriginProgress 健康数据[5分钟]-读取进度:" + progress;
+                    String message = "onReadOriginProgress dados[5]-Ler:" + progress;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "onReadOriginProgressDetail 健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                    String message = "onReadOriginProgressDetail dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                     Logger.t(TAG).i(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
-                    String message = "健康数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             };
@@ -2072,32 +2080,32 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readOriginDataFromDay(writeResponse, new IOriginDataListener() {
                 @Override
                 public void onOringinFiveMinuteDataChange(OriginData originData) {
-                    String message = "健康数据[5分钟]-返回:" + originData.toString();
+                    String message = "dados[5]-:" + originData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData) {
-                    String message = "健康数据[30分钟]-返回:" + originHalfHourData.toString();
+                    String message = "dados[30]-:" + originHalfHourData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
-                    String message = "健康数据[5分钟]-读取进度:" + progress;
+                    String message = "dados[5]-Ler:" + progress;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                    String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                     Logger.t(TAG).i(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
-                    String message = "健康数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             }, yesterday, 10, watchDataDay);
@@ -2107,40 +2115,40 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             IOriginProgressListener originDataListener = new IOriginDataListener() {
                 @Override
                 public void onOringinFiveMinuteDataChange(OriginData originData) {
-                    String message = "健康数据[5分钟]-返回:" + originData.toString();
+                    String message = "dados[5]-:" + originData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData) {
-                    String message = "健康数据[30分钟]-返回:" + originHalfHourData.toString();
+                    String message = "dados[30]-:" + originHalfHourData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
-                    String message = "健康数据[5分钟]-读取进度:" + progress;
+                    String message = "dados[5]-Ler:" + progress;
                     Logger.t(TAG).i(message);
                 }
 
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                    String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                     Logger.t(TAG).i(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
-                    String message = "健康数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             };
             IOriginProgressListener originData3Listener = new IOriginData3Listener() {
                 @Override
                 public void onOriginFiveMinuteListDataChange(List<OriginData3> originData3List) {
-                    String message = "健康数据[5分钟]-返回:" + originData3List.size();
+                    String message = "dados[5]-:" + originData3List.size();
                     for (int i = 0; i < originData3List.size(); i++) {
                         String s = originData3List.get(i).toString();
                         Logger.t(TAG).i(s);
@@ -2150,14 +2158,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourData) {
-                    String message = "健康数据[30分钟]-返回:" + originHalfHourData.toString();
+                    String message = "dados[30]-:" + originHalfHourData.toString();
                     Logger.t(TAG).i(message);
 
                 }
 
                 @Override
                 public void onOriginHRVOriginListDataChange(List<HRVOriginData> originHrvDataList) {
-                    String message = "健康数据[HRV]-返回:" + originHrvDataList.size();
+                    String message = "dados[HRV]-:" + originHrvDataList.size();
 //                    for (int i = 0; i < originHrvDataList.size(); i++) {
 //                        String s = originHrvDataList.get(i).toString();
 //                        Logger.t(TAG).i(s);
@@ -2167,7 +2175,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onOriginSpo2OriginListDataChange(List<Spo2hOriginData> originSpo2hDataList) {
-                    String message = "健康数据[Spo2h]-返回:" + originSpo2hDataList.size();
+                    String message = "dados[Spo2h]-:" + originSpo2hDataList.size();
                     Spo2hOriginUtil spo2hOriginUtil = new Spo2hOriginUtil(originSpo2hDataList);
                     for (int i = 0; i < originSpo2hDataList.size(); i++) {
                         String s = originSpo2hDataList.get(i).toString();
@@ -2181,19 +2189,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                    String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
-                    String message = "健康数据[5分钟]-读取进度:" + progress;
+                    String message = "dados[5]-Ler:" + progress;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginComplete() {
-                    String message = "健康数据-读取结束";
+                    String message = "dados-LerTerminar";
                     Logger.t(TAG).i(message);
                 }
             };
@@ -2245,7 +2253,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             }, watchDataDay);
         } else if (oprater.equals(OAD)) {
             if (deviceNumber < 0) {
-                Toast.makeText(mContext, "请先通过密码验证，获取版本号!", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "palavra-passe，!", Toast.LENGTH_LONG).show();
                 return;
             }
             boolean isOadModel = getIntent().getBooleanExtra("isoadmodel", false);
@@ -2266,85 +2274,85 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().stopSportModel(writeResponse, new ISportModelStateListener() {
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
-                    String message = "运动模式状态:" + sportModelStateData.toString();
+                    String message = "estado:" + sportModelStateData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onSportStopped() {
-                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_END + "================================运动结束 @_@");
+                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_END + "================================Terminar @_@");
                 }
             });
         } else if (oprater.equals(SPORT_MODE_ORIGIN_READSTAUTS)) {
             VPOperateManager.getInstance().readSportModelState(writeResponse, new ISportModelStateListener() {
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
-                    String message = "运动模式状态" + sportModelStateData.toString();
+                    String message = "estado" + sportModelStateData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onSportStopped() {
-                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_READSTAUTS + "================================运动结束 @_@");
+                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_READSTAUTS + "================================Terminar @_@");
                 }
             });
         } else if (oprater.equals(SPORT_MODE_START_INDOOR)) {
             VPOperateManager.getInstance().startMultSportModel(writeResponse, new ISportModelStateListener() {
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
-                    String message = "室内步行" + sportModelStateData.toString();
+                    String message = "" + sportModelStateData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onSportStopped() {
-                    Logger.t(TAG).i(SPORT_MODE_START_INDOOR + "================================运动结束 @_@");
+                    Logger.t(TAG).i(SPORT_MODE_START_INDOOR + "================================Terminar @_@");
                 }
             }, ESportType.INDOOR_WALK);
         } else if (oprater.equals(SPORT_MODE_ORIGIN_START)) {
             VPOperateManager.getInstance().startSportModel(writeResponse, new ISportModelStateListener() {
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
-                    String message = "运动模式状态" + sportModelStateData.toString();
+                    String message = "estado" + sportModelStateData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onSportStopped() {
-                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_START + "================================运动结束 @_@");
+                    Logger.t(TAG).i(SPORT_MODE_ORIGIN_START + "================================Terminar @_@");
                 }
             });
         } else if (oprater.equals(SPORT_MODE_ORIGIN_READ)) {
             VPOperateManager.getInstance().readSportModelOrigin(writeResponse, new ISportModelOriginListener() {
                 @Override
                 public void onReadOriginProgress(float progress) {
-                    String message = "运动模式数据[读取进度]:" + progress;
+                    String message = "dados[Ler]:" + progress;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                    String message = "运动模式数据[读取详情]:" + day +
+                    String message = "dados[Ler]:" + day +
                             ",allPackage=" + allPackage + ",currentPackage=" + currentPackage;
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onHeadChangeListListener(SportModelOriginHeadData sportModelHeadData) {
-                    String message = "运动模式数据[头部]:" + sportModelHeadData.toString();
+                    String message = "dados[]:" + sportModelHeadData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onGPSWatchSportModeHeadChange(SportModelGPSWatchOriginHeadData sportModelGPSWatchOriginHeadData) {
-                    String message = "运动模式数据[头部]:" + sportModelGPSWatchOriginHeadData.toString();
+                    String message = "dados[]:" + sportModelGPSWatchOriginHeadData.toString();
                     Logger.t(TAG).i(message);
                 }
 
                 @Override
                 public void onItemChangeListListener(List<SportModelOriginItemData> sportModelItemData) {
                     StringBuffer message = new StringBuffer();
-                    message.append("运动模式数据[详细]:");
+                    message.append("dados[]:");
                     for (SportModelOriginItemData sportModelOriginItemData : sportModelItemData) {
                         message.append("\n");
                         message.append(sportModelOriginItemData.toString());
@@ -2355,7 +2363,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onReadOriginComplete() {
-                    String message = "运动模式数据[读取结束]";
+                    String message = "dados[LerTerminar]";
                     Logger.t(TAG).i(message);
                 }
             });
@@ -2391,34 +2399,34 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startDetectHrv(writeResponse, new IHrvDetectListener() {
                 @Override
                 public void onHrvDetect(int hrv) {
-                    Toast.makeText(mContext, "app 测量hrv:" + hrv, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrv:" + hrv, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onDetectFailed(@NonNull HrvDetectState detectState) {
-                    Toast.makeText(mContext, "app 测量hrv异常:" + detectState, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrv:" + detectState, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onDetectStop() {
-                    Toast.makeText(mContext, "app 测量hrv结束", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrvTerminar", Toast.LENGTH_SHORT).show();
                 }
             });
         } else if(oprater.equals(HRV_STOP_DETECT)) {
             VPOperateManager.getInstance().stopDetectHrv(writeResponse, new IHrvDetectListener() {
                 @Override
                 public void onHrvDetect(int hrv) {
-                    Toast.makeText(mContext, "app 测量hrv:" + hrv, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrv:" + hrv, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onDetectFailed(@NonNull HrvDetectState detectState) {
-                    Toast.makeText(mContext, "app 测量hrv异常:" + detectState, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrv:" + detectState, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onDetectStop() {
-                    Toast.makeText(mContext, "app 测量hrv结束", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "app hrvTerminar", Toast.LENGTH_SHORT).show();
                 }
             });
         } else if (oprater.equals(S22_READ_DATA)) {
@@ -2486,13 +2494,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readTextAlarm(writeResponse, new ITextAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                    Logger.t(TAG).e("读闹钟数据 --》" + textAlarmData.toString());
+                    Logger.t(TAG).e("alarmedados --" + textAlarmData.toString());
                     EMultiAlarmOprate OPT = textAlarmData.getOprate();
                     boolean isOk = OPT == EMultiAlarmOprate.READ_SUCCESS ||
                             OPT == EMultiAlarmOprate.READ_SUCCESS_SAME_CRC ||
                             OPT == EMultiAlarmOprate.READ_SUCCESS_SAVE;
-                    showToast("读闹钟数据 --》" +
-                            (isOk ? ("成功,一共" + textAlarmData.getTextAlarm2SettingList().size() + "条=>" + textAlarmData.toString()) : "失败"));
+                    showToast("alarmedados --" +
+                            (isOk ? ("," + textAlarmData.getTextAlarm2SettingList().size() + "=>" + textAlarmData.toString()) : ""));
                 }
             });
         } else if (oprater.equals(TEXT_ALARM_ADD)) {
@@ -2500,8 +2508,8 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().addTextAlarm(writeResponse, new ITextAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                    Logger.t(TAG).e("添加闹钟 --》" + textAlarmData.toString());
-                    showToast("添加闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? ("成功,一共" + textAlarmData.getTextAlarm2SettingList().size() + "条=>" + textAlarmData.toString()) : "失败"));
+                    Logger.t(TAG).e("Adicionaralarme --" + textAlarmData.toString());
+                    showToast("Adicionaralarme --" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? ("," + textAlarmData.getTextAlarm2SettingList().size() + "=>" + textAlarmData.toString()) : ""));
                 }
             }, setting);
         } else if (oprater.equals(TEXT_ALARM_MODIFY)) {
@@ -2509,17 +2517,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             int flag = random.nextInt(100);
             List<TextAlarm2Setting> settings = VPOperateManager.getInstance().getTextAlarmList();
             if (settings == null || settings.size() == 0) {
-                showToast("闹钟列表为空，请先添加闹钟或，读取更新闹钟列表");
+                showToast("alarme，Adicionaralarme，LerAtualizaralarme");
                 return;
             }
             final TextAlarm2Setting setting = settings.get(0);
             setting.setOpen(false);
-            setting.setContent("西门官人[" + flag + "]大郎卖烧饼回来了");
+            setting.setContent("[" + flag + "]");
             VPOperateManager.getInstance().modifyTextAlarm(writeResponse, new ITextAlarmDataListener() {
                 @Override
                 public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                    Logger.t(TAG).e("修改闹钟 --》" + textAlarmData.toString());
-                    showToast("修改闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "成功 : " + setting.toString() : "失败"));
+                    Logger.t(TAG).e("alarme --" + textAlarmData.toString());
+                    showToast("alarme --" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? " : " + setting.toString() : ""));
 
                 }
             }, setting);
@@ -2528,19 +2536,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             if (settings != null && settings.size() > 0) {
                 final TextAlarm2Setting setting = settings.get(0);
                 for (TextAlarm2Setting s : settings) {
-                    Logger.t(TAG).e("存在的文字闹钟：" + s.toString());
+                    Logger.t(TAG).e("alarme：" + s.toString());
                 }
-                Logger.t(TAG).e("要删除的文字闹钟：" + setting.toString());
+                Logger.t(TAG).e("Eliminaralarme：" + setting.toString());
                 VPOperateManager.getInstance().deleteTextAlarm(writeResponse, new ITextAlarmDataListener() {
                     @Override
                     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                        Logger.t(TAG).e("删除闹钟 --》" + textAlarmData.toString());
-                        showToast("删除闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.CLEAR_SUCCESS ? "成功:" + setting.toString() : "失败"));
+                        Logger.t(TAG).e("Eliminaralarme --" + textAlarmData.toString());
+                        showToast("Eliminaralarme --" + (textAlarmData.getOprate() == EMultiAlarmOprate.CLEAR_SUCCESS ? ":" + setting.toString() : ""));
                     }
                 }, setting);
             } else {
-                Logger.t(TAG).e("暂无闹钟可以删除");
-                showToast("暂无闹钟可以删除");
+                Logger.t(TAG).e("alarmeEliminar");
+                showToast("alarmeEliminar");
             }
         } else if (oprater.equals(TEXT_ALARM)) {
             startActivity(new Intent(this, TextAlarmActivity.class));
@@ -2610,12 +2618,12 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBloodGlucoseAdjustingReadSuccess(boolean isOpen, float adjustingValue) {
-                    showToast("血糖私人模式读取成功：isOpen " + isOpen + " value = " + adjustingValue);
+                    showToast("Ler：isOpen " + isOpen + " value = " + adjustingValue);
                 }
 
                 @Override
                 public void onBloodGlucoseAdjustingReadFailed() {
-                    showToast("血糖私人模式读取失败");
+                    showToast("Ler");
                 }
             });
         } else if (oprater.equals(BLOOD_GLUCOSE_P_SETTING)) {
@@ -2623,12 +2631,12 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBloodGlucoseAdjustingSettingSuccess(boolean isOpen, float adjustingValue) {
-                    showToast("血糖私人模式设置成功：isOpen " + isOpen + " value = " + adjustingValue);
+                    showToast("Configurar：isOpen " + isOpen + " value = " + adjustingValue);
                 }
 
                 @Override
                 public void onBloodGlucoseAdjustingSettingFailed() {
-                    showToast("血糖私人模式设置失败");
+                    showToast("Configurar");
                 }
             });
         } else if (oprater.equals(BLOOD_GLUCOSE_MULTIPLE_READ)) {
@@ -2636,13 +2644,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBGMultipleAdjustingReadSuccess(boolean isOpen, MealInfo breakfast, MealInfo lunch, MealInfo dinner) {
-                    showToast("血糖多校准模式读取成功：isOpen " + isOpen + " breakfast = " + breakfast.toString() + " lunch = " + lunch.toString() + " dinner = " + dinner.toString());
-                    Logger.t("血糖多校准模式读取成功-").d(isOpen + " breakfast = " + breakfast.toString() + " lunch = " + lunch.toString() + " dinner = " + dinner.toString());
+                    showToast("Ler：isOpen " + isOpen + " breakfast = " + breakfast.toString() + " lunch = " + lunch.toString() + " dinner = " + dinner.toString());
+                    Logger.t("Ler-").d(isOpen + " breakfast = " + breakfast.toString() + " lunch = " + lunch.toString() + " dinner = " + dinner.toString());
                 }
 
                 @Override
                 public void onBGMultipleAdjustingReadFailed() {
-                    showToast("血糖多校准模式读取失败");
+                    showToast("Ler");
                 }
             });
         } else if (oprater.equals(BLOOD_GLUCOSE_MULTIPLE_SETTING)) {
@@ -2668,14 +2676,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBGMultipleAdjustingSettingSuccess() {
-                    Logger.t("血糖多校准模式设置成功-");
-                    showToast("血糖多校准模式设置成功");
+                    Logger.t("Configurar-");
+                    showToast("Configurar");
 
                 }
 
                 @Override
                 public void onBGMultipleAdjustingSettingFailed() {
-                    showToast("血糖多校准模式设置失败");
+                    showToast("Configurar");
                 }
             });
         } else if (oprater.equals(BLE_RENAME)) {
@@ -2712,38 +2720,38 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readBTInfo(writeResponse, new IDeviceBTInfoListener() {
                 @Override
                 public void onDeviceBTFunctionNotSupport() {
-                    Logger.t("【BT】-").d("【BT】- ---> 不支持BT功能");
-                    showToast("不支持BT功能");
+                    Logger.t("BT-").d("BT- ---> BTfuncionalidade");
+                    showToast("BTfuncionalidade");
                 }
 
                 @Override
                 public void onDeviceBTInfoSettingSuccess(@NotNull BTInfo btInfo) {
-                    Logger.t("【BT】-").d("【BT】- ---> btInfo : " + btInfo.toString());
-                    showToast("【BT】- ---> btInfo : " + btInfo.toString());
+                    Logger.t("BT-").d("BT- ---> btInfo : " + btInfo.toString());
+                    showToast("BT- ---> btInfo : " + btInfo.toString());
                 }
 
                 @Override
                 public void onDeviceBTInfoSettingFailed() {
-                    Logger.t("【BT】-").d("【BT】- ---> BT设置失败");
-                    showToast("【BT】- ---> BT设置失败");
+                    Logger.t("BT-").d("BT- ---> BTConfigurar");
+                    showToast("BT- ---> BTConfigurar");
                 }
 
                 @Override
                 public void onDeviceBTInfoReadSuccess(@NotNull BTInfo btInfo) {
-                    Logger.t("【BT】-").d("【BT】- ---> BT读取成功, btInfo : " + btInfo.toString());
-                    showToast("【BT】- ---> BT读取成功, btInfo : " + btInfo.toString());
+                    Logger.t("BT-").d("BT- ---> BTLer, btInfo : " + btInfo.toString());
+                    showToast("BT- ---> BTLer, btInfo : " + btInfo.toString());
                 }
 
                 @Override
                 public void onDeviceBTInfoReadFailed() {
-                    Logger.t("【BT】-").d("【BT】- ---> BT读取失败");
-                    showToast("【BT】- ---> BT读取失败");
+                    Logger.t("BT-").d("BT- ---> BTLer");
+                    showToast("BT- ---> BTLer");
                 }
 
                 @Override
                 public void onDeviceBTInfoReport(@NotNull BTInfo btInfo) {
-                    Logger.t("【BT】-").d("【BT】- ---> BT上报，btInfo = " + btInfo.toString());
-                    showToast("【BT】- ---> BT上报，btInfo = " + btInfo.toString());
+                    Logger.t("BT-").d("BT- ---> BT，btInfo = " + btInfo.toString());
+                    showToast("BT- ---> BT，btInfo = " + btInfo.toString());
                 }
             });
         } else if (oprater.equals(HEALTH_REMIND)) {
@@ -2752,17 +2760,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startJLDeviceAuth(new RcspAuthResponse() {
                 @Override
                 public void onRcspAuthStart() {
-                    showToast("设备认证开始");
+                    showToast("dispositivoIniciar");
                 }
 
                 @Override
                 public void onRcspAuthSuccess() {
-                    showToast("设备认证成功");
+                    showToast("dispositivo");
                 }
 
                 @Override
                 public void onRcspAuthFailed() {
-                    showToast("设备认证失败");
+                    showToast("dispositivo");
                 }
             });
         } else if (oprater.equals(JL_NOTIFY_OPEN)) {
@@ -2789,40 +2797,40 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 }
             });
         } else if (oprater.equals(JL_INIT_FILE_SYS)) {
-            //杰理文件系统
+            //
             VPOperateManager.getInstance().listJLWatchList(new JLWatchFaceManager.OnWatchDialInfoGetListener() {
                 @Override
                 public void onGettingWatchDialInfo() {
-                    ToastUtil.show("正在获取中...请勿重复调用");
+                    ToastUtil.show("...");
                 }
 
                 @Override
                 public void onWatchDialInfoGetStart() {
-                    Logger.t(TAG).e("系统表盘--->Start");
-                    ToastUtil.show("获取文件系统列表-开始");
+                    Logger.t(TAG).e("--->Start");
+                    ToastUtil.show("-Iniciar");
                 }
 
                 @Override
                 public void onWatchDialInfoGetComplete() {
-                    Logger.t(TAG).e("系统表盘--->Complete");
-                    ToastUtil.show("获取文件系统列表-完成");
+                    Logger.t(TAG).e("--->Complete");
+                    ToastUtil.show("-");
                 }
 
                 @Override
                 public void onWatchDialInfoGetSuccess(List<FatFile> systemFatFiles, List<FatFile> serverFatFiles, FatFile picFatFile) {
                     for (FatFile systemFatFile : systemFatFiles) {
-                        Logger.t(TAG).e("系统表盘--->" + systemFatFile.toString());
+                        Logger.t(TAG).e("--->" + systemFatFile.toString());
                     }
                     for (FatFile serverFatFile : serverFatFiles) {
-                        Logger.t(TAG).e("服务器表盘--->" + serverFatFile.toString());
+                        Logger.t(TAG).e("--->" + serverFatFile.toString());
                     }
-                    Logger.t(TAG).e("照片表盘--->" + picFatFile.toString());
+                    Logger.t(TAG).e("--->" + picFatFile.toString());
                 }
 
                 @Override
                 public void onWatchDialInfoGetFailed(BaseError error) {
-                    Logger.t(TAG).e("系统表盘--->Error:" + error.toString());
-                    ToastUtil.show("获取文件系统列表-失败");
+                    Logger.t(TAG).e("--->Error:" + error.toString());
+                    ToastUtil.show("-");
                 }
             });
         } else if (oprater.equals(FIND_DEVICE)) {
@@ -2863,17 +2871,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onJLTransferPicDialStart() {
-                    Logger.t(TAG).e("【杰理表盘传输】onJLTransferPicDialStart--->" + Thread.currentThread().toString());
+                    Logger.t(TAG).e("onJLTransferPicDialStart--->" + Thread.currentThread().toString());
                 }
 
                 @Override
                 public void onTransferPicDialProgress(int progress) {
-                    Logger.t(TAG).e("【杰理表盘传输】--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
+                    Logger.t(TAG).e("--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
                 }
 
                 @Override
                 public void onScaleBGPFileTransferComplete() {
-                    Logger.t(TAG).e("【杰理表盘传输】--->缩略图传输完成" + " : Thread = " + Thread.currentThread().toString());
+                    Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
                 }
 
                 @Override
@@ -2883,17 +2891,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBigBGPFileTransferComplete() {
-                    Logger.t(TAG).e("【杰理表盘传输】--->大图传输完成" + " : Thread = " + Thread.currentThread().toString());
+                    Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
                 }
 
                 @Override
                 public void onTransferComplete() {
-                    Logger.t(TAG).e("【杰理表盘传输】--->表盘传输完成" + " : Thread = " + Thread.currentThread().toString());
+                    Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
                 }
 
                 @Override
                 public void onTransferError(int code, String msg) {
-                    Logger.t(TAG).e("【杰理表盘传输】--->表盘传输失败 code = " + code + ", msg = " + msg + " : Thread = " + Thread.currentThread().toString());
+                    Logger.t(TAG).e("---> code = " + code + ", msg = " + msg + " : Thread = " + Thread.currentThread().toString());
                 }
             });
         } else if (oprater.equals(JL_DEVICE_OTA)) {
@@ -2902,17 +2910,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startJLDeviceOTAUpgrade(firmwareFilePath, new JLOTAHolder.OnJLDeviceOTAListener() {
                 @Override
                 public void onOTAStart() {
-                    Logger.t(TAG).e("【杰理OTA】--->OTA升级【开始】");
+                    Logger.t(TAG).e("OTA--->OTAIniciar");
                 }
 
                 @Override
                 public void onProgress(float progress) {
-                    Logger.t(TAG).e("【杰理OTA】--->OTA升级中:" + progress + "%");
+                    Logger.t(TAG).e("OTA--->OTA:" + progress + "%");
                 }
 
                 @Override
                 public void onNeedReconnect(String address, String dfuLangAddress, boolean isReconnectBySdk) {
-                    Logger.t(TAG).e("【杰理OTA】--->OTA升级dfuLang重连中: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , 是否由SDK重连 = " + isReconnectBySdk);
+                    Logger.t(TAG).e("OTA--->OTAdfuLang: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , SDK = " + isReconnectBySdk);
                 }
 
                 @Override
@@ -2927,30 +2935,30 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onOTASuccess() {
-                    Logger.t(TAG).e("【杰理OTA】--->OTA升级【成功】");
+                    Logger.t(TAG).e("OTA--->OTA");
                 }
 
                 @Override
                 public void onOTAFailed(com.jieli.jl_bt_ota.model.base.BaseError error) {
-                    Logger.t(TAG).e("【杰理OTA】--->OTA升级【失败】:" + error.toString());
+                    Logger.t(TAG).e("OTA--->OTA:" + error.toString());
                 }
             });
         } else if (oprater.equals(JL_DEVICE)) {
             if (VPOperateManager.getInstance().isJLDevice()) {
                 startActivity(new Intent(this, JLDeviceOPTActivity.class));
             } else {
-                ToastUtil.show("当前设备非杰理芯片");
+                ToastUtil.show("dispositivo");
             }
         } else if (oprater.equals(CONTACT)) {
             boolean isHaveContactFunction = VpSpGetUtil.getVpSpVariInstance(this).isSupportContactFunction();
             if (isHaveContactFunction) {
                 startActivity(new Intent(OperaterActivity.this, ContactActivity.class));
             } else {
-                ToastUtil.show("当前设备无联系人功能");
+                ToastUtil.show("dispositivoContactosfuncionalidade");
             }
         } else if (oprater.equals(GATT_CLOSE)) {
-            //BluetoothGatt gatt = VPOperateManager.getInstance().getConnectGatt(mac);//传入mac地址获取、推荐使用此方法
-            BluetoothGatt gatt = VPOperateManager.getInstance().getCurrentConnectGatt();//获取当前练级的
+            //BluetoothGatt gatt = VPOperateManager.getInstance().getConnectGatt(mac);//mac
+            BluetoothGatt gatt = VPOperateManager.getInstance().getCurrentConnectGatt();//
             if (gatt != null) {
                 Logger.t(TAG).i("Gatt-Close:" + gatt.getDevice().getName() + " | " + gatt.getDevice().getAddress());
                 gatt.disconnect();
@@ -2971,7 +2979,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                     for (int i = 0; i < ids.length; i++) {
                         sb.append(ids[i] + ",");
                     }
-                    showToast("读取ECG ID完成：" + sb.toString());
+                    showToast("LerECG ID：" + sb.toString());
 
 
                 }
@@ -2983,8 +2991,8 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void readDataFinish(List<EcgDetectResult> resultList) {
 
-                    showToast("读取ECG 数据完成：" + resultList.toString());
-                    Logger.t(TAG).e("读取ECG 数据完成：" + resultList.toString());
+                    showToast("LerECG dados：" + resultList.toString());
+                    Logger.t(TAG).e("LerECG dados：" + resultList.toString());
                     for (int i = 0; i < resultList.size(); i++) {
                         Logger.t(TAG).e("ECG " + i + resultList.get(i).toString());
                     }
@@ -2992,8 +3000,8 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void readDiagnosisDataFinish(List<EcgDiagnosis> resultList) {
-                    showToast("读取ECG 数据完成：" + resultList.toString());
-                    Logger.t(TAG).e("读取ECG 数据完成：" + resultList.toString());
+                    showToast("LerECG dados：" + resultList.toString());
+                    Logger.t(TAG).e("LerECG dados：" + resultList.toString());
                     for (int i = 0; i < resultList.size(); i++) {
                         Logger.t(TAG).e("ECG " + i + resultList.get(i).toString());
                     }
@@ -3003,11 +3011,11 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().setNewEcgDataReportListener(new INewECGDataReportListener() {
                 @Override
                 public void onNewECGDetectDataReport() {
-                    showToast("监听到设备有新的ecg测量数据上报，请读取ECG数据获取详细信息");
+                    showToast("dispositivoecgdados，LerECGdados");
                 }
             });
 
-            showToast("已设置监听，请到设备上进行ecg测量");
+            showToast("Configurar，dispositivoecg");
         } else if (oprater.equals(DETECT_START_BODY_COMPONENT)) {
             VPOperateManager.getInstance().startDetectBodyComponent(writeResponse, new IBodyComponentDetectListener() {
                 @Override
@@ -3017,29 +3025,29 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onDetectSuccess(@NotNull BodyComponent bodyComponent) {
-                    showToast("测量成功：" + bodyComponent.toString());
+                    showToast("：" + bodyComponent.toString());
                 }
 
                 @Override
                 public void onDetectFailed(@NotNull DetectState detectState) {
-                    showToast("测量失败：" + detectState.toString());
+                    showToast("：" + detectState.toString());
                 }
 
                 @Override
                 public void onDetectStop() {
-                    showToast("测量停止");
+                    showToast("");
                 }
             });
-            showToast("正在测量身体成分数据....");
+            showToast("dados....");
 
         } else if (oprater.equals(DETECT_STOP_BODY_COMPONENT)) {
-            showToast("结束测量身体成分数据");
+            showToast("Terminardados");
             VPOperateManager.getInstance().stopDetectBodyComponent(writeResponse);
         } else if (oprater.equals(READ_BODY_COMPONENT_ID)) {
             VPOperateManager.getInstance().readBodyComponentId(writeResponse, new IBodyComponentReadIdListener() {
                 @Override
                 public void readIdFinish(@NotNull ArrayList<Integer> ids) {
-                    showToast("读取完成,ID数量：" + ids.size());
+                    showToast("Ler,ID：" + ids.size());
                 }
             });
         } else if (oprater.equals(READ_BODY_COMPONENT_DATA)) {
@@ -3047,18 +3055,18 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().readBodyComponentData(writeResponse, new IBodyComponentReadDataListener() {
                 @Override
                 public void readBodyComponentDataFinish(@Nullable List<BodyComponent> bodyComponentList) {
-                    showToast("读取身体成分数据完成：" + bodyComponentList.toString());
+                    showToast("Lerdados：" + bodyComponentList.toString());
                 }
             });
         } else if (oprater.equals(SET_BODY_COMPONENT_NEW_DATA_REPORT)) {
             VPOperateManager.getInstance().setBodyComponentReportListener(new INewBodyComponentReportListener() {
                 @Override
                 public void onNewBodyComponentReport() {
-                    showToast("监听到设备有新的身体成分数据上报，请读取身体成分数据获取详细信息");
+                    showToast("dispositivodados，Lerdados");
                 }
             });
 
-            showToast("已设置监听，请到设备上进行身体成分测量");
+            showToast("Configurar，dispositivo");
         } else if (oprater.equals(SHARE_LOG)) {
             VPLocalLogger.getInstance().shareLogFile(this, "com.timaimee.vpdemo.fileProvider");
         } else if (oprater.equals(READ_BLOOD_COMPOSITION_CALIBRATION)) {
@@ -3076,12 +3084,12 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBloodCompositionReadFailed() {
-                    showToast("读取血液成分校准失败");
+                    showToast("Ler");
                 }
 
                 @Override
                 public void onBloodCompositionReadSuccess(boolean isOpen, @NotNull BloodComponent bloodComposition) {
-                    showToast("读取血液成分校准成功：" + isOpen + "," + bloodComposition.toString());
+                    showToast("Ler：" + isOpen + "," + bloodComposition.toString());
                     OperaterActivity.this.isBloodCompositionOpen = isOpen;
                 }
             });
@@ -3092,12 +3100,12 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
                 @Override
                 public void onBloodCompositionSettingFailed() {
-                    showToast("设置血液成分校准失败");
+                    showToast("Configurar");
                 }
 
                 @Override
                 public void onBloodCompositionSettingSuccess(boolean isOpen, @NotNull BloodComponent bloodComposition) {
-                    showToast("设置血液成分校准成功：" + isOpen + "," + bloodComposition.toString());
+                    showToast("Configurar：" + isOpen + "," + bloodComposition.toString());
                 }
 
                 @Override
@@ -3115,25 +3123,25 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             VPOperateManager.getInstance().startDetectBloodComponent(writeResponse, isBloodCompositionOpen, new IBloodComponentDetectListener() {
                 @Override
                 public void onDetectComplete(@NotNull BloodComponent bloodComponent) {
-                    showToast("血液成分测量完成：" + bloodComponent.toString());
+                    showToast("：" + bloodComponent.toString());
                 }
 
                 @Override
                 public void onDetectStop() {
-                    showToast("血液成分测量结束");
+                    showToast("Terminar");
                 }
 
                 @Override
                 public void onDetecting(int progress, @NotNull BloodComponent bloodComponent) {
                     if (progress % 50 == 0) {
-                        showToast("血液成分测量中..");
+                        showToast("..");
                     }
 
                 }
 
                 @Override
                 public void onDetectFailed(@NotNull EBloodComponentDetectState errorState) {
-                    showToast("血液成分测量失败：" + errorState);
+                    showToast("：" + errorState);
                 }
             });
 
@@ -3151,20 +3159,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onPPGLightCallBack(int lightType, List<Integer> data) {
                     if (lightType == 0) {
-                        Logger.t(TAG).e("G08W-绿光  --》 " + list2Str(data));
-                        Toast.makeText(mContext, "G08W-绿光  --》 " + data.size(), Toast.LENGTH_SHORT).show();
+                        Logger.t(TAG).e("G08W-  -- " + list2Str(data));
+                        Toast.makeText(mContext, "G08W-  -- " + data.size(), Toast.LENGTH_SHORT).show();
                     } else if (lightType == 1) {
-                        Logger.t(TAG).e("G08W-红光  --》 " + list2Str(data));
-                        Toast.makeText(mContext, "G08W-红光  --》 " + data.size(), Toast.LENGTH_SHORT).show();
+                        Logger.t(TAG).e("G08W-  -- " + list2Str(data));
+                        Toast.makeText(mContext, "G08W-  -- " + data.size(), Toast.LENGTH_SHORT).show();
                     } else if (lightType == 2) {
-                        Logger.t(TAG).e("G08W-红外  --》 " + list2Str(data));
-                        Toast.makeText(mContext, "G08W-红外  --》 " + data.size(), Toast.LENGTH_SHORT).show();
+                        Logger.t(TAG).e("G08W-  -- " + list2Str(data));
+                        Toast.makeText(mContext, "G08W-  -- " + data.size(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
             });
         } else if (oprater.equals(MAGNETIC_OPEN)) {
-            //如果退出了磁疗相关页面还想继续监听或者移除监听可以设置全局的磁疗监听
+            //Configurar
 //            VPOperateManager.getInstance().setGlobalMagneticTherapy(new IMagneticTherapyListener() {
 //                @Override
 //                public void functionNotSupport() {
@@ -3202,22 +3210,22 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             }, new IGsrDetectListener() {
                 @Override
                 public void onGsrDetectProgress(int progress) {
-                    Logger.t(TAG).e("onGsrDetectProgress --》 " + progress);
+                    Logger.t(TAG).e("onGsrDetectProgress -- " + progress);
                 }
 
                 @Override
                 public void onGsrDetectSuccess(@NonNull GsrDetectResult detectResult) {
-                    Logger.t(TAG).e("onGsrDetectSuccess --》 " + detectResult.toString());
+                    Logger.t(TAG).e("onGsrDetectSuccess -- " + detectResult.toString());
                 }
 
                 @Override
                 public void onGsrDetectFailed(@NonNull GsrDetectAck detectAck) {
-                    Logger.t(TAG).e("onGsrDetectFailed --》 " + detectAck.getDescription());
+                    Logger.t(TAG).e("onGsrDetectFailed -- " + detectAck.getDescription());
                 }
 
                 @Override
                 public void onGsrDetectStop() {
-                    Logger.t(TAG).e("onGsrDetectStop --》 -- ");
+                    Logger.t(TAG).e("onGsrDetectStop -- -- ");
                 }
             });
         } else if (oprater.equals(GSR_STOP)) {
@@ -3240,10 +3248,10 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             }, new IFunSwitchListener() {
                 @Override
                 public void onFunSwitchStatusChanged(int con, Map<Integer, EFunctionStatus> states) {
-                    Toast.makeText(mContext, "读取健康辅助功能完成，具体内容看log", Toast.LENGTH_LONG).show();
-                    //    con    命令类型  1设置  2读取  3设备主动上报
-                    //    states 功能状态 其中Int代表功能类型，详见FunSwitchFlags，EFunctionStatus代表该功能状态，有相关的FunSwitchFlags返回则代表支持，没有代表不支持
-                    Logger.t(TAG).e("onFunSwitchStatusChanged --》 con=" + con + ",states=" + states.toString());
+                    Toast.makeText(mContext, "Lerfuncionalidade，log", Toast.LENGTH_LONG).show();
+                    //    con      1Configurar  2Ler  3dispositivo
+                    //    states funcionalidadeestado Intfuncionalidade，FunSwitchFlags，EFunctionStatusfuncionalidadeestado，FunSwitchFlags，
+                    Logger.t(TAG).e("onFunSwitchStatusChanged -- con=" + con + ",states=" + states.toString());
                 }
             });
         } else if (oprater.equals(FUN_SWITCH_SETTING)) {
@@ -3264,7 +3272,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             if (VpSpGetUtil.getVpSpVariInstance(mContext).isSupportAutoMeasure()) {
                 startActivity(new Intent(this, AutoMeasureActivity.class));
             } else {
-                showToast("当前设备不支持自动测量设置");
+                showToast("dispositivoConfiguração de medição automática");
             }
         } else if (oprater.equals(NRF_OTA)) {
             startActivity(new Intent(this, NRFOtaActivity.class));
@@ -3291,24 +3299,24 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
             @Override
             public void onReadRRIntervalProgressChanged(float progress, RRIntervalData rrIntervalData) {
-                Logger.t(TAG).e("onReadRRIntervalProgressChanged --》 " + dayState + ": progress = " + progress + " || -> " + rrIntervalData.toString());
+                Logger.t(TAG).e("onReadRRIntervalProgressChanged -- " + dayState + ": progress = " + progress + " || -> " + rrIntervalData.toString());
             }
 
             @Override
             public void onReadRRIntervalComplete(DayState dayState, List<RRIntervalData> rrIntervalData) {
-                Logger.t(TAG).e("onReadRRIntervalComplete --》 dayState = " + dayState + " || -> rrIntervalData size = " + rrIntervalData.size());
+                Logger.t(TAG).e("onReadRRIntervalComplete -- dayState = " + dayState + " || -> rrIntervalData size = " + rrIntervalData.size());
 //                for (RRIntervalData data : rrIntervalData) {
-//                    Logger.t(TAG).e("onReadRRIntervalComplete --》 data = " + data.toString());
+//                    Logger.t(TAG).e("onReadRRIntervalComplete -- data = " + data.toString());
 //                }
                 if (dayState == DayState.TODAY) {
                     SystemClock.sleep(50);
                     readRR(DayState.YESTERDAY);
                 } else if (dayState == DayState.YESTERDAY) {
-                    Logger.t(TAG).e("onReadRRIntervalComplete --》 2天数据已全部读取结束 ");
+                    Logger.t(TAG).e("onReadRRIntervalComplete -- 2dadosLerTerminar ");
                     SystemClock.sleep(50);
                     readRR(DayState.BEFORE_YESTERDAY);
                 } else if (dayState == DayState.BEFORE_YESTERDAY) {
-                    Logger.t(TAG).e("onReadRRIntervalComplete --》 三天数据已全部读取结束 ");
+                    Logger.t(TAG).e("onReadRRIntervalComplete -- dadosLerTerminar ");
                 }
 
             }
@@ -3326,7 +3334,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         setting.setUnRepeatDate("0000-00-00");
         setting.setAlarmHour(16);
         setting.setAlarmMinute(1);
-        setting.setContent("^_^大郎，该吃药了！");
+        setting.setContent("^_^Hora da medicação！");
         return setting;
     }
 
@@ -3344,16 +3352,16 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private void setWeatherData1() {
         //CRC
         int crc = 0;
-        //城市名称
-        String cityName = "深圳";
-        //数据来源
+        //
+        String cityName = "";
+        //dados
         int sourcr = 0;
-        //最近更新时间
+        //Atualizar
         int year = TimeData.getSysYear();
         int month = TimeData.getSysMonth();
         int day = TimeData.getSysDay();
         TimeData lasTimeUpdate = new TimeData(year, month, day, 6, 59, 23);
-        //天气列表（以小时为单位）
+        //meteorologia（）
         List<WeatherEvery3Hour> weatherEvery3HourList = new ArrayList<>();
         TimeData every3Hour0 = new TimeData(year, month, day, 6, 59, 23);
         TimeData every3Hour1 = new TimeData(year, month, day, 9, 59, 23);
@@ -3376,20 +3384,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         TimeData every3Hour42 = new TimeData(year, month, day + 2, 18, 59, 23);
         TimeData every3Hour52 = new TimeData(year, month, day + 2, 21, 59, 23);
         /**
-         * 天气状态
-         * 0-4	晴
-         * 5-12	晴转多云
-         * 13-16	阴天
-         * 17-20	阵雨
-         * 21-24	雷阵雨
-         * 25-32	冰雹
-         * 33-40	小雨
-         * 41-48	中雨
-         * 49-56	大雨
-         * 57-72	暴雨
-         * 73-84	小雪
-         * 85-100	大雪
-         * 101-155	多云
+         * meteorologiaestado
+         * 0-4	
+         * 5-12	
+         * 13-16	
+         * 17-20	
+         * 21-24	
+         * 25-32	
+         * 33-40	
+         * 41-48	
+         * 49-56	
+         * 57-72	
+         * 73-84	
+         * 85-100	
+         * 101-155	
          */
         WeatherEvery3Hour weatherEvery3Hour0 =
                 new WeatherEvery3Hour(every3Hour0, 60, 29, 6, 3, "3-4", 15.0);
@@ -3448,7 +3456,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         weatherEvery3HourList.add(weatherEvery3Hour42);
         weatherEvery3HourList.add(weatherEvery3Hour52);
 
-        //天气列表（以天为单位）
+        //meteorologia（）
         List<WeatherEveryDay> weatherEveryDayList = new ArrayList<>();
         TimeData everyDay0 = new TimeData(year, month, day, 12, 59, 23);
         TimeData everyDay1 = new TimeData(year, month, day + 1, 12, 59, 23);
@@ -3496,16 +3504,16 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private void setWeatherData11() {
         //CRC
         int crc = 0;
-        //城市名称
-        String cityName = "南山";
-        //数据来源
+        //
+        String cityName = "";
+        //dados
         int sourcr = 0;
-        //最近更新时间
+        //Atualizar
         int year = TimeData.getSysYear();
         int month = TimeData.getSysMonth();
         int day = TimeData.getSysDay();
         TimeData lasTimeUpdate = new TimeData(year, month, day, 6, 59, 23);
-        //天气列表（以小时为单位）
+        //meteorologia（）
         List<WeatherEvery3Hour> weatherEvery3HourList = new ArrayList<>();
         TimeData every3Hour0 = new TimeData(year, month, day, 6, 59, 23);
         TimeData every3Hour1 = new TimeData(year, month, day, 9, 59, 23);
@@ -3531,20 +3539,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         TimeData every3Hour52 = new TimeData(year, month, day + 2, 21, 59, 23);
         TimeData every3Hour62 = new TimeData(year, month, day + 2, 24, 0, 0);
         /**
-         * 天气状态
-         * 0-4	晴
-         * 5-12	晴转多云
-         * 13-16	阴天
-         * 17-20	阵雨
-         * 21-24	雷阵雨
-         * 25-32	冰雹
-         * 33-40	小雨
-         * 41-48	中雨
-         * 49-56	大雨
-         * 57-72	暴雨
-         * 73-84	小雪
-         * 85-100	大雪
-         * 101-155	多云
+         * meteorologiaestado
+         * 0-4	
+         * 5-12	
+         * 13-16	
+         * 17-20	
+         * 21-24	
+         * 25-32	
+         * 33-40	
+         * 41-48	
+         * 49-56	
+         * 57-72	
+         * 73-84	
+         * 85-100	
+         * 101-155	
          */
         WeatherEvery3Hour weatherEvery3Hour0 =
                 new WeatherEvery3Hour(every3Hour0, 60, TR(), 6, WR(), "3-4", 15.0);
@@ -3612,7 +3620,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         weatherEvery3HourList.add(weatherEvery3Hour52);
         weatherEvery3HourList.add(weatherEvery3Hour62);
 
-        //天气列表（以天为单位）
+        //meteorologia（）
         List<WeatherEveryDay> weatherEveryDayList = new ArrayList<>();
         int t1 = TR();
         int t2 = TR();
@@ -3645,18 +3653,18 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private void setWeatherData24() {
         //CRC
         int crc = 0;
-        //城市名称
-        String cityName = "南山";
-        //数据来源
+        //
+        String cityName = "";
+        //dados
         int sourcr = 0;
-        //最近更新时间
+        //Atualizar
         int year = TimeData.getSysYear();
         int month = TimeData.getSysMonth();
         int day = TimeData.getSysDay();
         int hour = TimeData.getSysHour();
         int minute = TimeData.getSysMiute();
         TimeData lasTimeUpdate = new TimeData(year, month, day, hour, minute, 0);
-        //天气列表（以小时为单位）
+        //meteorologia（）
         List<WeatherEvery3Hour> weatherEvery3HourList = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
             TimeData hourTime = new TimeData(year, month, day, i, 1, 00);
@@ -3680,22 +3688,22 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         }
 
         /**
-         * 天气状态
-         * 0-4	晴
-         * 5-12	晴转多云
-         * 13-16	阴天
-         * 17-20	阵雨
-         * 21-24	雷阵雨
-         * 25-32	冰雹
-         * 33-40	小雨
-         * 41-48	中雨
-         * 49-56	大雨
-         * 57-72	暴雨
-         * 73-84	小雪
-         * 85-100	大雪
-         * 101-155	多云
+         * meteorologiaestado
+         * 0-4	
+         * 5-12	
+         * 13-16	
+         * 17-20	
+         * 21-24	
+         * 25-32	
+         * 33-40	
+         * 41-48	
+         * 49-56	
+         * 57-72	
+         * 73-84	
+         * 85-100	
+         * 101-155	
          */
-        //天气列表（以天为单位）
+        //meteorologia（）
         List<WeatherEveryDay> weatherEveryDayList = new ArrayList<>();
         int t1 = TR();
         int t2 = TR();
@@ -3754,7 +3762,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         });
     }
 
+    /**
+     * Centraliza a publicação de mensagens para a UI e regista simultaneamente no logger da demo.
+     *
+     * @param message conteúdo da mensagem a mostrar.
+     * @param what canal de visualização (tv1/tv2/tv3).
+     */
     private void sendMsg(String message, int what) {
+        DemoStepLogger.featureEvent("OPERATION_RESULT", "canal=" + what + ", mensagem=" + message);
         msg = Message.obtain();
         msg.what = what;
         msg.obj = message;
@@ -3762,22 +3777,28 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     /**
-     * 写入的状态返回
+     * estado
      */
     static class WriteResponse implements IBleWriteResponse {
 
         @Override
         public void onResponse(int code) {
             Logger.t(TAG).i("write cmd status:" + code);
+            if (code == 0) {
+                DemoStepLogger.stepSuccess("BLE_WRITE", "Comando BLE escrito com sucesso");
+            } else {
+                DemoStepLogger.stepError("BLE_WRITE", "Comando BLE devolveu código=" + code);
+            }
 
         }
     }
 
     /**
-     * 密码验证之前，要调用这个方法
-     * 因为在密码验证之后，inPttModel/outPttModel其中一个会有回调
+     * palavra-passe，
+     * palavra-passe，inPttModel/outPttModel
      */
     public void listenDeviceCallbackData() {
+        DemoStepLogger.featureEvent("CALLBACK_SETUP", "Registo de callbacks de controlo do telefone/PTT");
         VPOperateManager.getInstance().settingDeviceControlPhone(new IDeviceControlPhoneModelState() {
 
             @Override
@@ -3792,7 +3813,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
             @Override
             public void inPttModel() {
-                String message = "手表提示:手表进入ptt模式\n";
+                String message = ":ptt\n";
                 isInPttModel = true;
                 Logger.t(TAG).i(message);
             }
@@ -3800,91 +3821,91 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void outPttModel() {
                 isInPttModel = false;
-                String message = "手表提示:手表退出ptt模式\n";
+                String message = ":ptt\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void rejectPhone() {
-                String message = "手表提示:请挂断来电\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void cliencePhone() {
-                String message = "手表提示:请来电静音\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void appAnswerCall() {
-                String message = "手表提示:手机接听来电\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void knocknotify(int type) {
-                String message = "手表提示:敲击提醒，1表示单击，2表示双击\n";
+                String message = ":，1，2\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void sos() {
-                String message = "手表提示:sos\n";
+                String message = ":sos\n";
                 Logger.t(TAG).i(message);
             }
 
             public void nextMusic() {
-                String message = "手表提示:下一曲\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
             }
 
             public void previousMusic() {
-                String message = "手表提示:上一曲\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
             }
 
             public void pauseAndPlayMusic() {
-                String message = "手表提示:暂停和播放\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void pauseMusic() {
-                String message = "手表提示:暂停\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void playMusic() {
-                String message = "手表提示:播放\n";
+                String message = ":\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void voiceUp() {
-                String message = "手表提示:调高音量\n";
+                String message = ":volume\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void voiceDown() {
-                String message = "手表提示:调低音量\n";
+                String message = ":volume\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void oprateMusicSuccess() {
-                String message = "手表提示:音乐相关的操作成功了\n";
+                String message = ":música\n";
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void oprateMusicFail() {
-                String message = "手表提示:音乐相关的操作失败了\n";
+                String message = ":música\n";
                 Logger.t(TAG).i(message);
             }
 
@@ -3901,7 +3922,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     public void startListenADC() {
-        Logger.t(TAG).i("开始监听光电信号");
+        Logger.t(TAG).i("Iniciar");
         byte[] cmd = new byte[20];
         cmd[0] = (byte) 0xf3;
         cmd[1] = (byte) 0x08;
@@ -3909,43 +3930,43 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         VPOperateManager.getInstance().startDetectSPO2H(writeResponse, new ISpo2hDataListener() {
             @Override
             public void onSpO2HADataChange(Spo2hData spo2HData) {
-                //不用理会
+                //
             }
         }, new ILightDataCallBack() {
             @Override
             public void onGreenLightDataChange(int[] data) {
-                String message = "返回-光电信号:\n" + Arrays.toString(data);
+                String message = "-:\n" + Arrays.toString(data);
                 Logger.t(TAG).i(message);
             }
         });
         VPOperateManager.getInstance().stopDetectSPO2H(writeResponse, new ISpo2hDataListener() {
             @Override
             public void onSpO2HADataChange(Spo2hData spo2HData) {
-                //不用理会
+                //
             }
         });
 
         VPOperateManager.getInstance().startDetectHeart(writeResponse, new IHeartDataListener() {
             @Override
             public void onDataChange(HeartData heartData) {
-                String message = "返回-心率值:" + heartData.toString();
+                String message = "-Frequência cardíaca:" + heartData.toString();
                 Logger.t(TAG).i(message);
             }
         });
     }
 
     public void stopListenADC() {
-        Logger.t(TAG).i("停止监听光电信号");
+        Logger.t(TAG).i("");
         VPOperateManager.getInstance().stopDetectHeart(writeResponse);
     }
 
     private String getDay(String day) {
         if (day.equals("0")) {
-            return "今天";
+            return "";
         } else if (day.equals("1")) {
-            return "昨天";
+            return "";
         } else {
-            return "前天";
+            return "";
         }
     }
 
@@ -3955,7 +3976,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
             @Override
             public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                String message = "健康数据[5分钟]-读取进度:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                String message = "dados[5]-Ler:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                 Logger.t(TAG).i(message);
             }
 
@@ -3982,17 +4003,17 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         IOriginProgressListener originData3Listener = new IOriginData3Listener() {
             @Override
             public void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList) {
-                String message = "健康数据-返回:" + originDataList.toString();
+                String message = "dados-:" + originDataList.toString();
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
-                String message = "健康数据[30分钟]-返回:" + originHalfHourDataList.toString();
+                String message = "dados[30]-:" + originHalfHourDataList.toString();
                 Logger.t(TAG).i(message);
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的心率数据 size = " + originHalfHourDataList.getHalfHourRateDatas().size());
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的血压数据 size = " + originHalfHourDataList.getHalfHourBps().size());
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的运动数据 size = " + originHalfHourDataList.getHalfHourSportDatas().size());
+                Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
+                Logger.t(TAG).i("dados[30]-:30pressão arterialdados size = " + originHalfHourDataList.getHalfHourBps().size());
+                Logger.t(TAG).i("dados[30]-:30dados size = " + originHalfHourDataList.getHalfHourSportDatas().size());
             }
 
             @Override
@@ -4009,20 +4030,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
             @Override
             public void onReadOriginProgress(float progress) {
-                String message = "onReadOriginProgress 健康数据[5分钟]-读取进度:" + progress;
+                String message = "onReadOriginProgress dados[5]-Ler:" + progress;
                 Logger.t(TAG).i(message);
             }
 
             @Override
             public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-                String message = "onReadOriginProgressDetail 健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+                String message = "onReadOriginProgressDetail dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
                 Logger.t(TAG).i(message);
             }
 
 
             @Override
             public void onReadOriginComplete() {
-                String message = "健康数据-读取结束";
+                String message = "dados-LerTerminar";
                 Logger.t(TAG).i(message);
             }
         };
@@ -4035,19 +4056,23 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 
     @Override
     protected void onDestroy() {
-        VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
-            @Override
-            public void onResponse(int i) {
-
-            }
-        });
+        if (deviceaddress != null && !deviceaddress.trim().isEmpty()) {
+            VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
+                @Override
+                public void onResponse(int i) {
+                    DemoStepLogger.featureEvent("BLE_DISCONNECT", "Disconnect no OperaterActivity.onDestroy. code=" + i);
+                }
+            });
+        } else {
+            DemoStepLogger.featureEvent("BLE_DISCONNECT", "OperaterActivity.onDestroy sem endereço válido; sem disconnect");
+        }
         super.onDestroy();
     }
 
     private void controlVolume() {
         Random random = new Random();
         int volume = random.nextInt(100);
-        Toast.makeText(mContext, "设置音量：" + volume, Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "Configurarvolume：" + volume, Toast.LENGTH_SHORT).show();
         VPOperateManager.getInstance().settingVolume(volume, writeResponse, new IMusicControlListener() {
             @Override
             public void oprateMusicSuccess() {
@@ -4097,9 +4122,9 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     private void controlMusic(boolean isPlay) {
-        int play = 1;//播放状态
-        int pause = 2;//暂停状态
-        MusicData musicData = new MusicData("周杰伦", "上海一九四三", "范特西", 80, isPlay ? play : pause);
+        int play = 1;//estado
+        int pause = 2;//estado
+        MusicData musicData = new MusicData("", "", "", 80, isPlay ? play : pause);
         Logger.t(TAG).i("settingMusicData");
         VPOperateManager.getInstance().settingMusicData(writeResponse, musicData, new IMusicControlListener() {
             @Override
@@ -4155,26 +4180,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         VPOperateManager.getInstance().connectBT(VPOperateManager.getCurrentDeviceAddress(), new IDeviceBTConnectionListener() {
             @Override
             public void onDeviceBTConnecting() {
-                Logger.t("【BT】-").d("BT设备连接中");
-                showToast("BT设备连接中");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTConnected() {
-                Logger.t("【BT】-").d("BT设备已连接");
-                showToast("BT设备已连接");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTDisconnected() {
-                Logger.t("【BT】-").d("BT设备已断开");
-                showToast("BT设备已断开");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTConnectTimeout() {
-                Logger.t("【BT】-").d("BT连接超时");
-                showToast("BT连接超时");
+                Logger.t("BT-").d("BT");
+                showToast("BT");
             }
         });
     }
@@ -4183,26 +4208,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         VPOperateManager.getInstance().disconnectBT(VPOperateManager.getCurrentDeviceAddress(), new IDeviceBTConnectionListener() {
             @Override
             public void onDeviceBTConnecting() {
-                Logger.t("【BT】-").d("BT设备连接中");
-                showToast("BT设备连接中");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTConnected() {
-                Logger.t("【BT】-").d("BT设备已连接");
-                showToast("BT设备已连接");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTDisconnected() {
-                Logger.t("【BT】-").d("BT设备已断开");
-                showToast("BT设备已断开");
+                Logger.t("BT-").d("BTdispositivo");
+                showToast("BTdispositivo");
             }
 
             @Override
             public void onDeviceBTConnectTimeout() {
-                Logger.t("【BT】-").d("BT连接超时");
-                showToast("BT连接超时");
+                Logger.t("BT-").d("BT");
+                showToast("BT");
             }
         });
     }

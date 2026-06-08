@@ -55,27 +55,27 @@ public class UiUpdateAGPSActivity extends Activity {
     }
 
     /**
-     * 是否支持
+     * 
      */
     public void isSupport(View view) {
         if (UiUpdateUtil.getInstance().isSupportChangeCustomAGPS()) {
-            mUiAGPSSupportTV.setText("1.支持自定义AGPS");
+            mUiAGPSSupportTV.setText("1.AGPS");
         } else {
-            mUiAGPSSupportTV.setText("1.不支持自定义AGPS");
-            Toast.makeText(mContext, "不支持自定义AGPS", Toast.LENGTH_LONG).show();
+            mUiAGPSSupportTV.setText("1.AGPS");
+            Toast.makeText(mContext, "AGPS", Toast.LENGTH_LONG).show();
         }
     }
 
     UIDataAGPS mUiDataAGPS;
 
     /**
-     * 读取基本的信息(自定义表盘)
+     * Ler()
      */
     public void readBaseInfo(View view) {
         UiUpdateUtil.getInstance().getAGPSWacthUiInfo(new IUIBaseInfoFormAGPSListener() {
             @Override
             public void onBaseUiInfoFormAgps(UIDataAGPS uiDataAGPS) {
-                Logger.t(TAG).i("2.自定义AGPS的基本信息 uiAGPS:" + uiDataAGPS.toString());
+                Logger.t(TAG).i("2.AGPSInformação base uiAGPS:" + uiDataAGPS.toString());
                 mUiDataAGPS = uiDataAGPS;
                 mUiAGPSBaseInfoTV.setText(mUiDataAGPS.toString());
             }
@@ -86,7 +86,7 @@ public class UiUpdateAGPSActivity extends Activity {
 
 
     /**
-     * 使用的是apgs
+     * apgs
      */
     public void setAgps(View view){
 
@@ -127,14 +127,14 @@ public class UiUpdateAGPSActivity extends Activity {
                     @Override
                     public void onUiUpdateProgress(int currentBlock, int sumBlock, int progress) {
                         Logger.t(TAG).i("onUiUpdateProgress:" + currentBlock + "," + sumBlock + "," + progress + "%");
-                        mSendProgressTv.setText("发送中：" + progress + "%");
+                        mSendProgressTv.setText("Enviar：" + progress + "%");
                     }
 
 
                     @Override
                     public void onUiUpdateSuccess() {
                         Logger.t(TAG).i("onUiUpdateSuccess");
-                        mSendProgressTv.setText("设置成功");
+                        mSendProgressTv.setText("Configurar");
                     }
 
                     @Override

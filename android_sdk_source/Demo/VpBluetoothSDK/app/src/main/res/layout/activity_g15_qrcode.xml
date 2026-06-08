@@ -14,13 +14,13 @@
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="20sp"
         android:background="#cccccc"
-        android:text="G15发送二维码"/>
+        android:text="G15 enviar QR code"/>
 
     <TextView
         android:id="@+id/tvType"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="二维码类型："
+        android:text="Tipo de QR code:"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:layout_width="wrap_content"
@@ -39,19 +39,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="患者二维码"/>
+            android:text="QR code do paciente"/>
         <RadioButton
             android:id="@+id/rbSk"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="收款二维码"/>
+            android:text="QR code de pagamento"/>
     </RadioGroup>
     <TextView
         android:id="@+id/tvContent"
         app:layout_constraintTop_toBottomOf="@id/rgQRCode"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="二维码内容："
+        android:text="Conteúdo do QR code:"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:layout_width="wrap_content"
@@ -61,15 +61,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvContent"
         android:layout_margin="10dp"
-        android:hint="内容长度不能超过50个字节"
-        android:text="脑子有问题，里面全是水，需要治疗"
+        android:hint="O conteúdo não pode exceder 50 bytes"
+        android:text="Texto de teste para QR code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/tvName"
         app:layout_constraintTop_toBottomOf="@id/etContent"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="姓名："
+        android:text="Nome:"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:layout_width="wrap_content"
@@ -79,15 +79,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvName"
         android:layout_margin="10dp"
-        android:hint="内容长度不能超过30个字节"
-        android:text="玛勒格碧"
+        android:hint="O conteúdo não pode exceder 30 bytes"
+        android:text="Utilizador de Teste"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/tvGroup"
         app:layout_constraintTop_toBottomOf="@id/etName"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="组别："
+        android:text="Grupo:"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:layout_width="wrap_content"
@@ -97,15 +97,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvGroup"
         android:layout_margin="10dp"
-        android:hint="内容长度不能超过30个字节"
-        android:text="精神病组"
+        android:hint="O conteúdo não pode exceder 30 bytes"
+        android:text="Grupo Clínico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/tvNumber"
         app:layout_constraintTop_toBottomOf="@id/etGroup"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="编号："
+        android:text="Número:"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:layout_width="wrap_content"
@@ -115,7 +115,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNumber"
         android:layout_margin="10dp"
-        android:hint="内容长度不能超过30个字节"
+        android:hint="O conteúdo não pode exceder 30 bytes"
         android:text="9527"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -126,7 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:onClick="sendQRCode"
-        android:text="发送"
+        android:text="Enviar"
         android:textSize="20sp"
         app:layout_constraintTop_toBottomOf="@id/etNumber"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="公英制转换"
+            android:text="Conversão métrico/imperial"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -32,7 +32,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="个人身高(cm):" />
+            android:text="Altura (cm):" />
 
         <EditText
             android:id="@+id/institution_person_height"
@@ -56,7 +56,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="个人体重(kg):" />
+            android:text="Peso (kg):" />
 
         <EditText
             android:id="@+id/institution_person_weight"
@@ -80,7 +80,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="距离(km):" />
+            android:text="Distância (km):" />
 
         <EditText
             android:id="@+id/institution_distance"
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
-        android:text="更新" />
+        android:text="Atualizar" />
 
     <ScrollView
         android:layout_width="match_parent"

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description 添加世界时钟
+ * Description AdicionarRelógio mundial
  *
  * @author KYM.
  * @date 2024/4/10 20:01

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * QX17数据采集流控演示Activity
+ * QX17dadosActivity
  */
 public class QX17DataAcquisitionActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "QX17Demo";
@@ -47,7 +47,7 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
     private int gpsCount = 0;
     private int hrCount = 0;
 
-    // 全局状态标记，由OperaterActivity中的全局监听更新
+    // estado，OperaterActivityAtualizar
     public static Boolean lastKnownState = null;
 
     @Override
@@ -74,24 +74,24 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
         btnClearLog.setOnClickListener(this);
         btnSendVibration.setOnClickListener(this);
 
-        // 初始化振动模式Spinner
-        String[] vibrationModes = {"开始(0)", "结束(1)", "通知(2)", "提醒(3)", "确认(4)", "节拍(5)", "已连接(6)", "错误(7)"};
+        // Spinner
+        String[] vibrationModes = {"Iniciar(0)", "Terminar(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, vibrationModes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerVibrationMode.setAdapter(adapter);
 
-        // 进入页面时显示当前已知状态
+        // estado
         updateStatusDisplay();
 
-        // 设置状态监听，实时更新状态显示
+        // Configurarestado，Atualizarestado
         mVpOperateManager.setVpQX17DataAcquisitionStateListener(mStateListener);
     }
 
     private void updateStatusDisplay() {
         if (lastKnownState != null) {
-            tvStatus.setText("状态: " + (lastKnownState ? "采集中" : "已停止"));
+            tvStatus.setText("estado: " + (lastKnownState ? "" : ""));
         } else {
-            tvStatus.setText("状态: 未知");
+            tvStatus.setText("estado: ");
         }
     }
 
@@ -102,27 +102,27 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
             imuCount = 0;
             gpsCount = 0;
             hrCount = 0;
-            appendLog(">>> 发送开启数据采集指令");
+            appendLog(">>> EnviarAtivardados");
             mVpOperateManager.vpQX17StartDataAcquisition(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
-                    appendLog("开启采集写入响应: code=" + code);
+                    appendLog("Ativar: code=" + code);
                 }
             }, mDataListener);
         } else if (id == R.id.btn_qx17_stop) {
-            appendLog(">>> 发送关闭数据采集指令");
+            appendLog(">>> EnviarDesativardados");
             mVpOperateManager.vpQX17StopDataAcquisition(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
-                    appendLog("关闭采集写入响应: code=" + code);
+                    appendLog("Desativar: code=" + code);
                 }
             });
         } else if (id == R.id.btn_qx17_continue) {
-            appendLog(">>> 发送继续数据采集(重传)指令");
+            appendLog(">>> Enviardados()");
             mVpOperateManager.vpQX17ContinueDataAcquisition(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
-                    appendLog("继续采集写入响应: code=" + code);
+                    appendLog(": code=" + code);
                 }
             }, mDataListener);
         } else if (id == R.id.btn_qx17_clear_log) {
@@ -139,21 +139,21 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
             } catch (NumberFormatException e) {
                 // ignore
             }
-            appendLog(">>> 发送振动指令: mode=" + mode + ", duration=" + duration);
+            appendLog(">>> Enviar: mode=" + mode + ", duration=" + duration);
             mVpOperateManager.vpQX17SetVibrationMode(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
-                    appendLog("振动指令写入响应: code=" + code);
+                    appendLog(": code=" + code);
                 }
             }, mode, duration);
         }
     }
 
-    // 状态监听：设备上报采集状态变更
+    // estado：dispositivoestado
     private final IQX17DataAcquisitionStateListener mStateListener = new IQX17DataAcquisitionStateListener() {
         @Override
         public void onQX17DataAcquisitionStatus(boolean isOpen) {
-            appendLog("[状态变更] isOpen=" + isOpen);
+            appendLog("[estado] isOpen=" + isOpen);
             lastKnownState = isOpen;
             mMainHandler.post(new Runnable() {
                 @Override
@@ -164,19 +164,19 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
         }
     };
 
-    // 数据监听：接收IMU/GPS/心率数据
+    // dados：IMU/GPS/Frequência cardíacadados
     private final IQX17DataAcquisitionListener mDataListener = new IQX17DataAcquisitionListener() {
         @Override
         public void onQX17DataAcquisitionStatus(boolean isOpen) {
-            appendLog("[数据监听-状态变更] isOpen=" + isOpen);
+            appendLog("[dados-estado] isOpen=" + isOpen);
         }
 
         @Override
         public void onQX17IMUData(List<QX17IMUData> imuDataList) {
             imuCount += imuDataList.size();
             QX17IMUData last = imuDataList.get(imuDataList.size() - 1);
-            Log.d(TAG, "IMU数据: count=" + imuDataList.size() + ", last=" + last.toString());
-            appendLog("[IMU] +" + imuDataList.size() + "条 (总" + imuCount + ") ts=" + last.getTimestamp());
+            Log.d(TAG, "IMUdados: count=" + imuDataList.size() + ", last=" + last.toString());
+            appendLog("[IMU] +" + imuDataList.size() + " (" + imuCount + ") ts=" + last.getTimestamp());
         }
 
         @Override
@@ -191,7 +191,7 @@ public class QX17DataAcquisitionActivity extends Activity implements View.OnClic
         @Override
         public void onQX17HeartRateData(QX17HeartRateData heartRateData) {
             hrCount++;
-            appendLog("[心率] #" + hrCount + " HR=" + heartRateData.getHeartRate()
+            appendLog("[Frequência cardíaca] #" + hrCount + " HR=" + heartRateData.getHeartRate()
                     + " ts=" + heartRateData.getTimestamp());
         }
     };

@@ -46,7 +46,7 @@ public class MediaPickerHelper {
     private WeakReference<AppCompatActivity> activity;
 
 
-    // 选择结果监听接口
+    // 
     public void launch(AppCompatActivity activity) {
         init(activity);
         initPickers(activity);
@@ -80,7 +80,7 @@ public class MediaPickerHelper {
 
     private void initPickers(AppCompatActivity activity) {
         this.activity = new WeakReference<>(activity);
-        // 单张图片选择
+        // 
         singleImagePicker = activity.registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
@@ -88,7 +88,7 @@ public class MediaPickerHelper {
                         MediaInfo info = getMediaInfo(uri, false);
                         if (singleImageSelectionListener != null) {
                             singleImageSelectionListener.onSingleImageSelected(info);
-                            //开始裁剪
+                            //Iniciar
                         }
                         startCrop(info);
                     }
@@ -109,7 +109,7 @@ public class MediaPickerHelper {
     }
 
     /**
-     * 选择单张图片
+     * 
      */
     public void pickSingleImage(int width, int height, boolean isCircle) {
         this.width = width;
@@ -122,7 +122,7 @@ public class MediaPickerHelper {
 //                @Override
 //                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 //                    Logger.t(TAG).e("onPermissionGranted:Granted::::" + permissionGrantedResponse.getRequestedPermission().toString());
-//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE 权限已授予");
+//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE ");
 //                    Logger.t(TAG).e("======================> requestPostNotifications#start2Next");
 //                    pickSingleImage(width, height, isCircle);
 //                }
@@ -130,18 +130,18 @@ public class MediaPickerHelper {
 //                @Override
 //                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
 //                    Logger.t(TAG).e("onPermissionDenied:Denied::::" + permissionDeniedResponse.getRequestedPermission().toString());
-//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE 权限已拒绝");
+//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE ");
 //                    if (mediaSelectionListener != null) {
-//                        mediaSelectionListener.onError("需要存储权限");
+//                        mediaSelectionListener.onError("");
 //                    }
 //                }
 //
 //                @Override
 //                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
 //                    Logger.t(TAG).e("onPermissionRationaleShouldBeShown:Granted::::" + permissionRequest.getName());
-//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE 权限多次拒绝");
+//                    ToastUtils.showDebug("WRITE_EXTERNAL_STORAGE ");
 //                    if (mediaSelectionListener != null) {
-//                        mediaSelectionListener.onError("需要存储权限");
+//                        mediaSelectionListener.onError("");
 //                    }
 //                }
 //            }).check();
@@ -157,7 +157,7 @@ public class MediaPickerHelper {
 
 
     /**
-     * 获取媒体文件详细信息
+     * 
      */
     @SuppressLint("Range")
     private MediaInfo getMediaInfo(Uri uri, boolean isVideo) {
@@ -166,10 +166,10 @@ public class MediaPickerHelper {
         info.isVideo = isVideo;
         Logger.t(TAG).e("-getMediaInfo-: | " + uri);
         ContentResolver resolver = activity.get().getContentResolver();
-        // 获取基础信息
+        // 
         try (Cursor cursor = resolver.query(uri, null, null, null, null)) {
             if (cursor != null && cursor.moveToFirst()) {
-                // 文件名和大小
+                // 
                 int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                 int mimeTypeIndex = cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE);
@@ -177,7 +177,7 @@ public class MediaPickerHelper {
                 info.size = cursor.getLong(sizeIndex);
                 info.mimeType = cursor.getString(mimeTypeIndex);
 
-                // 尝试获取路径
+                // 
                 String[] proj = {MediaStore.Images.Media.DATA};
                 try (Cursor pathCursor = resolver.query(uri, proj, null, null, null)) {
                     if (pathCursor != null && pathCursor.moveToFirst()) {
@@ -186,7 +186,7 @@ public class MediaPickerHelper {
                     }
                 }
 
-                // 获取尺寸
+                // 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     try {
                         getImageDimensions(info, uri);
@@ -198,11 +198,11 @@ public class MediaPickerHelper {
         } catch (Exception e) {
             e.printStackTrace();
             if (singleImageSelectionListener != null) {
-                singleImageSelectionListener.onError("获取文件信息失败");
+                singleImageSelectionListener.onError("");
             }
         }
 
-        // 如果无法直接获取路径，尝试复制到缓存目录
+        // ，
         if (info.path == null) {
             info.path = copyToCache(uri);
         }
@@ -213,7 +213,7 @@ public class MediaPickerHelper {
     private void getImageDimensions(MediaInfo info, Uri uri) {
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true; // 只解析边界，不加载完整图片
+            options.inJustDecodeBounds = true; // ，
 
             InputStream input = activity.get().getContentResolver().openInputStream(uri);
             BitmapFactory.decodeStream(input, null, options);
@@ -227,7 +227,7 @@ public class MediaPickerHelper {
     }
 
     /**
-     * 将URI指向的文件复制到缓存目录
+     * URI
      */
     private String copyToCache(Uri uri) {
         File cacheDir = activity.get().getCacheDir();
@@ -274,36 +274,36 @@ public class MediaPickerHelper {
     private UCrop.Options buildOptions(int width, int height, String outputDir, boolean isCircle) {
         Logger.t(TAG).e("-buildOptions-: | width = " + width + " height = " + height);
         UCrop.Options options = new UCrop.Options();
-        options.setHideBottomControls(false);//是否显示裁剪菜单栏
-        options.setFreeStyleCropEnabled(false);//裁剪框or图片拖动
-        options.setShowCropFrame(true);//是否显示裁剪边框
-        options.setShowCropGrid(true);//是否显示裁剪框
-        options.setCircleDimmedLayer(isCircle);//是否圆形裁剪
+        options.setHideBottomControls(false);//
+        options.setFreeStyleCropEnabled(false);//or
+        options.setShowCropFrame(true);//
+        options.setShowCropGrid(true);//
+        options.setCircleDimmedLayer(isCircle);//
         if (isCircle) {
-            // 圆形必须 1:1 比例
+            //  1:1 
             options.withAspectRatio(1, 1);
-            // 圆形裁剪框 隐藏网格 + 隐藏边框（更美观）
+            //   + （）
             options.setShowCropGrid(false);
             options.setShowCropFrame(false);
         } else {
-            // 普通裁剪使用传入比例
+            // 
             options.withAspectRatio(width, height);
         }
         options.withAspectRatio(width, height);
         options.withMaxResultSize(width, height);
-        options.isCropDragSmoothToCenter(true);//裁剪并自动拖拽到中间
+        options.isCropDragSmoothToCenter(true);//
         options.setCropOutputPathDir(outputDir);
-        options.isUseCustomLoaderBitmap(true);//设置自定义Loader Bitmap
+        options.isUseCustomLoaderBitmap(true);//ConfigurarLoader Bitmap
            String MIME_TYPE_GIF = "image/gif";
            String MIME_TYPE_WEBP = "image/webp";
-        options.setSkipCropMimeType(MIME_TYPE_GIF, MIME_TYPE_WEBP);//设置跳过的裁剪类型
-        options.isForbidCropGifWebp(true);//设置禁止裁剪GIF
+        options.setSkipCropMimeType(MIME_TYPE_GIF, MIME_TYPE_WEBP);//Configurar
+        options.isForbidCropGifWebp(true);//ConfigurarGIF
         options.isForbidSkipMultipleCrop(false);
-        options.setMaxScaleMultiplier(4);//最大的放大倍数
+        options.setMaxScaleMultiplier(4);//
         options.isDarkStatusBarBlack(true);
-        options.setStatusBarColor(Color.parseColor("#f5f5f5"));//状态栏颜色
-        options.setToolbarColor(Color.parseColor("#f5f5f5"));//toolbar颜色
-//        options.setDimmedLayerColor(ContextCompat.getColor(HBandApplication.instance, R.color.ecg_bg)); //背景色
+        options.setStatusBarColor(Color.parseColor("#f5f5f5"));//estado
+        options.setToolbarColor(Color.parseColor("#f5f5f5"));//toolbar
+//        options.setDimmedLayerColor(ContextCompat.getColor(HBandApplication.instance, R.color.ecg_bg)); //
 //        options.setActiveControlsWidgetColor(Color.RED);
 //        options.setRootViewBackgroundColor(Color.BLACK);
 //        options.setLogoColor(Color.GREEN);

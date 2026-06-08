@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Author: YWX
  * Date: 2021/12/25 9:30
- * Description: 原始数据打印
+ * Description: Dados brutos
  */
 public class OriginalDataLogActivity extends Activity implements View.OnClickListener {
     private static final String TAG = OriginalDataLogActivity.class.getSimpleName();
@@ -66,7 +66,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
     private void initHRVLog(List<HRVOriginData> originHrvDataList) {
         clearLogData();
         for (HRVOriginData data : originHrvDataList) {
-            String timeTag = "【" + data.getmTime().toFullDateTimeString() + "-" + data.getCurrentPackNumber() + "/" + data.getAllCurrentPackNumber() + "】";
+            String timeTag = "" + data.getmTime().toFullDateTimeString() + "-" + data.getCurrentPackNumber() + "/" + data.getAllCurrentPackNumber() + "";
             String log = timeTag + data.rate;
             logs.add(new ShowLog(log, isContainTime(timeTag) ? ShowLog.Level.ERROR : ShowLog.Level.BLUE));
         }
@@ -76,9 +76,9 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
     private void initSpo2Log(List<Spo2hOriginData> originSpo2hDataList, int tag) {
 //        clearLogData();
         for (Spo2hOriginData data : originSpo2hDataList) {
-            String timeTag = "【" + data.getmTime().toFullDateTimeString() + "-" + data.getCurrentPackNumber() + "/" + data.getAllPackNumner() + "】";
+            String timeTag = "" + data.getmTime().toFullDateTimeString() + "-" + data.getCurrentPackNumber() + "/" + data.getAllPackNumner() + "";
             String log = timeTag
-                    + "-> 血氧 = " + data.getOxygenValue() + " 心率 = " + data.getHeartValue() + " 呼吸率 = " + data.getRespirationRate();
+                    + "-> SpO2 = " + data.getOxygenValue() + " Frequência cardíaca = " + data.getHeartValue() + "  = " + data.getRespirationRate();
             logs.add(new ShowLog(log, isContainTime(timeTag) ? ShowLog.Level.ERROR : tag == 0 ? ShowLog.Level.GREEN : tag == 1 ? ShowLog.Level.BLACK : ShowLog.Level.BLUE));
         }
         mAdapter.notifyDataSetChanged();
@@ -95,7 +95,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
 
     private void initOriginDataLog(List<OriginData3> originDataList, int tag) {
         for (OriginData3 data : originDataList) {
-            String timeTag = "【" + data.getmTime().toFullDateTimeString() + "-" + data.getPackageNumber() + "/" + data.getAllPackage() + "】";
+            String timeTag = "" + data.getmTime().toFullDateTimeString() + "-" + data.getPackageNumber() + "/" + data.getAllPackage() + "";
             String log = timeTag + data.toString();
             logs.add(new ShowLog(log, isContainTime(timeTag) ? ShowLog.Level.ERROR : tag == 0 ? ShowLog.Level.GREEN : tag == 1 ? ShowLog.Level.BLACK : ShowLog.Level.BLUE));
         }
@@ -131,7 +131,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
         IOriginProgressListener originDataListener = new IOriginData3Listener() {
             @Override
             public void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList) {
-                String message = "健康数据-返回:" + originDataList.toString();
+                String message = "dados-:" + originDataList.toString();
                 Logger.t(TAG).i(message);
                 if (isShowOrigin) {
                     initOriginDataLog(originDataList, count);
@@ -141,11 +141,11 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
 
             @Override
             public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
-                String message = "健康数据[30分钟]-返回:" + originHalfHourDataList.toString();
+                String message = "dados[30]-:" + originHalfHourDataList.toString();
                 Logger.t(TAG).i(message);
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的心率数据 size = " + originHalfHourDataList.getHalfHourRateDatas().size());
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的血压数据 size = " + originHalfHourDataList.getHalfHourBps().size());
-                Logger.t(TAG).i("健康数据[30分钟]-返回:30分钟的运动数据 size = " + originHalfHourDataList.getHalfHourSportDatas().size());
+                Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
+                Logger.t(TAG).i("dados[30]-:30pressão arterialdados size = " + originHalfHourDataList.getHalfHourBps().size());
+                Logger.t(TAG).i("dados[30]-:30dados size = " + originHalfHourDataList.getHalfHourSportDatas().size());
             }
 
             @Override
@@ -168,20 +168,20 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
 
             @Override
             public void onReadOriginProgress(float progress) {
-//                String message = "onReadOriginProgress 健康数据[5分钟]-读取进度:" + progress;
+//                String message = "onReadOriginProgress dados[5]-Ler:" + progress;
 //                Logger.t(TAG).i(message);
             }
 
             @Override
             public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
-//                String message = "onReadOriginProgressDetail 健康数据[5分钟]-读取进度:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
+//                String message = "onReadOriginProgressDetail dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
 //                Logger.t(TAG).i(message);
             }
 
 
             @Override
             public void onReadOriginComplete() {
-                String message = "健康数据-读取结束";
+                String message = "dados-LerTerminar";
                 Logger.t(TAG).i(message);
                 isReadFinished = true;
                 mProgressBar.setVisibility(View.GONE);
@@ -193,7 +193,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
     WriteResponse writeResponse = new WriteResponse();
 
     /**
-     * 写入的状态返回
+     * estado
      */
     static class WriteResponse implements IBleWriteResponse {
 
@@ -234,7 +234,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
 
     public static class ShowLog {
         public String log;
-        public Level level;//0 黑色 1 红色 2 蓝色
+        public Level level;//0  1  2 
 
         public enum Level implements Serializable {
             BLACK(Color.BLACK),

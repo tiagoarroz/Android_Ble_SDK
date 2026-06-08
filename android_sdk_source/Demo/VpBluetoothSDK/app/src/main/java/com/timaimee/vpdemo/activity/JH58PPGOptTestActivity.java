@@ -112,7 +112,7 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
         timeData.setSecond(0);
         btnDatePicker.setText(timeData.toDatabaseDateString());
         btnTimePicker.setText(timeData.getClock() + ":00");
-        //读取PPG原生数据时的模式
+        //LerPPGdados
         rgReadPPGTestMode.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbReadMode1On) {
                 ppgTestMode = PPGTestMode.MODE1;
@@ -121,7 +121,7 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
                 ppgTestMode = PPGTestMode.MODE2;
             }
         });
-        //设置测量模式
+        //Configurar
         rgPPGTestMode.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rbAllOff) {
                 ppgSwitchStatus = PPGSwitchStatus.ALL_OFF;
@@ -130,11 +130,11 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
             } else if (checkedId == R.id.rbMode2On) {
                 ppgSwitchStatus = PPGSwitchStatus.MODE2_ON;
             }
-            /*设置PPG开关状态*/
-            VPOperateManager.getInstance().setPPGSwitchStatus(ppgSwitchStatus, code -> tvPPGOptInfo.setText("设置PPG测量开关状态指令发送" + (code == Code.REQUEST_SUCCESS ? "成功" : "失败")));
+            /*Configurar estado do PPG*/
+            VPOperateManager.getInstance().setPPGSwitchStatus(ppgSwitchStatus, code -> tvPPGOptInfo.setText("ConfigurarPPGestadoEnviar" + (code == Code.REQUEST_SUCCESS ? "" : "")));
         });
         readPPGTestStatus();
-        /*添加PPG测量状态监听*/
+        /*AdicionarPPGestado*/
         VPOperateManager.getInstance().addPPGTestSwitchStatusListener(new IPPGSwitchOperaterListener() {
             @Override
             public void onPPGSwitchStatusRead(@NonNull PPGSwitchStatus switchStatus) {
@@ -150,35 +150,35 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
 
             @Override
             public void onPPGSwitchStatusSetting(@NonNull PPGSwitchStatus switchStatus) {
-                tvPPGOptInfo.setText("PPG测量模式开关设置成功：" + switchStatus);
+                tvPPGOptInfo.setText("PPGConfigurar：" + switchStatus);
             }
 
             @Override
             public void onPPGSwitchStatusReport(@NonNull PPGSwitchStatus switchStatus) {
-                tvPPGOptInfo.setText("PPG测量模式开关上报：" + switchStatus);
+                tvPPGOptInfo.setText("PPG：" + switchStatus);
             }
         });
-        /*添加设备PPG高频实时传输监听*/
+        /*AdicionardispositivoPPG*/
         VPOperateManager.getInstance().addDevicePPGRealTimeTransferListener(new IPPGRealTimeTransmissionListener() {
 
             @Override
             public void onDeviceRequestPPGRealTimeTransfer(boolean isRequestOpen) {
-                appendMsg("设备请求PPG实时传输：" + (isRequestOpen ? "【开启】" : "【关闭】"));
+                appendMsg("dispositivoPPG：" + (isRequestOpen ? "Ativar" : "Desativar"));
             }
 
             @Override
             public void onAppRequestPPGRealTimeTransfer(boolean isSuccess) {
-                appendMsg("App请求PPG实时传输：" + (isSuccess ? "成功" : "失败"));
+                appendMsg("AppPPG：" + (isSuccess ? "" : ""));
             }
 
             @Override
             public void onGreenLightDataReport(@NonNull List<Integer> greenLightDataList) {
-                appendMsg("收到绿光信号>>> " + greenLightDataList);
+                appendMsg(">>> " + greenLightDataList);
             }
 
             @Override
             public void onAccelerationDataReport(@NonNull List<AccelerationData> accDataList) {
-                appendMsg("收到加速度信号>>> " + accDataList);
+                appendMsg(">>> " + accDataList);
             }
         });
     }
@@ -214,110 +214,110 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
     }
 
     private void readPPGTestStatus() {
-        VPOperateManager.getInstance().readPPGSwitchStatus(code -> tvPPGOptInfo.setText("读取PPG测量开关状态指令发送" + (code == Code.REQUEST_SUCCESS ? "成功" : "失败")));
+        VPOperateManager.getInstance().readPPGSwitchStatus(code -> tvPPGOptInfo.setText("LerPPGestadoEnviar" + (code == Code.REQUEST_SUCCESS ? "" : "")));
     }
 
     private PPGReadData ppgReadData = null;
 
     private void readPPGRawData() {
         sb.setLength(0);
-        appendMsg("【读取】PPG原始数据~");
-        appendMsg("时间:" + timeData.toFullDateTimeString() + " , 模式:" + ppgTestMode);
+        appendMsg("LerPPGDados brutos~");
+        appendMsg(":" + timeData.toFullDateTimeString() + " , :" + ppgTestMode);
         VPOperateManager.getInstance().readPPGRawData(timeData, ppgTestMode, new BleWriteResponse() {
             @Override
             public void onResponse(int code) {
-                appendMsg("~【读取PPG测量开关状态指令发送" + (code == Code.REQUEST_SUCCESS ? "成功】" : "失败】"));
+                appendMsg("~LerPPGestadoEnviar" + (code == Code.REQUEST_SUCCESS ? "" : ""));
             }
         }, new IPPGRawDataReadListener() {
             @Override
             public void onPPGReadStart(int count) {
-                appendMsg("开始读取PPG原始数据。\n一共" + count + "组数据");
+                appendMsg("IniciarLerPPGDados brutos\n" + count + "dados");
             }
 
             @Override
             public void onPPGRawDataRead(int index, int count, @NonNull PPGRawData ppgRawData) {
-                appendMsg("PPG原始数据读取中。\n>>>>>>>>>【" + index + "/" + count + "】 --> " + ppgRawData.toString());
+                appendMsg("PPGDados brutosLer\n>>>>>>>>>" + index + "/" + count + " --> " + ppgRawData.toString());
             }
 
             @Override
             public void onPPGRawDataReadComplete(@NonNull PPGReadData ppgReadData) {
-                appendMsg("PPG原始数据读取完成。\n" + ppgReadData);
+                appendMsg("PPGDados brutosLer\n" + ppgReadData);
                 JH58PPGOptTestActivity.this.ppgReadData = ppgReadData;
             }
 
             @Override
             public void onPPGRawDataReadStop() {
                 String content = tvPPGOptInfo.getText().toString();
-                appendMsg(content + "\nPPG原始数据读取停止。");
+                appendMsg(content + "\nPPGDados brutosLer");
             }
         });
     }
 
     private void startPPGRawDataRealTimeTransfer() {
         sb.setLength(0);
-        appendMsg("APP请求【开始】PPG实时传输");
-        VPOperateManager.getInstance().startPPGRealTimeTransmission(code -> appendMsg("【开始】PPG实时传输指令发送" + (code == Code.REQUEST_SUCCESS ? "成功" : "失败")), new IPPGRealTimeTransmissionListener() {
+        appendMsg("APPIniciarPPG");
+        VPOperateManager.getInstance().startPPGRealTimeTransmission(code -> appendMsg("IniciarPPGEnviar" + (code == Code.REQUEST_SUCCESS ? "" : "")), new IPPGRealTimeTransmissionListener() {
             @Override
             public void onDeviceRequestPPGRealTimeTransfer(boolean isRequestOpen) {
-                appendMsg("设备请求PPG实时传输：" + (isRequestOpen ? "【开启】" : "【关闭】"));
+                appendMsg("dispositivoPPG：" + (isRequestOpen ? "Ativar" : "Desativar"));
             }
 
             @Override
             public void onAppRequestPPGRealTimeTransfer(boolean isSuccess) {
-                appendMsg("App请求PPG实时传输：" + (isSuccess ? "成功" : "失败"));
+                appendMsg("AppPPG：" + (isSuccess ? "" : ""));
             }
 
             @Override
             public void onGreenLightDataReport(@NonNull List<Integer> greenLightDataList) {
-                appendMsg("收到绿光信号>>> " + greenLightDataList);
+                appendMsg(">>> " + greenLightDataList);
             }
 
             @Override
             public void onAccelerationDataReport(@NonNull List<AccelerationData> accDataList) {
-                appendMsg("收到加速度信号>>> " + accDataList);
+                appendMsg(">>> " + accDataList);
             }
         }/*, new IPPGRealTimeTransferOptListener() {
             @Override
             public void onDeviceRequestPPGRealTimeTransfer(boolean isRequestOpen) {
-                tvPPGOptInfo.setText("start，设备请求PPG实时传输：" + (isRequestOpen ? "【开启】" : "【关闭】"));
+                tvPPGOptInfo.setText("start，dispositivoPPG：" + (isRequestOpen ? "Ativar" : "Desativar"));
             }
 
             @Override
             public void onAppRequestPPGRealTimeTransfer(boolean isSuccess) {
-                tvPPGOptInfo.setText("start，App请求PPG实时传输：" + (isSuccess ? "成功" : "失败"));
+                tvPPGOptInfo.setText("start，AppPPG：" + (isSuccess ? "" : ""));
             }
         }*/);
     }
 
     private void stopPPGRawDataRealTimeTransfer() {
         sb.setLength(0);
-        appendMsg("APP请求【停止】PPG实时传输");
-        VPOperateManager.getInstance().stopPPGRealTimeTransmission(code -> appendMsg("【停止】PPG实时传输指令发送" + (code == Code.REQUEST_SUCCESS ? "成功" : "失败"))/*, new IPPGRealTimeTransferOptListener() {
+        appendMsg("APPPPG");
+        VPOperateManager.getInstance().stopPPGRealTimeTransmission(code -> appendMsg("PPGEnviar" + (code == Code.REQUEST_SUCCESS ? "" : ""))/*, new IPPGRealTimeTransferOptListener() {
             @Override
             public void onDeviceRequestPPGRealTimeTransfer(boolean isRequestOpen) {
-                tvPPGOptInfo.setText("stop，设备请求PPG实时传输：" + (isRequestOpen ? "【开启】" : "【关闭】"));
+                tvPPGOptInfo.setText("stop，dispositivoPPG：" + (isRequestOpen ? "Ativar" : "Desativar"));
             }
 
             @Override
             public void onAppRequestPPGRealTimeTransfer(boolean isSuccess) {
-                tvPPGOptInfo.setText("stop，App请求PPG实时传输：" + (isSuccess ? "成功" : "失败"));
+                tvPPGOptInfo.setText("stop，AppPPG：" + (isSuccess ? "" : ""));
             }
         }*/);
     }
 
     private void shareData() {
         if (ppgReadData == null) {
-            Toast.makeText(this, "暂无读取数据可以分享", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lerdadospartilhar", Toast.LENGTH_SHORT).show();
             return;
         }
-        String fileName = "JH58PPG原生数据读取.txt";
+        String fileName = "JH58PPGdadosLer.txt";
         new Thread(() -> {
             StringBuilder sb = new StringBuilder();
-            sb.append("数据总数:").append(ppgReadData.getDataCount()).append("组\n");
+            sb.append("dados:").append(ppgReadData.getDataCount()).append("\n");
             for (PPGRawData ppgRawData : ppgReadData.getPpgRawDataList()) {
-                sb.append("第【").append(ppgRawData.getIndex()).append("/").append(ppgReadData.getDataCount()).append("】组:")
+                sb.append("").append(ppgRawData.getIndex()).append("/").append(ppgReadData.getDataCount()).append(":")
                         .append(TimeData.getTimeBeanByTimestampSecond((int) ppgRawData.getTimestamp()).toFullDateTimeString())
-                        .append(", 数据量=").append(ppgRawData.getCount()).append(",一共").append(ppgRawData.getPpgSecondDataList().size()).append("秒数据。\n");
+                        .append(", dados=").append(ppgRawData.getCount()).append(",").append(ppgRawData.getPpgSecondDataList().size()).append("dados\n");
                 for (PPGSecondData ppgSecondData : ppgRawData.getPpgSecondDataList()) {
                     sb.append(ppgSecondData.toDataStr()).append("\n");
                 }
@@ -327,13 +327,13 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
                 File externalFilesDir = getExternalFilesDir(null);
 
                 if (externalFilesDir == null) {
-                    Log.e("FileSave", "无法获取外部存储目录，请检查设备状态或存储是否可用。");
+                    Log.e("FileSave", "，dispositivoestado");
                     return;
                 }
 
                 File targetFile = new File(externalFilesDir, fileName);
 
-                shareTxtContent(JH58PPGOptTestActivity.this, targetFile.getAbsolutePath(), "分享PPG读取的原始数据");
+                shareTxtContent(JH58PPGOptTestActivity.this, targetFile.getAbsolutePath(), "partilharPPGLerDados brutos");
             });
         }).start();
 
@@ -341,17 +341,17 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
 
 
     /**
-     * 读取 TXT 文件内容并直接分享文本（不分享文件本身）
+     * Ler TXT partilhar（partilhar）
      *
-     * @param context      上下文
-     * @param filePath     文件路径
-     * @param chooserTitle 分享选择器标题
+     * @param context      
+     * @param filePath     
+     * @param chooserTitle partilhar
      */
     public void shareTxtContent(Context context, String filePath, String chooserTitle) {
         File file = new File(filePath);
 
         if (!file.exists()) {
-            Toast.makeText(context, "文件不存在", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
             return;
         }
         Uri uri = getUri(context, filePath);
@@ -374,12 +374,12 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
         return dfuFileUri;
     }
 
-    // 追加写入版本
+    // 
     public static void appendTextToExternalFilesDir(Context context, String filename, String textContent) {
         File externalFilesDir = context.getExternalFilesDir(null);
 
         if (externalFilesDir == null) {
-            Log.e("FileSave", "无法获取外部存储目录，请检查设备状态或存储是否可用。");
+            Log.e("FileSave", "，dispositivoestado");
             return;
         }
 
@@ -391,17 +391,17 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
         OutputStreamWriter osw = null;
 
         try {
-            // 使用 FileOutputStream 的追加模式
+            //  FileOutputStream 
             fos = new FileOutputStream(targetFile, false);
             osw = new OutputStreamWriter(fos);
 
             osw.write(textContent);
             osw.flush();
 
-            Log.i("FileSave", "文本已成功追加到: " + targetFile.getAbsolutePath());
+            Log.i("FileSave", ": " + targetFile.getAbsolutePath());
 
         } catch (IOException e) {
-            Log.e("FileSave", "追加文件失败: " + e.getMessage());
+            Log.e("FileSave", ": " + e.getMessage());
             e.printStackTrace();
         } finally {
             try {
@@ -412,7 +412,7 @@ public class JH58PPGOptTestActivity extends Activity implements View.OnClickList
                     fos.close();
                 }
             } catch (IOException e) {
-                Log.e("FileSave", "关闭流时发生错误: " + e.getMessage());
+                Log.e("FileSave", "Desativar: " + e.getMessage());
                 e.printStackTrace();
             }
         }

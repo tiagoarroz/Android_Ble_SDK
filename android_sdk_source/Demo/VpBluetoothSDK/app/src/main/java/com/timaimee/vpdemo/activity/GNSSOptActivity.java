@@ -62,7 +62,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
         btnStopSP.setOnClickListener(this);
         btnPushGnssData.setOnClickListener(this);
 
-        String[] languages = {"GNSS运动", "亲情安全守护", "SOS紧急求助"};
+        String[] languages = {"GNSS", "", "SOS"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, languages);
@@ -103,7 +103,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
         if(!TextUtils.isEmpty(rssiStr)) {
             rssi = Integer.parseInt(rssiStr);
         } else {
-            showToast("蓝牙信号值不能为空");
+            showToast("");
             return null;
         }
 
@@ -121,7 +121,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
         if(!TextUtils.isEmpty(latStr)) {
             lat = Double.parseDouble(latStr);
         } else {
-            showToast("纬度不能为空");
+            showToast("");
             return null;
         }
 
@@ -130,7 +130,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
         if(!TextUtils.isEmpty(lngStr)) {
             lng = Double.parseDouble(lngStr);
         } else {
-            showToast("经度不能为空");
+            showToast("");
             return null;
         }
         data.setRssi(rssi);
@@ -158,7 +158,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
             if (data != null) {
                 VPOperateManager.getInstance().pushGnssLocationData(EGnssOptType.GNSS_SPORT, data, code -> {
                     appendMsg("+--------------------------------------+");
-                    appendMsg("| 【" + optType.getDes() + "】位置信息推送成功：");
+                    appendMsg("| " + optType.getDes() + "：");
                     appendMsg("| ---> " + data);
                     appendMsg("+--------------------------------------+");
                 });
@@ -181,14 +181,14 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onPhoneSafetyProtectionOpt(boolean isStart) {
         appendMsg("+--------------------------------------+");
-        appendMsg(isStart ? "| 【手机】开启设备安全守护成功" : "| 【手机】结束设备安全守护成功");
+        appendMsg(isStart ? "| Ativardispositivo" : "| Terminardispositivo");
         appendMsg("+--------------------------------------+");
     }
 
     @Override
     public void onWatchSafetyProtectionOpt(boolean isStart, long timestamp) {
         appendMsg("+--------------------------------------+");
-        appendMsg((isStart ? "| 【设备】开启安全守护成功:" : "| 【设备】结束安全守护成功:") + sdf.format(new Date(timestamp * 1000)));
+        appendMsg((isStart ? "| dispositivoAtivar:" : "| dispositivoTerminar:") + sdf.format(new Date(timestamp * 1000)));
         appendMsg("+--------------------------------------+");
 
     }
@@ -196,7 +196,7 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onPhoneSafetyProtectionStartError(@NonNull ESafetyProtectionState status) {
         appendMsg("+--------------------------------------+");
-        appendMsg("| 【手机】开启手表安全守护异常:" + status);
+        appendMsg("| Ativar:" + status);
         appendMsg("+--------------------------------------+");
 
     }
@@ -204,14 +204,14 @@ public class GNSSOptActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onDeviceGNSSOptRequest(@NonNull EGnssOptType gnssOptType, double longitude, double latitude) {
         appendMsg("+--------------------------------------+");
-        appendMsg("| 设备【" + gnssOptType.getDes() + "】请求获取实时位置数据。（附带位置信息："+longitude + " , " + latitude +")");
+        appendMsg("| dispositivo" + gnssOptType.getDes() + "dados（："+longitude + " , " + latitude +")");
         appendMsg("+--------------------------------------+");
     }
 
     @Override
     public void onDeviceGNSSOptReport(@NonNull EGnssOptType gnssOptType, @NonNull GnssLocationData data) {
         appendMsg("+--------------------------------------+");
-        appendMsg("| 设备【" + gnssOptType.getDes() + "】实时位置数据上报：");
+        appendMsg("| dispositivo" + gnssOptType.getDes() + "dados：");
         appendMsg("| ---> " + data.toString());
         appendMsg("+--------------------------------------+");
     }

@@ -173,7 +173,7 @@ public class TestActivity extends Activity {
     }
 
     /**
-     * 拷贝块内容
+     * 
      *
      * @param byteData
      * @param length
@@ -190,7 +190,7 @@ public class TestActivity extends Activity {
     public void parseSleep(int day, List<byte[]> bytedata) {
 //        byte[] bytesContent = getBytesByList(bytedata);
 //        List<byte[]> byteA1List = paseA1SleepV1Data(bytesContent);//808-3 805
-//        VPLogger.e("数组长度 = " + byteA1List.get(0).length);
+//        VPLogger.e(" = " + byteA1List.get(0).length);
 //        for (int i = 0; i < byteA1List.size(); i++) {
 //            byte[] data = byteA1List.get(i);
 //            PrecisionSleepParse.SleepItemContent sleepItemContent = null;
@@ -214,7 +214,7 @@ public class TestActivity extends Activity {
 
 
     /**
-     * CRC的具体内容byte块，不包含头部,目前长度定值为8
+     * CRCbyte，,8
      *
      * @param crcBlockBytes
      * @return
@@ -233,11 +233,11 @@ public class TestActivity extends Activity {
     }
 
     /**
-     * 解析睡眠
+     * 
      *
-     * @param baseSleepBlockBytes  睡眠的基本信息的具体内容byte块
-     * @param insomniaBlockBytes   失眠的基本信息的具体内容byte块
-     * @param sleepCurveBlockBytes 睡眠曲线的基本信息的具体内容byte块
+     * @param baseSleepBlockBytes  Informação basebyte
+     * @param insomniaBlockBytes   Informação basebyte
+     * @param sleepCurveBlockBytes Informação basebyte
      * @return
      */
     private SleepPrecisionData pasrseSleepInfoBlock(byte[] baseSleepBlockBytes, byte[] insomniaBlockBytes, byte[] insomniaBlockBytesV2, byte[] sleepCurveBlockBytes) {
@@ -254,23 +254,23 @@ public class TestActivity extends Activity {
     }
 
     /**
-     * 要将失眠信息插入到睡眠曲线当中
+     * 
      *
      * @param baseSleepBean
      */
     private void mixInsomniaAndSleepLine(SleepPrecisionData baseSleepBean) {
         List<InsomniaTimeData> insomniaBeanList = baseSleepBean.getInsomniaBeanList();
         String sleepLine = baseSleepBean.getSleepLine();
-        //TODO 插入算法
+        //TODO 
         baseSleepBean.setSleepLine(sleepLine);
     }
 
 
     /**
-     * 解析失眠的基本信息
+     * Informação base
      *
      * @param baseSleepBean
-     * @param insomniaBlockBytes 失眠的基本信息的具体内容byte块，不包含头部,目前长度定值为44
+     * @param insomniaBlockBytes Informação basebyte，,44
      */
     private void pasrseInsomniaBlock(SleepPrecisionData baseSleepBean, byte[] insomniaBlockBytes) {
         if (insomniaBlockBytes.length < 44) {
@@ -296,10 +296,10 @@ public class TestActivity extends Activity {
     }
 
     /**
-     * 解析失眠的基本信息V2,长度45
+     * Informação baseV2,45
      *
      * @param baseSleepBean
-     * @param insomniaBlockBytes 失眠的基本信息的具体内容byte块，不包含头部,目前长度定值为45
+     * @param insomniaBlockBytes Informação basebyte，,45
      */
     public void pasrseInsomniaBlockV2(SleepPrecisionData baseSleepBean, byte[] insomniaBlockBytes) {
         if (insomniaBlockBytes.length < 45) {
@@ -329,10 +329,10 @@ public class TestActivity extends Activity {
 
 
     /**
-     * 解析睡眠曲线的基本信息
+     * Informação base
      *
      * @param baseSleepBean
-     * @param sleepCurveBlockBytes 睡眠曲线的基本信息的具体内容byte块，不包含头部
+     * @param sleepCurveBlockBytes Informação basebyte，
      */
     private void pasrseSleepCurveBlock(SleepPrecisionData baseSleepBean, byte[] sleepCurveBlockBytes) {
 //        Logger.t(TAG).i("pasrseSleepCurveBlock: sleepCurveBlockBytes=" + sleepCurveBlockBytes.length);
@@ -344,10 +344,10 @@ public class TestActivity extends Activity {
         int insomniaDuration = 0;
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < length / 2; i++) {
-            //大端模式,其他为小端模式
+            //,
             String strHex = sleepCurveStrArr[i * 2] + sleepCurveStrArr[i * 2 + 1];
             int vlaue = VpBleByteUtil.hexStrToInt(strHex);
-            //取前三位表示状态，一共16位
+            //estado，16
             int first3Bit = (vlaue & 0b1110000000000000) >> 13;
             if (first3Bit > 4) {
                 first3Bit = 4;
@@ -369,10 +369,10 @@ public class TestActivity extends Activity {
     }
 
     /**
-     * 解析睡眠的基本信息
+     * Informação base
      *
      * @param sleepPrecisionData
-     * @param baseSleepBlockBytes 睡眠的基本信息的具体内容byte块，不包含头部,目前长度定值为35
+     * @param baseSleepBlockBytes Informação basebyte，,35
      */
     private void pasrseBaseSleepBlock(SleepPrecisionData sleepPrecisionData, byte[] baseSleepBlockBytes) {
         if (baseSleepBlockBytes.length < 35) {
@@ -459,7 +459,7 @@ public class TestActivity extends Activity {
 
 
     /**
-     * 获取块内容
+     * 
      *
      * @param buffer
      * @param type

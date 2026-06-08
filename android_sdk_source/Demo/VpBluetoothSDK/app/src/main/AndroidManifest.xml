@@ -9,9 +9,9 @@
     <uses-permission
         android:name="android.permission.ACCESS_NETWORK_STATE"
         tools:node="merge" />
-    <!--允许程序访问WiFi网络信息-->
+    <!--WiFi-->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!--允许程序读写手机状态和身份-->
+    <!--estado-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -20,16 +20,16 @@
 
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Android 12以下才需要定位权限， Android 9以下官方建议申请ACCESS_COARSE_LOCATION -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /><!--模糊定位基于wifi-蓝牙4.0 5.0搜索需要-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /><!--精准定位-蓝牙4.0 5.0搜索需要-->
+    <!-- Android 12， Android 9ACCESS_COARSE_LOCATION -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /><!--wifi-4.0 5.0-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /><!---4.0 5.0-->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-    <!-- Android 12在不申请定位权限时，必须加上android:usesPermissionFlags="neverForLocation"，否则搜不到设备 -->
+    <!-- Android 12，android:usesPermissionFlags="neverForLocation"，dispositivo -->
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation"
@@ -196,7 +196,7 @@
             android:foregroundServiceType="location" />
 
         <service android:name=".oad.service.DfuService" android:exported="false"/>
-        <!-- 高德地图定位 -->
+        <!--  -->
         <service android:name="com.amap.api.location.APSService" android:exported="false"/>
 
         <service

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="ui升级-服务器UI"
+            android:text="ui-UI"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -38,7 +38,7 @@
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
                 android:onClick="isSupportServerUi"
-                android:text="1.是否支持表盘市场"
+                android:text="1."
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="是否支持"
+                android:text=""
                 android:textColor="@color/colorAccent"
                 android:textSize="8sp" />
 
@@ -58,7 +58,7 @@
                 android:onClick="readBaseInfoFromServer"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="2.读取基本信息"
+                android:text="2.Ler informação base"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="基本信息"
+                android:text="Informação base"
                 android:textColor="@color/colorAccent"
                 android:textSize="8sp" />
 
@@ -79,7 +79,7 @@
                 android:onClick="serverUI"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="3.获取服务器的UI"
+                android:text="3.UI"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
-                android:text="4.下载ui"
+                android:text="4.ui"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 
@@ -119,7 +119,7 @@
                 android:layout_centerInParent="true"
                 android:layout_margin="10dp"
                 android:onClick="onServerSet"
-                android:text="5.设置服务器的UI"
+                android:text="5.ConfigurarUI"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp" />
 

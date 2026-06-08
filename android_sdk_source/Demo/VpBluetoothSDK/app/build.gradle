@@ -10,9 +10,11 @@ android {
     compileSdkVersion 34
     signingConfigs {
         release {
+            // Caminho parametrizável para evitar dependência de paths locais Windows.
+            def releaseStorePath = project.findProperty("VP_RELEASE_KEYSTORE") ?: "${rootDir}/keystore/zhongxin003.keystore"
             keyAlias 'zhongxin'
             keyPassword 'veepooandroid'
-            storeFile file('F:\\ExportProject\\zhongxin003.keystore')
+            storeFile file(releaseStorePath)
             storePassword 'veepooandroid'
         }
     }

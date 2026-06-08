@@ -1404,7 +1404,7 @@
         abbreviation="GMT+5:00"
         cityName="Qyzylorda"
         originalTimeZoneName="Asia/Qyzylorda"
-        shortGenericTimeZoneName="West Kazakhstan Time" /><!--###这里多了Rangoon-->
+        shortGenericTimeZoneName="West Kazakhstan Time" /><!--###Rangoon-->
     <TimeZoneBean
         abbreviation="GMT+6:30"
         cityName="Rangoon"

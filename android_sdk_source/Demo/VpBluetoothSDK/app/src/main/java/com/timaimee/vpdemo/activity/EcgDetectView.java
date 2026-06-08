@@ -21,7 +21,7 @@ import java.util.List;
 
 
 /**
- * ECG报告测量页面
+ * ECG
  * Created by Administrator on 2018/11/5.
  */
 
@@ -115,7 +115,7 @@ public class EcgDetectView extends View {
 
     private float getRowY(float adcValue) {
         float yValue = adcValue * 1000f * 1.8f / ((1 << 23) * 20);
-        // 一个小格是0.1mv，所以这里 *20
+        // 0.1mv， *20
         float v1 = mHeight / 2 - yValue * 10 * coumlnQutoWidth;
         if (v1 < 0) {
             v1 = 0;
@@ -245,7 +245,7 @@ public class EcgDetectView extends View {
     }
 
     /**
-     * 清除以及初始化数据（600个点的计算列表，数据回放的点，）
+     * dados（600，dados，）
      */
     public void clearData() {
         linePositionX = 0;
@@ -256,23 +256,23 @@ public class EcgDetectView extends View {
 
     List<Integer> arraylist = new ArrayList<>();
 
-    //采样率&走速
+    //&
     int HZ = 250;
     int SPEED = 25;
-    //一个格子多少个点
+    //
     int count = HZ / SPEED;
-    //纵向一共放多少个格子
+    //
     int coumlnQutoCount = 6 * 5;
-    //一个格子的高度
+    //
     float coumlnQutoWidth = 1;
-    //横向一共放多少格子
+    //
     float rowQutoCount = 1;
-    //一个格子的宽度
+    //
     float rowQutoWidth = 1;
-    //横向一共放多少个点
+    //
 
     int rowEcgCount = 1;
-    //一个点的宽度
+    //
     float rowEcgWidth = 1;
 
     private void onPagerSetting() {

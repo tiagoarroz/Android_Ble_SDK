@@ -30,7 +30,7 @@ public class MagneticTherapyActivity extends AppCompatActivity implements IMagne
     private int level = 1;
     private boolean isOpen = true;
     private MagneticTherapyType type = MagneticTherapyType.PULSE_MAGNETIC_THERAPY;
-    //如果退出了磁疗相关页面还想继续监听或者移除监听可以设置全局的磁疗监听
+    //Configurar
 //            VPOperateManager.getInstance().setGlobalMagneticTherapy(new IMagneticTherapyListener() {
 //                @Override
 //                public void functionNotSupport() {
@@ -79,13 +79,13 @@ public class MagneticTherapyActivity extends AppCompatActivity implements IMagne
 //                    sbDuration.setMin(1);
 //                }
 //                sbDuration.setMax(255);
-//                tvDuration.setText("1分钟");
+//                tvDuration.setText("1");
 //            } else {
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                    sbDuration.setMin(1);
 //                }
 //                sbDuration.setMax(15);
-//                tvDuration.setText("1分钟");
+//                tvDuration.setText("1");
 //            }
 //        });
 //
@@ -95,7 +95,7 @@ public class MagneticTherapyActivity extends AppCompatActivity implements IMagne
 //            @Override
 //            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //                duration = progress;
-//                tvDuration.setText(duration + "分钟");
+//                tvDuration.setText(duration + "");
 //            }
 //
 //            @Override
@@ -139,27 +139,27 @@ public class MagneticTherapyActivity extends AppCompatActivity implements IMagne
 
     @Override
     public void functionNotSupport() {
-        setResult("磁疗功能不支持");
+        setResult("funcionalidade");
     }
 
     @Override
     public void onMagneticTherapyDurationError(int min, int max) {
-        setResult("磁疗时间设置错误 请设置在" + min + "~" + max + "分钟之间（包含）");
+        setResult("Configurar Configurar" + min + "~" + max + "（）");
     }
 
     @Override
     public void onMagneticTherapyChange(@NonNull MagneticTherapy data) {
-        setResult("设备端变更主动上报：" + data.toString());
+        setResult("dispositivo：" + data.toString());
     }
 
     @Override
     public void onMagneticTherapyOpen(@NonNull MagneticTherapy data) {
-        setResult("磁疗打开：" + data.toString());
+        setResult("Ativar：" + data.toString());
     }
 
     @Override
     public void onMagneticTherapyClose(@NonNull MagneticTherapy data) {
-        setResult("磁疗关闭：" + data.toString());
+        setResult("Desativar：" + data.toString());
     }
 
     public BleWriteResponse response = new BleWriteResponse() {

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="多导心电"
+            android:text="ECG multi-derivação"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -25,7 +25,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="I导联"
+        android:text="I"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -37,7 +37,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="II导联"
+        android:text="II"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -49,7 +49,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="III导联"
+        android:text="III"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -61,7 +61,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AVR导联"
+        android:text="AVR"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -73,7 +73,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AVL导联"
+        android:text="AVL"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -85,7 +85,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AVF导联"
+        android:text="AVF"
         android:textColor="@android:color/black"
         android:textSize="12sp" />
 
@@ -109,7 +109,7 @@
             android:paddingTop="8dp"
             android:paddingEnd="16dp"
             android:paddingBottom="8dp"
-            android:text="开始ECG测量"
+            android:text="Iniciar medição ECG"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -132,7 +132,7 @@
             android:paddingTop="8dp"
             android:paddingEnd="16dp"
             android:paddingBottom="8dp"
-            android:text="结束ECG测量"
+            android:text="Terminar medição ECG"
             android:textColor="@android:color/white" />
     </RelativeLayout>
 

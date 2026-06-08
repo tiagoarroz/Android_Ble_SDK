@@ -32,12 +32,12 @@ public class Device4gOptActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device4g_opt);
 
-        // 初始化视图
+        // 
         tvConfigInfo = findViewById(R.id.tvConfigInfo);
         etAccount = findViewById(R.id.etAccount);
         etPwd = findViewById(R.id.etPwd);
 
-        // 读取配置按钮
+        // Ler
         findViewById(R.id.btnRead).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +45,7 @@ public class Device4gOptActivity extends AppCompatActivity {
             }
         });
 
-        // 设置配置按钮
+        // Configurar
         findViewById(R.id.btnSetting).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,21 +56,21 @@ public class Device4gOptActivity extends AppCompatActivity {
                 String account = etAccount.getText().toString();
                 String pwd = etPwd.getText().toString();
 
-                // 设置实体类属性
+                // Configurar
                 config.setPassword(pwd);
                 config.setUserName(account);
-                // 4g开关
+                // 4g
                 config.setSwitch4g(true);
-                // 上传开关
+                // 
                 config.setSwitchUpload(true);
-                // 设备数据上传服务器时间
+                // dispositivodados
                 config.setReportInterval(10);
 
                 set4gServerInfo();
             }
         });
 
-        // 清除配置按钮
+        // 
         findViewById(R.id.btnClear).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,7 +101,7 @@ public class Device4gOptActivity extends AppCompatActivity {
         }
     };
 
-    // 实现接口回调
+    // 
     private final INetServer4gConfigListener configListener = new INetServer4gConfigListener() {
         @Override
         public void onReadSuccess(NetworkSever4gConfigInfo info) {
@@ -113,12 +113,12 @@ public class Device4gOptActivity extends AppCompatActivity {
 
         @Override
         public void onSettingSuccess() {
-            ToastUtil.show("设置成功");
+            ToastUtil.show("Configurar");
         }
 
         @Override
         public void onSettingFailed() {
-            ToastUtil.show("设置失败");
+            ToastUtil.show("Configurar");
         }
     };
 }

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="ECG检测"
+            android:text="Deteção ECG"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
 
@@ -34,7 +34,7 @@
         android:layout_gravity="center"
         android:layout_marginRight="20dp"
         android:visibility="gone"
-        android:text="监听绿光信号" />
+        android:text="Escutar sinal de luz verde" />
 
     <Button
         android:id="@+id/start"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginRight="20dp"
-        android:text="开始ECG测量" />
+        android:text="Iniciar medição ECG" />
 
     <Button
         android:id="@+id/stop"
@@ -50,5 +50,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginRight="20dp"
-        android:text="结束ECG测量" />
+        android:text="Terminar medição ECG" />
 </LinearLayout>

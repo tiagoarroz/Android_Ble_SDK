@@ -58,18 +58,18 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
                 VPOperateManager.getInstance().addTextAlarm(writeResponse, new ITextAlarmDataListener() {
                     @Override
                     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                        Logger.t(TAG).e("添加闹钟 --》" + textAlarmData.toString());
+                        Logger.t(TAG).e("Adicionaralarme --" + textAlarmData.toString());
                         EMultiAlarmOprate OPT = textAlarmData.getOprate();
-                        showMsg("添加闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "成功" : "失败"));
+                        showMsg("Adicionaralarme --" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "" : ""));
                         if (OPT == EMultiAlarmOprate.ALARM_FULL) {
-                            showMsg("闹钟已满（最多添加十个）");
+                            showMsg("alarme（Adicionar）");
                         } else if (OPT == EMultiAlarmOprate.SETTING_SUCCESS) {
-                            showMsg("闹钟添加成功");
+                            showMsg("alarmeAdicionar");
                             mSettings.clear();
                             mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
                             mAdapter.notifyDataSetChanged();
                         } else if (OPT == EMultiAlarmOprate.SETTING_FAIL) {
-                            showMsg("闹钟添加失败");
+                            showMsg("alarmeAdicionar");
                         }
                     }
                 }, setting);
@@ -81,23 +81,23 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
     }
 
     /**
-     * 菜单创建器，在Item要创建菜单的时候调用。
+     * ，Item
      */
     private SwipeMenuCreator swipeMenuCreator = new SwipeMenuCreator() {
         @Override
         public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int position) {
             int width = getResources().getDimensionPixelSize(R.dimen.dp_70);
 
-            // 1. MATCH_PARENT 自适应高度，保持和Item一样高;
-            // 2. 指定具体的高，比如80;
-            // 3. WRAP_CONTENT，自身高度，不推荐;
+            // 1. MATCH_PARENT ，Item;
+            // 2. ，80;
+            // 3. WRAP_CONTENT，，;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
 
-            // 添加左侧的，如果不添加，则左侧不会出现菜单。
+            // Adicionar，Adicionar，
             {
                 SwipeMenuItem addItem = new SwipeMenuItem(TextAlarmActivity.this)
                         .setBackgroundColor(getResources().getColor(R.color.colorAccent))
-                        .setText("删除")
+                        .setText("Eliminar")
                         .setWidth(width)
                         .setHeight(height);
                 swipeRightMenu.addMenuItem(addItem);
@@ -108,30 +108,30 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
     };
 
     /**
-     * RecyclerView的Item的Menu点击监听。
+     * RecyclerViewItemMenu
      */
     private OnItemMenuClickListener mMenuItemClickListener = new OnItemMenuClickListener() {
         @Override
         public void onItemClick(SwipeMenuBridge menuBridge, int position) {
             menuBridge.closeMenu();
 
-            int direction = menuBridge.getDirection(); // 左侧还是右侧菜单。
-            int menuPosition = menuBridge.getPosition(); // 菜单在RecyclerView的Item中的Position。
+            int direction = menuBridge.getDirection(); // 
+            int menuPosition = menuBridge.getPosition(); // RecyclerViewItemPosition
 
             if (direction == SwipeRecyclerView.RIGHT_DIRECTION) {
-                Toast.makeText(TextAlarmActivity.this, "list第" + position + "; 右侧菜单第" + menuPosition, Toast.LENGTH_SHORT)
+                Toast.makeText(TextAlarmActivity.this, "list" + position + "; " + menuPosition, Toast.LENGTH_SHORT)
                         .show();
                 VPOperateManager.getInstance().deleteTextAlarm(writeResponse, new ITextAlarmDataListener() {
                     @Override
                     public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
                         EMultiAlarmOprate OPT =  textAlarmData.getOprate();
                         if(OPT == EMultiAlarmOprate.CLEAR_SUCCESS) {
-                            showMsg("闹钟删除成功");
+                            showMsg("alarmeEliminar");
                             mSettings.clear();
                             mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
                             mAdapter.notifyDataSetChanged();
                         } else {
-                            showMsg("删除失败");
+                            showMsg("Eliminar");
                         }
                     }
                 }, mSettings.get(position));
@@ -143,7 +143,7 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
     private TextAlarm2Setting getTextAlarm2Setting() {
         String content = mEditText.getText().toString();
         if (TextUtils.isEmpty(content)) {
-            content = "大郎，该吃药了 @^_^@ !";
+            content = "Hora da medicação @^_^@ !";
         }
         String strHour = etHour.getText().toString();
         String strMinute = etMinute.getText().toString();
@@ -186,7 +186,7 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
                     mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
                     mAdapter.notifyDataSetChanged();
                 }
-                showMsg(isOk ? "读取文字闹钟成功" : "读取文字闹钟失败");
+                showMsg(isOk ? "Leralarme" : "Leralarme");
             }
         });
     }
@@ -207,7 +207,7 @@ public class TextAlarmActivity extends Activity implements TextAlarmAdapter.OnTe
         VPOperateManager.getInstance().modifyTextAlarm(writeResponse, new ITextAlarmDataListener() {
             @Override
             public void onAlarmDataChangeListListener(TextAlarmData textAlarmData) {
-                showMsg("修改闹钟 --》" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "成功" : "失败"));
+                showMsg("alarme --" + (textAlarmData.getOprate() == EMultiAlarmOprate.SETTING_SUCCESS ? "" : ""));
                 mSettings.clear();
                 mSettings.addAll(textAlarmData.getTextAlarm2SettingList());
                 mAdapter.notifyDataSetChanged();

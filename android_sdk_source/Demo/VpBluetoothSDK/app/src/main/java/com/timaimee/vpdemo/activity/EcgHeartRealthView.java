@@ -19,7 +19,7 @@ import com.veepoo.protocol.util.EcgUtil;
 
 
 /**
- * ECG报告测量页面
+ * ECG
  * Created by Administrator on 2018/11/5.
  */
 
@@ -88,10 +88,10 @@ public class EcgHeartRealthView extends View {
 
     }
 
-    //波形频率&走速
+    //&
     int DRAW_FREQUENCY = 512;
     int SPEED = 25;
-    //一个格子多少个点 20个点
+    // 20
     int count = DRAW_FREQUENCY / SPEED;
 
     public void setDrawHz(int drawfrequency) {
@@ -262,7 +262,7 @@ public class EcgHeartRealthView extends View {
     }
 
     /**
-     * 清除以及初始化数据（600个点的计算列表，数据回放的点，）
+     * dados（600，dados，）
      */
     public void clearData() {
         linePositionX = 0;
@@ -271,24 +271,24 @@ public class EcgHeartRealthView extends View {
     }
 
 
-    //纵向一共放16个大格子，80个小格子
+    //16，80
     int coumlnQutoCount = 16 * 5;
-    //一个格子的高度
+    //
     float coumlnQutoWidth = 1;
-    //横向一个共多少个小格子
+    //
     float rowQutoCount = 1;
-    //一个格子的宽度
+    //
     float rowQutoWidth = 1;
 
-    //横向一共放多少个点
+    //
     int rowEcgCount = 1;
-    //一个点的宽度
+    //
     float rowEcgWidth = 1;
 
     private void onPagerSetting() {
-        coumlnQutoWidth = mHeight / coumlnQutoCount;//纵向一共16个大格子，80个小格子
+        coumlnQutoWidth = mHeight / coumlnQutoCount;//16，80
         rowQutoWidth = coumlnQutoWidth;
-        rowQutoCount = mWidth / rowQutoWidth;//横向一个共多少个小格子
+        rowQutoCount = mWidth / rowQutoWidth;//
         rowEcgCount = (int) (rowQutoCount * count);
         rowEcgWidth = mWidth / rowEcgCount;
         mPoints = new PointF[rowEcgCount];

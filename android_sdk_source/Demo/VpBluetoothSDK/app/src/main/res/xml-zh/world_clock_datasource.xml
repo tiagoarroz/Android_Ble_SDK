@@ -2,2197 +2,2209 @@
 <TimeZoneArray>
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="阿比让"
+        cityName="Abidjan"
         originalTimeZoneName="Africa/Abidjan"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="阿克拉"
+        cityName="Accra"
         originalTimeZoneName="Africa/Accra"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="亚的斯亚贝巴"
+        cityName="Addis Ababa"
         originalTimeZoneName="Africa/Addis_Ababa"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="阿尔及尔"
+        cityName="Algiers"
         originalTimeZoneName="Africa/Algiers"
-        shortGenericTimeZoneName="中欧标准时间" />
+        shortGenericTimeZoneName="Central European Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="阿斯马拉"
+        cityName="Asmara"
         originalTimeZoneName="Africa/Asmara"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="巴马科"
+        cityName="Bamako"
         originalTimeZoneName="Africa/Bamako"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="班吉"
+        cityName="Bangui"
         originalTimeZoneName="Africa/Bangui"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="班珠尔"
+        cityName="Banjul"
         originalTimeZoneName="Africa/Banjul"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="比绍"
+        cityName="Bissau"
         originalTimeZoneName="Africa/Bissau"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="布兰太尔"
+        cityName="Blantyre"
         originalTimeZoneName="Africa/Blantyre"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="布拉柴维尔"
+        cityName="Brazzaville"
         originalTimeZoneName="Africa/Brazzaville"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="布琼布拉"
+        cityName="Bujumbura"
         originalTimeZoneName="Africa/Bujumbura"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="开罗"
+        cityName="Cairo"
         originalTimeZoneName="Africa/Cairo"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="卡萨布兰卡"
+        cityName="Casablanca"
         originalTimeZoneName="Africa/Casablanca"
-        shortGenericTimeZoneName="摩洛哥时间" />
+        shortGenericTimeZoneName="Morocco Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="休达"
+        cityName="Ceuta"
         originalTimeZoneName="Africa/Ceuta"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="科纳克里"
+        cityName="Conakry"
         originalTimeZoneName="Africa/Conakry"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="达喀尔"
+        cityName="Dakar"
         originalTimeZoneName="Africa/Dakar"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="达累斯萨拉姆"
+        cityName="Dar es Salaam"
         originalTimeZoneName="Africa/Dar_es_Salaam"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="吉布提"
+        cityName="Djibouti"
         originalTimeZoneName="Africa/Djibouti"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="杜阿拉"
+        cityName="Douala"
         originalTimeZoneName="Africa/Douala"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="阿尤恩"
+        cityName="El Aaiun"
         originalTimeZoneName="Africa/El_Aaiun"
-        shortGenericTimeZoneName="西撒哈拉时间" />
+        shortGenericTimeZoneName="Western Sahara Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="弗里敦"
+        cityName="Freetown"
         originalTimeZoneName="Africa/Freetown"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="哈博罗内"
+        cityName="Gaborone"
         originalTimeZoneName="Africa/Gaborone"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="哈拉雷"
+        cityName="Harare"
         originalTimeZoneName="Africa/Harare"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="约翰尼斯堡"
+        cityName="Johannesburg"
         originalTimeZoneName="Africa/Johannesburg"
-        shortGenericTimeZoneName="南非标准时间" />
+        shortGenericTimeZoneName="South Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="朱巴"
+        cityName="Juba"
         originalTimeZoneName="Africa/Juba"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="坎帕拉"
+        cityName="Kampala"
         originalTimeZoneName="Africa/Kampala"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="喀土穆"
+        cityName="Khartoum"
         originalTimeZoneName="Africa/Khartoum"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="基加利"
+        cityName="Kigali"
         originalTimeZoneName="Africa/Kigali"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="金沙萨"
+        cityName="Kinshasa"
         originalTimeZoneName="Africa/Kinshasa"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="拉各斯"
+        cityName="Lagos"
         originalTimeZoneName="Africa/Lagos"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="利伯维尔"
+        cityName="Libreville"
         originalTimeZoneName="Africa/Libreville"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="洛美"
+        cityName="Lome"
         originalTimeZoneName="Africa/Lome"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="罗安达"
+        cityName="Luanda"
         originalTimeZoneName="Africa/Luanda"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="卢本巴希"
+        cityName="Lubumbashi"
         originalTimeZoneName="Africa/Lubumbashi"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="卢萨卡"
+        cityName="Lusaka"
         originalTimeZoneName="Africa/Lusaka"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="马拉博"
+        cityName="Malabo"
         originalTimeZoneName="Africa/Malabo"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="马普托"
+        cityName="Maputo"
         originalTimeZoneName="Africa/Maputo"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="马塞鲁"
+        cityName="Maseru"
         originalTimeZoneName="Africa/Maseru"
-        shortGenericTimeZoneName="南非标准时间" />
+        shortGenericTimeZoneName="South Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="姆巴巴内"
+        cityName="Mbabane"
         originalTimeZoneName="Africa/Mbabane"
-        shortGenericTimeZoneName="南非标准时间" />
+        shortGenericTimeZoneName="South Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="摩加迪沙"
+        cityName="Mogadishu"
         originalTimeZoneName="Africa/Mogadishu"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="蒙罗维亚"
+        cityName="Monrovia"
         originalTimeZoneName="Africa/Monrovia"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="内罗毕"
+        cityName="Nairobi"
         originalTimeZoneName="Africa/Nairobi"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="恩贾梅纳"
+        cityName="Ndjamena"
         originalTimeZoneName="Africa/Ndjamena"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="尼亚美"
+        cityName="Niamey"
         originalTimeZoneName="Africa/Niamey"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="努瓦克肖特"
+        cityName="Nouakchott"
         originalTimeZoneName="Africa/Nouakchott"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="瓦加杜古"
+        cityName="Ouagadougou"
         originalTimeZoneName="Africa/Ouagadougou"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="波多诺伏"
+        cityName="Porto-Novo"
         originalTimeZoneName="Africa/Porto-Novo"
-        shortGenericTimeZoneName="西部非洲标准时间" />
+        shortGenericTimeZoneName="West Africa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="圣多美"
+        cityName="Sao Tome"
         originalTimeZoneName="Africa/Sao_Tome"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="的黎波里"
+        cityName="Tripoli"
         originalTimeZoneName="Africa/Tripoli"
-        shortGenericTimeZoneName="东欧标准时间" />
+        shortGenericTimeZoneName="Eastern European Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="突尼斯"
+        cityName="Tunis"
         originalTimeZoneName="Africa/Tunis"
-        shortGenericTimeZoneName="中欧标准时间" />
+        shortGenericTimeZoneName="Central European Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="温得和克"
+        cityName="Windhoek"
         originalTimeZoneName="Africa/Windhoek"
-        shortGenericTimeZoneName="中部非洲时间" />
+        shortGenericTimeZoneName="Central Africa Time" />
     <TimeZoneBean
         abbreviation="GMT-10:00"
-        cityName="阿达克"
+        cityName="Adak"
         originalTimeZoneName="America/Adak"
-        shortGenericTimeZoneName="夏威夷-阿留申时间" />
+        shortGenericTimeZoneName="Hawaii-Aleutian Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="安克雷奇"
+        cityName="Anchorage"
         originalTimeZoneName="America/Anchorage"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="安圭拉"
+        cityName="Anguilla"
         originalTimeZoneName="America/Anguilla"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="安提瓜岛"
+        cityName="Antigua"
         originalTimeZoneName="America/Antigua"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="阿拉瓜伊纳"
+        cityName="Araguaina"
         originalTimeZoneName="America/Araguaina"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="布宜诺斯艾利斯"
+        cityName="Buenos Aires"
         originalTimeZoneName="America/Argentina/Buenos_Aires"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="卡塔马卡"
+        cityName="Catamarca"
         originalTimeZoneName="America/Argentina/Catamarca"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="科尔多瓦"
+        cityName="Cordoba"
         originalTimeZoneName="America/Argentina/Cordoba"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="胡胡伊"
+        cityName="Jujuy"
         originalTimeZoneName="America/Argentina/Jujuy"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="拉里奥哈"
+        cityName="La Rioja"
         originalTimeZoneName="America/Argentina/La_Rioja"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="门多萨"
+        cityName="Mendoza"
         originalTimeZoneName="America/Argentina/Mendoza"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="里奥加耶戈斯"
+        cityName="Rio Gallegos"
         originalTimeZoneName="America/Argentina/Rio_Gallegos"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="萨尔塔"
+        cityName="Salta"
         originalTimeZoneName="America/Argentina/Salta"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="圣胡安"
+        cityName="San Juan"
         originalTimeZoneName="America/Argentina/San_Juan"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="圣路易斯"
+        cityName="San Luis"
         originalTimeZoneName="America/Argentina/San_Luis"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="图库曼"
+        cityName="Tucuman"
         originalTimeZoneName="America/Argentina/Tucuman"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="乌斯怀亚"
+        cityName="Ushuaia"
         originalTimeZoneName="America/Argentina/Ushuaia"
-        shortGenericTimeZoneName="阿根廷标准时间" />
+        shortGenericTimeZoneName="Argentina Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="阿鲁巴岛"
+        cityName="Aruba"
         originalTimeZoneName="America/Aruba"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="亚松森"
+        cityName="Asuncion"
         originalTimeZoneName="America/Asuncion"
-        shortGenericTimeZoneName="巴拉圭时间" />
+        shortGenericTimeZoneName="Paraguay Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="阿蒂科肯"
+        cityName="Atikokan"
         originalTimeZoneName="America/Atikokan"
-        shortGenericTimeZoneName="北美东部标准时间" />
+        shortGenericTimeZoneName="Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="巴伊亚"
+        cityName="Bahia"
         originalTimeZoneName="America/Bahia"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="巴伊亚班德拉斯"
+        cityName="Bahia Banderas"
         originalTimeZoneName="America/Bahia_Banderas"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="巴巴多斯"
+        cityName="Barbados"
         originalTimeZoneName="America/Barbados"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="贝伦"
+        cityName="Belem"
         originalTimeZoneName="America/Belem"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="伯利兹"
+        cityName="Belize"
         originalTimeZoneName="America/Belize"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="布朗-萨布隆"
+        cityName="Blanc-Sablon"
         originalTimeZoneName="America/Blanc-Sablon"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="博阿维斯塔"
+        cityName="Boa Vista"
         originalTimeZoneName="America/Boa_Vista"
-        shortGenericTimeZoneName="亚马逊标准时间" />
+        shortGenericTimeZoneName="Amazon Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="波哥大"
+        cityName="Bogota"
         originalTimeZoneName="America/Bogota"
-        shortGenericTimeZoneName="哥伦比亚标准时间" />
+        shortGenericTimeZoneName="Colombia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="博伊西"
+        cityName="Boise"
         originalTimeZoneName="America/Boise"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="剑桥湾"
+        cityName="Cambridge Bay"
         originalTimeZoneName="America/Cambridge_Bay"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="大坎普"
+        cityName="Campo Grande"
         originalTimeZoneName="America/Campo_Grande"
-        shortGenericTimeZoneName="亚马逊标准时间" />
+        shortGenericTimeZoneName="Amazon Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="坎昆"
+        cityName="Cancun"
         originalTimeZoneName="America/Cancun"
-        shortGenericTimeZoneName="北美东部标准时间" />
+        shortGenericTimeZoneName="Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="加拉加斯"
+        cityName="Caracas"
         originalTimeZoneName="America/Caracas"
-        shortGenericTimeZoneName="委内瑞拉时间" />
+        shortGenericTimeZoneName="Venezuela Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="卡宴"
+        cityName="Cayenne"
         originalTimeZoneName="America/Cayenne"
-        shortGenericTimeZoneName="法属圭亚那标准时间" />
+        shortGenericTimeZoneName="French Guiana Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="开曼"
+        cityName="Cayman"
         originalTimeZoneName="America/Cayman"
-        shortGenericTimeZoneName="北美东部标准时间" />
+        shortGenericTimeZoneName="Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="芝加哥"
+        cityName="Chicago"
         originalTimeZoneName="America/Chicago"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="奇瓦瓦"
+        cityName="Chihuahua"
         originalTimeZoneName="America/Chihuahua"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="华雷斯"
+        cityName="Ciudad Juarez"
         originalTimeZoneName="America/Ciudad_Juarez"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="哥斯达黎加"
+        cityName="Costa Rica"
         originalTimeZoneName="America/Costa_Rica"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="克雷斯顿"
+        cityName="Creston"
         originalTimeZoneName="America/Creston"
-        shortGenericTimeZoneName="北美山区标准时间" />
+        shortGenericTimeZoneName="Mountain Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="库亚巴"
+        cityName="Cuiaba"
         originalTimeZoneName="America/Cuiaba"
-        shortGenericTimeZoneName="亚马逊标准时间" />
+        shortGenericTimeZoneName="Amazon Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="库拉索岛"
+        cityName="Curacao"
         originalTimeZoneName="America/Curacao"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="丹麦港"
+        cityName="Danmarkshavn"
         originalTimeZoneName="America/Danmarkshavn"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="道森"
+        cityName="Dawson"
         originalTimeZoneName="America/Dawson"
-        shortGenericTimeZoneName="育空时间" />
+        shortGenericTimeZoneName="Yukon Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="道森克里克"
+        cityName="Dawson Creek"
         originalTimeZoneName="America/Dawson_Creek"
-        shortGenericTimeZoneName="北美山区标准时间" />
+        shortGenericTimeZoneName="Mountain Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="丹佛"
+        cityName="Denver"
         originalTimeZoneName="America/Denver"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="底特律"
+        cityName="Detroit"
         originalTimeZoneName="America/Detroit"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="多米尼克"
+        cityName="Dominica"
         originalTimeZoneName="America/Dominica"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="埃德蒙顿"
+        cityName="Edmonton"
         originalTimeZoneName="America/Edmonton"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="埃鲁内佩"
+        cityName="Eirunepe"
         originalTimeZoneName="America/Eirunepe"
-        shortGenericTimeZoneName="阿克里标准时间" />
+        shortGenericTimeZoneName="Acre Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="萨尔瓦多"
+        cityName="El Salvador"
         originalTimeZoneName="America/El_Salvador"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="纳尔逊堡"
+        cityName="Fort Nelson"
         originalTimeZoneName="America/Fort_Nelson"
-        shortGenericTimeZoneName="北美山区标准时间" />
+        shortGenericTimeZoneName="Mountain Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="福塔雷萨"
+        cityName="Fortaleza"
         originalTimeZoneName="America/Fortaleza"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="格莱斯贝"
+        cityName="Glace Bay"
         originalTimeZoneName="America/Glace_Bay"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT-2:00"
-        cityName="戈特霍布"
+        cityName="Godthab"
         originalTimeZoneName="America/Godthab"
-        shortGenericTimeZoneName="格陵兰岛西部时间" />
+        shortGenericTimeZoneName="West Greenland Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="古斯湾"
+        cityName="Goose Bay"
         originalTimeZoneName="America/Goose_Bay"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="大特克岛"
+        cityName="Grand Turk"
         originalTimeZoneName="America/Grand_Turk"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="格林纳达"
+        cityName="Grenada"
         originalTimeZoneName="America/Grenada"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="瓜德罗普岛"
+        cityName="Guadeloupe"
         originalTimeZoneName="America/Guadeloupe"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="危地马拉"
+        cityName="Guatemala"
         originalTimeZoneName="America/Guatemala"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="瓜亚基尔"
+        cityName="Guayaquil"
         originalTimeZoneName="America/Guayaquil"
-        shortGenericTimeZoneName="厄瓜多尔标准时间" />
+        shortGenericTimeZoneName="Ecuador Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圭亚那"
+        cityName="Guyana"
         originalTimeZoneName="America/Guyana"
-        shortGenericTimeZoneName="圭亚那时间" />
+        shortGenericTimeZoneName="Guyana Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="哈利法克斯"
+        cityName="Halifax"
         originalTimeZoneName="America/Halifax"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="哈瓦那"
+        cityName="Havana"
         originalTimeZoneName="America/Havana"
-        shortGenericTimeZoneName="古巴时间" />
+        shortGenericTimeZoneName="Cuba Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="埃莫西约"
+        cityName="Hermosillo"
         originalTimeZoneName="America/Hermosillo"
-        shortGenericTimeZoneName="墨西哥太平洋标准时间" />
+        shortGenericTimeZoneName="Mexican Pacific Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="印第安纳波利斯"
+        cityName="Indianapolis"
         originalTimeZoneName="America/Indiana/Indianapolis"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="诺克斯"
+        cityName="Knox"
         originalTimeZoneName="America/Indiana/Knox"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="马伦戈"
+        cityName="Marengo"
         originalTimeZoneName="America/Indiana/Marengo"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="圣彼得堡"
+        cityName="Petersburg"
         originalTimeZoneName="America/Indiana/Petersburg"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="特尔城"
+        cityName="Tell City"
         originalTimeZoneName="America/Indiana/Tell_City"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="韦韦"
+        cityName="Vevay"
         originalTimeZoneName="America/Indiana/Vevay"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="万塞讷"
+        cityName="Vincennes"
         originalTimeZoneName="America/Indiana/Vincennes"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="维纳马克"
+        cityName="Winamac"
         originalTimeZoneName="America/Indiana/Winamac"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="伊努维克"
+        cityName="Inuvik"
         originalTimeZoneName="America/Inuvik"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="伊卡卢伊特"
+        cityName="Iqaluit"
         originalTimeZoneName="America/Iqaluit"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="牙买加"
+        cityName="Jamaica"
         originalTimeZoneName="America/Jamaica"
-        shortGenericTimeZoneName="北美东部标准时间" />
+        shortGenericTimeZoneName="Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="朱诺"
+        cityName="Juneau"
         originalTimeZoneName="America/Juneau"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="路易斯维尔"
+        cityName="Louisville"
         originalTimeZoneName="America/Kentucky/Louisville"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="蒙蒂塞洛"
+        cityName="Monticello"
         originalTimeZoneName="America/Kentucky/Monticello"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="克拉伦代克"
+        cityName="Kralendijk"
         originalTimeZoneName="America/Kralendijk"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="拉巴斯"
+        cityName="La Paz"
         originalTimeZoneName="America/La_Paz"
-        shortGenericTimeZoneName="玻利维亚标准时间" />
+        shortGenericTimeZoneName="Bolivia Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="利马"
+        cityName="Lima"
         originalTimeZoneName="America/Lima"
-        shortGenericTimeZoneName="秘鲁标准时间" />
+        shortGenericTimeZoneName="Peru Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-8:00"
-        cityName="洛杉矶"
+        cityName="Los Angeles"
         originalTimeZoneName="America/Los_Angeles"
-        shortGenericTimeZoneName="北美太平洋时间" />
+        shortGenericTimeZoneName="Pacific Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="下太子区"
+        cityName="Lower Princes"
         originalTimeZoneName="America/Lower_Princes"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="马塞约"
+        cityName="Maceio"
         originalTimeZoneName="America/Maceio"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="马那瓜"
+        cityName="Managua"
         originalTimeZoneName="America/Managua"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="马瑙斯"
+        cityName="Manaus"
         originalTimeZoneName="America/Manaus"
-        shortGenericTimeZoneName="亚马逊标准时间" />
+        shortGenericTimeZoneName="Amazon Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="马里戈特"
+        cityName="Marigot"
         originalTimeZoneName="America/Marigot"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="马提尼克岛"
+        cityName="Martinique"
         originalTimeZoneName="America/Martinique"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="马塔莫罗斯"
+        cityName="Matamoros"
         originalTimeZoneName="America/Matamoros"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="马萨特兰"
+        cityName="Mazatlan"
         originalTimeZoneName="America/Mazatlan"
-        shortGenericTimeZoneName="墨西哥太平洋标准时间" />
+        shortGenericTimeZoneName="Mexican Pacific Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="梅诺米尼"
+        cityName="Menominee"
         originalTimeZoneName="America/Menominee"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="梅里达"
+        cityName="Merida"
         originalTimeZoneName="America/Merida"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="梅特拉卡特拉"
+        cityName="Metlakatla"
         originalTimeZoneName="America/Metlakatla"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="墨西哥城"
+        cityName="Mexico City"
         originalTimeZoneName="America/Mexico_City"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="密克隆群岛"
+        cityName="Miquelon"
         originalTimeZoneName="America/Miquelon"
-        shortGenericTimeZoneName="圣皮埃尔和密克隆群岛时间" />
+        shortGenericTimeZoneName="St. Pierre &amp; Miquelon Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="蒙克顿"
+        cityName="Moncton"
         originalTimeZoneName="America/Moncton"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="蒙特雷"
+        cityName="Monterrey"
         originalTimeZoneName="America/Monterrey"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="蒙得维的亚"
+        cityName="Montevideo"
         originalTimeZoneName="America/Montevideo"
-        shortGenericTimeZoneName="乌拉圭标准时间" />
+        shortGenericTimeZoneName="Uruguay Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="蒙特利尔"
+        cityName="Montreal"
         originalTimeZoneName="America/Montreal"
-        shortGenericTimeZoneName="Montreal时间" />
+        shortGenericTimeZoneName="Montreal Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="蒙特塞拉特"
+        cityName="Montserrat"
         originalTimeZoneName="America/Montserrat"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="拿索"
+        cityName="Nassau"
         originalTimeZoneName="America/Nassau"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="纽约"
+        cityName="New York"
         originalTimeZoneName="America/New_York"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="尼皮贡"
+        cityName="Nipigon"
         originalTimeZoneName="America/Nipigon"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="诺姆"
+        cityName="Nome"
         originalTimeZoneName="America/Nome"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-2:00"
-        cityName="诺罗尼亚"
+        cityName="Noronha"
         originalTimeZoneName="America/Noronha"
-        shortGenericTimeZoneName="费尔南多-迪诺罗尼亚岛标准时间" />
+        shortGenericTimeZoneName="Fernando de Noronha Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="比尤拉"
+        cityName="Beulah"
         originalTimeZoneName="America/North_Dakota/Beulah"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="中心"
+        cityName="Center"
         originalTimeZoneName="America/North_Dakota/Center"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="新塞勒姆"
+        cityName="New Salem"
         originalTimeZoneName="America/North_Dakota/New_Salem"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-2:00"
-        cityName="努克"
+        cityName="Nuuk"
         originalTimeZoneName="America/Nuuk"
-        shortGenericTimeZoneName="格陵兰岛西部时间" />
+        shortGenericTimeZoneName="West Greenland Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="奥希纳加"
+        cityName="Ojinaga"
         originalTimeZoneName="America/Ojinaga"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="巴拿马"
+        cityName="Panama"
         originalTimeZoneName="America/Panama"
-        shortGenericTimeZoneName="北美东部标准时间" />
+        shortGenericTimeZoneName="Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="庞纳唐"
+        cityName="Pangnirtung"
         originalTimeZoneName="America/Pangnirtung"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="帕拉马里博"
+        cityName="Paramaribo"
         originalTimeZoneName="America/Paramaribo"
-        shortGenericTimeZoneName="苏里南时间" />
+        shortGenericTimeZoneName="Suriname Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="菲尼克斯"
+        cityName="Phoenix"
         originalTimeZoneName="America/Phoenix"
-        shortGenericTimeZoneName="北美山区标准时间" />
+        shortGenericTimeZoneName="Mountain Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="太子港"
+        cityName="Port-au-Prince"
         originalTimeZoneName="America/Port-au-Prince"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="西班牙港"
+        cityName="Port of Spain"
         originalTimeZoneName="America/Port_of_Spain"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="旧波尔图"
+        cityName="Porto Velho"
         originalTimeZoneName="America/Porto_Velho"
-        shortGenericTimeZoneName="亚马逊标准时间" />
+        shortGenericTimeZoneName="Amazon Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="波多黎各"
+        cityName="Puerto Rico"
         originalTimeZoneName="America/Puerto_Rico"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="蓬塔阿雷纳斯"
+        cityName="Punta Arenas"
         originalTimeZoneName="America/Punta_Arenas"
-        shortGenericTimeZoneName="蓬塔阿雷纳斯时间" />
+        shortGenericTimeZoneName="Punta Arenas Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="雷尼里弗"
+        cityName="Rainy River"
         originalTimeZoneName="America/Rainy_River"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="兰金因莱特"
+        cityName="Rankin Inlet"
         originalTimeZoneName="America/Rankin_Inlet"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="累西腓"
+        cityName="Recife"
         originalTimeZoneName="America/Recife"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="里贾纳"
+        cityName="Regina"
         originalTimeZoneName="America/Regina"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="雷索卢特"
+        cityName="Resolute"
         originalTimeZoneName="America/Resolute"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="里约布兰科"
+        cityName="Rio Branco"
         originalTimeZoneName="America/Rio_Branco"
-        shortGenericTimeZoneName="阿克里标准时间" />
+        shortGenericTimeZoneName="Acre Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-8:00"
-        cityName="圣伊萨贝尔"
+        cityName="Santa Isabel"
         originalTimeZoneName="America/Santa_Isabel"
-        shortGenericTimeZoneName="墨西哥西北部时间" />
+        shortGenericTimeZoneName="Northwest Mexico Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="圣塔伦"
+        cityName="Santarem"
         originalTimeZoneName="America/Santarem"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="圣地亚哥"
+        cityName="Santiago"
         originalTimeZoneName="America/Santiago"
-        shortGenericTimeZoneName="智利时间" />
+        shortGenericTimeZoneName="Chile Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣多明各"
+        cityName="Santo Domingo"
         originalTimeZoneName="America/Santo_Domingo"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="圣保罗"
+        cityName="Sao Paulo"
         originalTimeZoneName="America/Sao_Paulo"
-        shortGenericTimeZoneName="巴西利亚标准时间" />
+        shortGenericTimeZoneName="Brasilia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-1:00"
-        cityName="斯科斯比松"
+        cityName="Scoresbysund"
         originalTimeZoneName="America/Scoresbysund"
-        shortGenericTimeZoneName="格陵兰岛东部时间" />
+        shortGenericTimeZoneName="East Greenland Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="希普罗克"
+        cityName="Shiprock"
         originalTimeZoneName="America/Shiprock"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="锡特卡"
+        cityName="Sitka"
         originalTimeZoneName="America/Sitka"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣巴泰勒米岛"
+        cityName="St Barthelemy"
         originalTimeZoneName="America/St_Barthelemy"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-3:30"
-        cityName="圣约翰斯"
+        cityName="St Johns"
         originalTimeZoneName="America/St_Johns"
-        shortGenericTimeZoneName="纽芬兰时间" />
+        shortGenericTimeZoneName="Newfoundland Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣基茨"
+        cityName="St Kitts"
         originalTimeZoneName="America/St_Kitts"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣卢西亚"
+        cityName="St Lucia"
         originalTimeZoneName="America/St_Lucia"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣托马斯"
+        cityName="St Thomas"
         originalTimeZoneName="America/St_Thomas"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="圣文森特"
+        cityName="St Vincent"
         originalTimeZoneName="America/St_Vincent"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="斯威夫特卡伦特"
+        cityName="Swift Current"
         originalTimeZoneName="America/Swift_Current"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="特古西加尔巴"
+        cityName="Tegucigalpa"
         originalTimeZoneName="America/Tegucigalpa"
-        shortGenericTimeZoneName="北美中部标准时间" />
+        shortGenericTimeZoneName="Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="图勒"
+        cityName="Thule"
         originalTimeZoneName="America/Thule"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="桑德贝"
+        cityName="Thunder Bay"
         originalTimeZoneName="America/Thunder_Bay"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-8:00"
-        cityName="蒂华纳"
+        cityName="Tijuana"
         originalTimeZoneName="America/Tijuana"
-        shortGenericTimeZoneName="北美太平洋时间" />
+        shortGenericTimeZoneName="Pacific Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="多伦多"
+        cityName="Toronto"
         originalTimeZoneName="America/Toronto"
-        shortGenericTimeZoneName="北美东部时间" />
+        shortGenericTimeZoneName="Eastern Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="托尔托拉岛"
+        cityName="Tortola"
         originalTimeZoneName="America/Tortola"
-        shortGenericTimeZoneName="大西洋标准时间" />
+        shortGenericTimeZoneName="Atlantic Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-8:00"
-        cityName="温哥华"
+        cityName="Vancouver"
         originalTimeZoneName="America/Vancouver"
-        shortGenericTimeZoneName="北美太平洋时间" />
+        shortGenericTimeZoneName="Pacific Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="怀特霍斯"
+        cityName="Whitehorse"
         originalTimeZoneName="America/Whitehorse"
-        shortGenericTimeZoneName="育空时间" />
+        shortGenericTimeZoneName="Yukon Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="温尼伯"
+        cityName="Winnipeg"
         originalTimeZoneName="America/Winnipeg"
-        shortGenericTimeZoneName="北美中部时间" />
+        shortGenericTimeZoneName="Central Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="亚库塔特"
+        cityName="Yakutat"
         originalTimeZoneName="America/Yakutat"
-        shortGenericTimeZoneName="阿拉斯加时间" />
+        shortGenericTimeZoneName="Alaska Time" />
     <TimeZoneBean
         abbreviation="GMT-7:00"
-        cityName="耶洛奈夫"
+        cityName="Yellowknife"
         originalTimeZoneName="America/Yellowknife"
-        shortGenericTimeZoneName="北美山区时间" />
+        shortGenericTimeZoneName="Mountain Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="卡塞"
+        cityName="Casey"
         originalTimeZoneName="Antarctica/Casey"
-        shortGenericTimeZoneName="凯西时间" />
+        shortGenericTimeZoneName="Casey Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="戴维斯"
+        cityName="Davis"
         originalTimeZoneName="Antarctica/Davis"
-        shortGenericTimeZoneName="戴维斯时间" />
+        shortGenericTimeZoneName="Davis Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="迪蒙迪尔维尔"
+        cityName="DumontDUrville"
         originalTimeZoneName="Antarctica/DumontDUrville"
-        shortGenericTimeZoneName="迪蒙迪尔维尔时间" />
+        shortGenericTimeZoneName="Dumont-d’Urville Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="麦格理"
+        cityName="Macquarie"
         originalTimeZoneName="Antarctica/Macquarie"
-        shortGenericTimeZoneName="澳大利亚东部时间" />
+        shortGenericTimeZoneName="Eastern Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="莫森"
+        cityName="Mawson"
         originalTimeZoneName="Antarctica/Mawson"
-        shortGenericTimeZoneName="莫森时间" />
+        shortGenericTimeZoneName="Mawson Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="麦克默多"
+        cityName="McMurdo"
         originalTimeZoneName="Antarctica/McMurdo"
-        shortGenericTimeZoneName="新西兰时间" />
+        shortGenericTimeZoneName="New Zealand Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="帕尔默"
+        cityName="Palmer"
         originalTimeZoneName="Antarctica/Palmer"
-        shortGenericTimeZoneName="帕默尔时间" />
+        shortGenericTimeZoneName="Palmer Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="罗瑟拉"
+        cityName="Rothera"
         originalTimeZoneName="Antarctica/Rothera"
-        shortGenericTimeZoneName="罗瑟拉时间" />
+        shortGenericTimeZoneName="Rothera Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="南极"
+        cityName="South Pole"
         originalTimeZoneName="Antarctica/South_Pole"
-        shortGenericTimeZoneName="新西兰时间" />
+        shortGenericTimeZoneName="New Zealand Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="昭和"
+        cityName="Syowa"
         originalTimeZoneName="Antarctica/Syowa"
-        shortGenericTimeZoneName="昭和时间" />
+        shortGenericTimeZoneName="Syowa Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="特罗尔"
+        cityName="Troll"
         originalTimeZoneName="Antarctica/Troll"
-        shortGenericTimeZoneName="特罗尔时间" />
+        shortGenericTimeZoneName="Troll Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="沃斯托克"
+        cityName="Vostok"
         originalTimeZoneName="Antarctica/Vostok"
-        shortGenericTimeZoneName="沃斯托克时间" />
+        shortGenericTimeZoneName="Vostok Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="朗伊尔城"
+        cityName="Longyearbyen"
         originalTimeZoneName="Arctic/Longyearbyen"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="亚丁"
+        cityName="Aden"
         originalTimeZoneName="Asia/Aden"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="阿拉木图"
+        cityName="Almaty"
         originalTimeZoneName="Asia/Almaty"
-        shortGenericTimeZoneName="哈萨克斯坦东部时间" />
+        shortGenericTimeZoneName="East Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="安曼"
+        cityName="Amman"
         originalTimeZoneName="Asia/Amman"
-        shortGenericTimeZoneName="约旦时间" />
+        shortGenericTimeZoneName="Jordan Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="阿纳德尔"
+        cityName="Anadyr"
         originalTimeZoneName="Asia/Anadyr"
-        shortGenericTimeZoneName="阿纳德尔标准时间" />
+        shortGenericTimeZoneName="Anadyr Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="阿克套"
+        cityName="Aqtau"
         originalTimeZoneName="Asia/Aqtau"
-        shortGenericTimeZoneName="哈萨克斯坦西部时间" />
+        shortGenericTimeZoneName="West Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="阿克托别"
+        cityName="Aqtobe"
         originalTimeZoneName="Asia/Aqtobe"
-        shortGenericTimeZoneName="哈萨克斯坦西部时间" />
+        shortGenericTimeZoneName="West Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="阿什哈巴德"
+        cityName="Ashgabat"
         originalTimeZoneName="Asia/Ashgabat"
-        shortGenericTimeZoneName="土库曼斯坦标准时间" />
+        shortGenericTimeZoneName="Turkmenistan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="阿特劳"
+        cityName="Atyrau"
         originalTimeZoneName="Asia/Atyrau"
-        shortGenericTimeZoneName="哈萨克斯坦西部时间" />
+        shortGenericTimeZoneName="West Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="巴格达"
+        cityName="Baghdad"
         originalTimeZoneName="Asia/Baghdad"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="巴林"
+        cityName="Bahrain"
         originalTimeZoneName="Asia/Bahrain"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="巴库"
+        cityName="Baku"
         originalTimeZoneName="Asia/Baku"
-        shortGenericTimeZoneName="阿塞拜疆标准时间" />
+        shortGenericTimeZoneName="Azerbaijan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="曼谷"
+        cityName="Bangkok"
         originalTimeZoneName="Asia/Bangkok"
-        shortGenericTimeZoneName="中南半岛时间" />
+        shortGenericTimeZoneName="Indochina Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="巴尔瑙尔"
+        cityName="Barnaul"
         originalTimeZoneName="Asia/Barnaul"
-        shortGenericTimeZoneName="巴尔瑙尔时间" />
+        shortGenericTimeZoneName="Barnaul Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="贝鲁特"
+        cityName="Beirut"
         originalTimeZoneName="Asia/Beirut"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="比什凯克"
+        cityName="Bishkek"
         originalTimeZoneName="Asia/Bishkek"
-        shortGenericTimeZoneName="吉尔吉斯斯坦时间" />
+        shortGenericTimeZoneName="Kyrgyzstan Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="文莱"
+        cityName="Brunei"
         originalTimeZoneName="Asia/Brunei"
-        shortGenericTimeZoneName="文莱达鲁萨兰时间" />
+        shortGenericTimeZoneName="Brunei Darussalam Time" />
     <TimeZoneBean
         abbreviation="GMT+5:30"
-        cityName="加尔各答"
+        cityName="Calcutta"
         originalTimeZoneName="Asia/Calcutta"
-        shortGenericTimeZoneName="印度时间" />
+        shortGenericTimeZoneName="India Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="赤塔"
+        cityName="Chita"
         originalTimeZoneName="Asia/Chita"
-        shortGenericTimeZoneName="雅库茨克标准时间" />
+        shortGenericTimeZoneName="Yakutsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="乔巴山"
+        cityName="Choibalsan"
         originalTimeZoneName="Asia/Choibalsan"
-        shortGenericTimeZoneName="乌兰巴托标准时间" />
+        shortGenericTimeZoneName="Ulaanbaatar Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="重庆"
+        cityName="Chongqing"
         originalTimeZoneName="Asia/Chongqing"
-        shortGenericTimeZoneName="中国标准时间" />
+        shortGenericTimeZoneName="China Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:30"
-        cityName="科伦坡"
+        cityName="Colombo"
         originalTimeZoneName="Asia/Colombo"
-        shortGenericTimeZoneName="印度时间" />
+        shortGenericTimeZoneName="India Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="大马士革"
+        cityName="Damascus"
         originalTimeZoneName="Asia/Damascus"
-        shortGenericTimeZoneName="叙利亚时间" />
+        shortGenericTimeZoneName="Syria Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="达卡"
+        cityName="Dhaka"
         originalTimeZoneName="Asia/Dhaka"
-        shortGenericTimeZoneName="孟加拉标准时间" />
+        shortGenericTimeZoneName="Bangladesh Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="帝力"
+        cityName="Dili"
         originalTimeZoneName="Asia/Dili"
-        shortGenericTimeZoneName="东帝汶时间" />
+        shortGenericTimeZoneName="East Timor Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="迪拜"
+        cityName="Dubai"
         originalTimeZoneName="Asia/Dubai"
-        shortGenericTimeZoneName="海湾标准时间" />
+        shortGenericTimeZoneName="Gulf Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="杜尚别"
+        cityName="Dushanbe"
         originalTimeZoneName="Asia/Dushanbe"
-        shortGenericTimeZoneName="塔吉克斯坦时间" />
+        shortGenericTimeZoneName="Tajikistan Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="法马古斯塔"
+        cityName="Famagusta"
         originalTimeZoneName="Asia/Famagusta"
-        shortGenericTimeZoneName="法马古斯塔时间" />
+        shortGenericTimeZoneName="Famagusta Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="加沙"
+        cityName="Gaza"
         originalTimeZoneName="Asia/Gaza"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="哈尔滨"
+        cityName="Harbin"
         originalTimeZoneName="Asia/Harbin"
-        shortGenericTimeZoneName="中国标准时间" />
+        shortGenericTimeZoneName="China Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="希伯伦"
+        cityName="Hebron"
         originalTimeZoneName="Asia/Hebron"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="胡志明"
+        cityName="Ho Chi Minh"
         originalTimeZoneName="Asia/Ho_Chi_Minh"
-        shortGenericTimeZoneName="中南半岛时间" />
+        shortGenericTimeZoneName="Indochina Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="香港"
+        cityName="Hong Kong"
         originalTimeZoneName="Asia/Hong_Kong"
-        shortGenericTimeZoneName="香港标准时间" />
+        shortGenericTimeZoneName="Hong Kong Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="科布多"
+        cityName="Hovd"
         originalTimeZoneName="Asia/Hovd"
-        shortGenericTimeZoneName="科布多标准时间" />
+        shortGenericTimeZoneName="Hovd Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="伊尔库茨克"
+        cityName="Irkutsk"
         originalTimeZoneName="Asia/Irkutsk"
-        shortGenericTimeZoneName="伊尔库茨克标准时间" />
+        shortGenericTimeZoneName="Irkutsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="雅加达"
+        cityName="Jakarta"
         originalTimeZoneName="Asia/Jakarta"
-        shortGenericTimeZoneName="印度尼西亚西部时间" />
+        shortGenericTimeZoneName="Western Indonesia Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="查亚普拉"
+        cityName="Jayapura"
         originalTimeZoneName="Asia/Jayapura"
-        shortGenericTimeZoneName="印度尼西亚东部时间" />
+        shortGenericTimeZoneName="Eastern Indonesia Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="耶路撒冷"
+        cityName="Jerusalem"
         originalTimeZoneName="Asia/Jerusalem"
-        shortGenericTimeZoneName="以色列时间" />
+        shortGenericTimeZoneName="Israel Time" />
     <TimeZoneBean
         abbreviation="GMT+4:30"
-        cityName="喀布尔"
+        cityName="Kabul"
         originalTimeZoneName="Asia/Kabul"
-        shortGenericTimeZoneName="阿富汗时间" />
+        shortGenericTimeZoneName="Afghanistan Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="堪察加半岛"
+        cityName="Kamchatka"
         originalTimeZoneName="Asia/Kamchatka"
-        shortGenericTimeZoneName="彼得罗巴甫洛夫斯克-堪察加标准时间" />
+        shortGenericTimeZoneName="Petropavlovsk-Kamchatski Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="卡拉奇"
+        cityName="Karachi"
         originalTimeZoneName="Asia/Karachi"
-        shortGenericTimeZoneName="巴基斯坦标准时间" />
+        shortGenericTimeZoneName="Pakistan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="喀什"
+        cityName="Kashgar"
         originalTimeZoneName="Asia/Kashgar"
-        shortGenericTimeZoneName="乌鲁木齐时间" />
+        shortGenericTimeZoneName="Urumqi Time" />
     <TimeZoneBean
         abbreviation="GMT+5:45"
-        cityName="加德满都"
+        cityName="Kathmandu"
         originalTimeZoneName="Asia/Kathmandu"
-        shortGenericTimeZoneName="尼泊尔时间" />
+        shortGenericTimeZoneName="Nepal Time" />
     <TimeZoneBean
         abbreviation="GMT+5:45"
-        cityName="加德满都"
+        cityName="Katmandu"
         originalTimeZoneName="Asia/Katmandu"
-        shortGenericTimeZoneName="尼泊尔时间" />
+        shortGenericTimeZoneName="Nepal Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="汉德加"
+        cityName="Khandyga"
         originalTimeZoneName="Asia/Khandyga"
-        shortGenericTimeZoneName="雅库茨克标准时间" />
+        shortGenericTimeZoneName="Yakutsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="克拉斯诺亚尔斯克"
+        cityName="Krasnoyarsk"
         originalTimeZoneName="Asia/Krasnoyarsk"
-        shortGenericTimeZoneName="克拉斯诺亚尔斯克标准时间" />
+        shortGenericTimeZoneName="Krasnoyarsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="吉隆坡"
+        cityName="Kuala Lumpur"
         originalTimeZoneName="Asia/Kuala_Lumpur"
-        shortGenericTimeZoneName="马来西亚时间" />
+        shortGenericTimeZoneName="Malaysia Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="古晋"
+        cityName="Kuching"
         originalTimeZoneName="Asia/Kuching"
-        shortGenericTimeZoneName="马来西亚时间" />
+        shortGenericTimeZoneName="Malaysia Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="科威特"
+        cityName="Kuwait"
         originalTimeZoneName="Asia/Kuwait"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
-
-
-
-
-
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="澳门"
+        cityName="Macau"
         originalTimeZoneName="Asia/Macau"
-        shortGenericTimeZoneName="中国标准时间" />
+        shortGenericTimeZoneName="China Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="马加丹"
+        cityName="Magadan"
         originalTimeZoneName="Asia/Magadan"
-        shortGenericTimeZoneName="马加丹标准时间" />
+        shortGenericTimeZoneName="Magadan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="望加锡"
+        cityName="Makassar"
         originalTimeZoneName="Asia/Makassar"
-        shortGenericTimeZoneName="印度尼西亚中部时间" />
+        shortGenericTimeZoneName="Central Indonesia Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="马尼拉"
+        cityName="Manila"
         originalTimeZoneName="Asia/Manila"
-        shortGenericTimeZoneName="菲律宾标准时间" />
+        shortGenericTimeZoneName="Philippine Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="马斯喀特"
+        cityName="Muscat"
         originalTimeZoneName="Asia/Muscat"
-        shortGenericTimeZoneName="海湾标准时间" />
+        shortGenericTimeZoneName="Gulf Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="尼科西亚"
+        cityName="Nicosia"
         originalTimeZoneName="Asia/Nicosia"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="新库兹涅茨克"
+        cityName="Novokuznetsk"
         originalTimeZoneName="Asia/Novokuznetsk"
-        shortGenericTimeZoneName="克拉斯诺亚尔斯克标准时间" />
+        shortGenericTimeZoneName="Krasnoyarsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="新西伯利亚"
+        cityName="Novosibirsk"
         originalTimeZoneName="Asia/Novosibirsk"
-        shortGenericTimeZoneName="新西伯利亚标准时间" />
+        shortGenericTimeZoneName="Novosibirsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="鄂木斯克"
+        cityName="Omsk"
         originalTimeZoneName="Asia/Omsk"
-        shortGenericTimeZoneName="鄂木斯克标准时间" />
+        shortGenericTimeZoneName="Omsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="欧罗尔"
+        cityName="Oral"
         originalTimeZoneName="Asia/Oral"
-        shortGenericTimeZoneName="哈萨克斯坦西部时间" />
+        shortGenericTimeZoneName="West Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="金边"
+        cityName="Phnom Penh"
         originalTimeZoneName="Asia/Phnom_Penh"
-        shortGenericTimeZoneName="中南半岛时间" />
+        shortGenericTimeZoneName="Indochina Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="坤甸"
+        cityName="Pontianak"
         originalTimeZoneName="Asia/Pontianak"
-        shortGenericTimeZoneName="印度尼西亚西部时间" />
+        shortGenericTimeZoneName="Western Indonesia Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="平壤"
+        cityName="Pyongyang"
         originalTimeZoneName="Asia/Pyongyang"
-        shortGenericTimeZoneName="韩国标准时间" />
+        shortGenericTimeZoneName="Korean Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="卡塔尔"
+        cityName="Qatar"
         originalTimeZoneName="Asia/Qatar"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="库斯塔奈"
+        cityName="Qostanay"
         originalTimeZoneName="Asia/Qostanay"
-        shortGenericTimeZoneName="哈萨克斯坦东部时间" />
+        shortGenericTimeZoneName="East Kazakhstan Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="克孜洛尔达"
+        cityName="Qyzylorda"
         originalTimeZoneName="Asia/Qyzylorda"
-        shortGenericTimeZoneName="哈萨克斯坦西部时间" />
+        shortGenericTimeZoneName="West Kazakhstan Time" /><!--###Rangoon-->
+    <TimeZoneBean
+        abbreviation="GMT+6:30"
+        cityName="Rangoon"
+        originalTimeZoneName="Asia/Rangoon"
+        shortGenericTimeZoneName="Myanmar Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="利雅得"
+        cityName="Riyadh"
         originalTimeZoneName="Asia/Riyadh"
-        shortGenericTimeZoneName="阿拉伯标准时间" />
+        shortGenericTimeZoneName="Arabian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="萨哈林"
+        cityName="Sakhalin"
         originalTimeZoneName="Asia/Sakhalin"
-        shortGenericTimeZoneName="库页岛标准时间" />
+        shortGenericTimeZoneName="Sakhalin Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="撒马尔罕"
+        cityName="Samarkand"
         originalTimeZoneName="Asia/Samarkand"
-        shortGenericTimeZoneName="乌兹别克斯坦标准时间" />
+        shortGenericTimeZoneName="Uzbekistan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="首尔"
+        cityName="Seoul"
         originalTimeZoneName="Asia/Seoul"
-        shortGenericTimeZoneName="韩国标准时间" />
+        shortGenericTimeZoneName="Korean Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="上海"
+        cityName="Shanghai"
         originalTimeZoneName="Asia/Shanghai"
-        shortGenericTimeZoneName="中国标准时间" />
+        shortGenericTimeZoneName="China Standard Time" />
+
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="新加坡"
+        cityName="Singapore"
         originalTimeZoneName="Asia/Singapore"
-        shortGenericTimeZoneName="新加坡标准时间" />
+        shortGenericTimeZoneName="Singapore Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="中科雷姆斯克"
+        cityName="Srednekolymsk"
         originalTimeZoneName="Asia/Srednekolymsk"
-        shortGenericTimeZoneName="中科雷姆斯克时间" />
+        shortGenericTimeZoneName="Srednekolymsk Time" />
+
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="台北"
+        cityName="Taipei"
         originalTimeZoneName="Asia/Taipei"
-        shortGenericTimeZoneName="台北标准时间" />
+        shortGenericTimeZoneName="Taipei Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="塔什干"
+        cityName="Tashkent"
         originalTimeZoneName="Asia/Tashkent"
-        shortGenericTimeZoneName="乌兹别克斯坦标准时间" />
+        shortGenericTimeZoneName="Uzbekistan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="第比利斯"
+        cityName="Tbilisi"
         originalTimeZoneName="Asia/Tbilisi"
-        shortGenericTimeZoneName="格鲁吉亚标准时间" />
+        shortGenericTimeZoneName="Georgia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:30"
-        cityName="德黑兰"
+        cityName="Tehran"
         originalTimeZoneName="Asia/Tehran"
-        shortGenericTimeZoneName="伊朗标准时间" />
+        shortGenericTimeZoneName="Iran Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="廷布"
+        cityName="Thimphu"
         originalTimeZoneName="Asia/Thimphu"
-        shortGenericTimeZoneName="不丹时间" />
+        shortGenericTimeZoneName="Bhutan Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="东京"
+        cityName="Tokyo"
         originalTimeZoneName="Asia/Tokyo"
-        shortGenericTimeZoneName="日本标准时间" />
+        shortGenericTimeZoneName="Japan Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="托木斯克"
+        cityName="Tomsk"
         originalTimeZoneName="Asia/Tomsk"
-        shortGenericTimeZoneName="托木斯克时间" />
+        shortGenericTimeZoneName="Tomsk Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="乌兰巴托"
+        cityName="Ulaanbaatar"
         originalTimeZoneName="Asia/Ulaanbaatar"
-        shortGenericTimeZoneName="乌兰巴托标准时间" />
+        shortGenericTimeZoneName="Ulaanbaatar Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="乌鲁木齐"
+        cityName="Urumqi"
         originalTimeZoneName="Asia/Urumqi"
-        shortGenericTimeZoneName="乌鲁木齐时间" />
+        shortGenericTimeZoneName="Urumqi Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="乌斯内拉"
+        cityName="Ust-Nera"
         originalTimeZoneName="Asia/Ust-Nera"
-        shortGenericTimeZoneName="海参崴标准时间" />
+        shortGenericTimeZoneName="Vladivostok Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="万象"
+        cityName="Vientiane"
         originalTimeZoneName="Asia/Vientiane"
-        shortGenericTimeZoneName="中南半岛时间" />
+        shortGenericTimeZoneName="Indochina Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="符拉迪沃斯托克"
+        cityName="Vladivostok"
         originalTimeZoneName="Asia/Vladivostok"
-        shortGenericTimeZoneName="海参崴标准时间" />
+        shortGenericTimeZoneName="Vladivostok Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="雅库茨克"
+        cityName="Yakutsk"
         originalTimeZoneName="Asia/Yakutsk"
-        shortGenericTimeZoneName="雅库茨克标准时间" />
+        shortGenericTimeZoneName="Yakutsk Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+6:30"
-        cityName="仰光"
+        cityName="Yangon"
         originalTimeZoneName="Asia/Yangon"
-        shortGenericTimeZoneName="缅甸时间" />
+        shortGenericTimeZoneName="Myanmar Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="叶卡捷琳堡"
+        cityName="Yekaterinburg"
         originalTimeZoneName="Asia/Yekaterinburg"
-        shortGenericTimeZoneName="叶卡捷琳堡标准时间" />
+        shortGenericTimeZoneName="Yekaterinburg Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="耶烈万"
+        cityName="Yerevan"
         originalTimeZoneName="Asia/Yerevan"
-        shortGenericTimeZoneName="亚美尼亚标准时间" />
+        shortGenericTimeZoneName="Armenia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-1:00"
-        cityName="亚速尔群岛"
+        cityName="Azores"
         originalTimeZoneName="Atlantic/Azores"
-        shortGenericTimeZoneName="亚速尔群岛时间" />
+        shortGenericTimeZoneName="Azores Time" />
     <TimeZoneBean
         abbreviation="GMT-4:00"
-        cityName="百慕大"
+        cityName="Bermuda"
         originalTimeZoneName="Atlantic/Bermuda"
-        shortGenericTimeZoneName="大西洋时间" />
+        shortGenericTimeZoneName="Atlantic Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="加那利"
+        cityName="Canary"
         originalTimeZoneName="Atlantic/Canary"
-        shortGenericTimeZoneName="西欧时间" />
+        shortGenericTimeZoneName="Western European Time" />
     <TimeZoneBean
         abbreviation="GMT-1:00"
-        cityName="佛得角"
+        cityName="Cape Verde"
         originalTimeZoneName="Atlantic/Cape_Verde"
-        shortGenericTimeZoneName="佛得角标准时间" />
+        shortGenericTimeZoneName="Cape Verde Standard Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="法罗群岛"
+        cityName="Faroe"
         originalTimeZoneName="Atlantic/Faroe"
-        shortGenericTimeZoneName="西欧时间" />
+        shortGenericTimeZoneName="Western European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="马德拉群岛"
+        cityName="Madeira"
         originalTimeZoneName="Atlantic/Madeira"
-        shortGenericTimeZoneName="西欧时间" />
+        shortGenericTimeZoneName="Western European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="雷克雅维克"
+        cityName="Reykjavik"
         originalTimeZoneName="Atlantic/Reykjavik"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT-2:00"
-        cityName="南乔治亚岛"
+        cityName="South Georgia"
         originalTimeZoneName="Atlantic/South_Georgia"
-        shortGenericTimeZoneName="南乔治亚岛时间" />
+        shortGenericTimeZoneName="South Georgia Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="圣赫勒拿"
+        cityName="St Helena"
         originalTimeZoneName="Atlantic/St_Helena"
-        shortGenericTimeZoneName="格林尼治标准时间" />
+        shortGenericTimeZoneName="Greenwich Mean Time" />
     <TimeZoneBean
         abbreviation="GMT-3:00"
-        cityName="斯坦利"
+        cityName="Stanley"
         originalTimeZoneName="Atlantic/Stanley"
-        shortGenericTimeZoneName="福克兰群岛标准时间" />
+        shortGenericTimeZoneName="Falkland Islands Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+10:30"
-        cityName="阿德莱德"
+        cityName="Adelaide"
         originalTimeZoneName="Australia/Adelaide"
-        shortGenericTimeZoneName="澳大利亚中部时间" />
+        shortGenericTimeZoneName="Central Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="布里斯班"
+        cityName="Brisbane"
         originalTimeZoneName="Australia/Brisbane"
-        shortGenericTimeZoneName="澳大利亚东部标准时间" />
+        shortGenericTimeZoneName="Australian Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+10:30"
-        cityName="布罗肯希尔"
+        cityName="Broken Hill"
         originalTimeZoneName="Australia/Broken_Hill"
-        shortGenericTimeZoneName="澳大利亚中部时间" />
+        shortGenericTimeZoneName="Central Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="库利"
+        cityName="Currie"
         originalTimeZoneName="Australia/Currie"
-        shortGenericTimeZoneName="澳大利亚东部时间" />
+        shortGenericTimeZoneName="Eastern Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+9:30"
-        cityName="达尔文"
+        cityName="Darwin"
         originalTimeZoneName="Australia/Darwin"
-        shortGenericTimeZoneName="澳大利亚中部标准时间" />
+        shortGenericTimeZoneName="Australian Central Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+8:45"
-        cityName="尤克拉"
+        cityName="Eucla"
         originalTimeZoneName="Australia/Eucla"
-        shortGenericTimeZoneName="澳大利亚中西部标准时间" />
+        shortGenericTimeZoneName="Australian Central Western Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="霍巴特"
+        cityName="Hobart"
         originalTimeZoneName="Australia/Hobart"
-        shortGenericTimeZoneName="澳大利亚东部时间" />
+        shortGenericTimeZoneName="Eastern Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="林德曼"
+        cityName="Lindeman"
         originalTimeZoneName="Australia/Lindeman"
-        shortGenericTimeZoneName="澳大利亚东部标准时间" />
+        shortGenericTimeZoneName="Australian Eastern Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="豪勋爵岛"
+        cityName="Lord Howe"
         originalTimeZoneName="Australia/Lord_Howe"
-        shortGenericTimeZoneName="豪勋爵岛时间" />
+        shortGenericTimeZoneName="Lord Howe Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="墨尔本"
+        cityName="Melbourne"
         originalTimeZoneName="Australia/Melbourne"
-        shortGenericTimeZoneName="澳大利亚东部时间" />
+        shortGenericTimeZoneName="Eastern Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+8:00"
-        cityName="珀斯"
+        cityName="Perth"
         originalTimeZoneName="Australia/Perth"
-        shortGenericTimeZoneName="澳大利亚西部标准时间" />
+        shortGenericTimeZoneName="Australian Western Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="悉尼"
+        cityName="Sydney"
         originalTimeZoneName="Australia/Sydney"
-        shortGenericTimeZoneName="澳大利亚东部时间" />
+        shortGenericTimeZoneName="Eastern Australia Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="阿姆斯特丹"
+        cityName="Amsterdam"
         originalTimeZoneName="Europe/Amsterdam"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="安道尔"
+        cityName="Andorra"
         originalTimeZoneName="Europe/Andorra"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="阿斯特拉罕"
+        cityName="Astrakhan"
         originalTimeZoneName="Europe/Astrakhan"
-        shortGenericTimeZoneName="阿斯特拉罕时间" />
+        shortGenericTimeZoneName="Astrakhan Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="雅典"
+        cityName="Athens"
         originalTimeZoneName="Europe/Athens"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="贝尔格莱德"
+        cityName="Belgrade"
         originalTimeZoneName="Europe/Belgrade"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="柏林"
+        cityName="Berlin"
         originalTimeZoneName="Europe/Berlin"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="伯拉第斯拉瓦"
+        cityName="Bratislava"
         originalTimeZoneName="Europe/Bratislava"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="布鲁塞尔"
+        cityName="Brussels"
         originalTimeZoneName="Europe/Brussels"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="布加勒斯特"
+        cityName="Bucharest"
         originalTimeZoneName="Europe/Bucharest"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="布达佩斯"
+        cityName="Budapest"
         originalTimeZoneName="Europe/Budapest"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="布辛根"
+        cityName="Busingen"
         originalTimeZoneName="Europe/Busingen"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="基希讷乌"
+        cityName="Chisinau"
         originalTimeZoneName="Europe/Chisinau"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="哥本哈根"
+        cityName="Copenhagen"
         originalTimeZoneName="Europe/Copenhagen"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="都柏林"
+        cityName="Dublin"
         originalTimeZoneName="Europe/Dublin"
-        shortGenericTimeZoneName="爱尔兰时间" />
+        shortGenericTimeZoneName="Ireland Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="直布罗陀"
+        cityName="Gibraltar"
         originalTimeZoneName="Europe/Gibraltar"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="根西岛"
+        cityName="Guernsey"
         originalTimeZoneName="Europe/Guernsey"
-        shortGenericTimeZoneName="根西岛时间" />
+        shortGenericTimeZoneName="Guernsey Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="赫尔辛基"
+        cityName="Helsinki"
         originalTimeZoneName="Europe/Helsinki"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="马恩岛"
+        cityName="Isle of Man"
         originalTimeZoneName="Europe/Isle_of_Man"
-        shortGenericTimeZoneName="马恩岛时间" />
+        shortGenericTimeZoneName="Isle of Man Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="伊斯坦布尔"
+        cityName="Istanbul"
         originalTimeZoneName="Europe/Istanbul"
-        shortGenericTimeZoneName="土耳其时间" />
+        shortGenericTimeZoneName="Türkiye Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="泽西岛"
+        cityName="Jersey"
         originalTimeZoneName="Europe/Jersey"
-        shortGenericTimeZoneName="泽西岛时间" />
+        shortGenericTimeZoneName="Jersey Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="加里宁格勒"
+        cityName="Kaliningrad"
         originalTimeZoneName="Europe/Kaliningrad"
-        shortGenericTimeZoneName="东欧标准时间" />
+        shortGenericTimeZoneName="Eastern European Standard Time" />
+    <TimeZoneBean
+        abbreviation="GMT+2:00"
+        cityName="Kiev"
+        originalTimeZoneName="Europe/Kiev"
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="基洛夫"
+        cityName="Kirov"
         originalTimeZoneName="Europe/Kirov"
-        shortGenericTimeZoneName="基洛夫时间" />
+        shortGenericTimeZoneName="Kirov Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="基辅"
+        cityName="Kyiv"
         originalTimeZoneName="Europe/Kyiv"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="里斯本"
+        cityName="Lisbon"
         originalTimeZoneName="Europe/Lisbon"
-        shortGenericTimeZoneName="西欧时间" />
+        shortGenericTimeZoneName="Western European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="卢布尔雅那"
+        cityName="Ljubljana"
         originalTimeZoneName="Europe/Ljubljana"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT"
-        cityName="伦敦"
+        cityName="London"
         originalTimeZoneName="Europe/London"
-        shortGenericTimeZoneName="英国时间" />
+        shortGenericTimeZoneName="United Kingdom Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="卢森堡"
+        cityName="Luxembourg"
         originalTimeZoneName="Europe/Luxembourg"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="马德里"
+        cityName="Madrid"
         originalTimeZoneName="Europe/Madrid"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="马耳他"
+        cityName="Malta"
         originalTimeZoneName="Europe/Malta"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="玛丽港"
+        cityName="Mariehamn"
         originalTimeZoneName="Europe/Mariehamn"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="明斯克"
+        cityName="Minsk"
         originalTimeZoneName="Europe/Minsk"
-        shortGenericTimeZoneName="莫斯科标准时间" />
+        shortGenericTimeZoneName="Moscow Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="摩纳哥"
+        cityName="Monaco"
         originalTimeZoneName="Europe/Monaco"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="莫斯科"
+        cityName="Moscow"
         originalTimeZoneName="Europe/Moscow"
-        shortGenericTimeZoneName="莫斯科标准时间" />
+        shortGenericTimeZoneName="Moscow Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="奥斯陆"
+        cityName="Oslo"
         originalTimeZoneName="Europe/Oslo"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="巴黎"
+        cityName="Paris"
         originalTimeZoneName="Europe/Paris"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="波德戈里察"
+        cityName="Podgorica"
         originalTimeZoneName="Europe/Podgorica"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="布拉格"
+        cityName="Prague"
         originalTimeZoneName="Europe/Prague"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="里加"
+        cityName="Riga"
         originalTimeZoneName="Europe/Riga"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="罗马"
+        cityName="Rome"
         originalTimeZoneName="Europe/Rome"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="萨马拉"
+        cityName="Samara"
         originalTimeZoneName="Europe/Samara"
-        shortGenericTimeZoneName="萨马拉标准时间" />
+        shortGenericTimeZoneName="Samara Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="圣马力诺"
+        cityName="San Marino"
         originalTimeZoneName="Europe/San_Marino"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="萨拉热窝"
+        cityName="Sarajevo"
         originalTimeZoneName="Europe/Sarajevo"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="萨拉托夫"
+        cityName="Saratov"
         originalTimeZoneName="Europe/Saratov"
-        shortGenericTimeZoneName="萨拉托夫时间" />
+        shortGenericTimeZoneName="Saratov Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="辛菲罗波尔"
+        cityName="Simferopol"
         originalTimeZoneName="Europe/Simferopol"
-        shortGenericTimeZoneName="莫斯科标准时间" />
+        shortGenericTimeZoneName="Moscow Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="斯科普里"
+        cityName="Skopje"
         originalTimeZoneName="Europe/Skopje"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="苏菲亚"
+        cityName="Sofia"
         originalTimeZoneName="Europe/Sofia"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="斯德哥尔摩"
+        cityName="Stockholm"
         originalTimeZoneName="Europe/Stockholm"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="塔林"
+        cityName="Tallinn"
         originalTimeZoneName="Europe/Tallinn"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="地拉内"
+        cityName="Tirane"
         originalTimeZoneName="Europe/Tirane"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="乌里扬诺夫斯克"
+        cityName="Ulyanovsk"
         originalTimeZoneName="Europe/Ulyanovsk"
-        shortGenericTimeZoneName="乌里扬诺夫斯克时间" />
+        shortGenericTimeZoneName="Ulyanovsk Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="乌日哥罗德"
+        cityName="Uzhgorod"
         originalTimeZoneName="Europe/Uzhgorod"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="瓦杜兹"
+        cityName="Vaduz"
         originalTimeZoneName="Europe/Vaduz"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="梵蒂冈"
+        cityName="Vatican"
         originalTimeZoneName="Europe/Vatican"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="维也纳"
+        cityName="Vienna"
         originalTimeZoneName="Europe/Vienna"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="维尔纽斯"
+        cityName="Vilnius"
         originalTimeZoneName="Europe/Vilnius"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="伏尔加格勒"
+        cityName="Volgograd"
         originalTimeZoneName="Europe/Volgograd"
-        shortGenericTimeZoneName="伏尔加格勒标准时间" />
+        shortGenericTimeZoneName="Volgograd Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="华沙"
+        cityName="Warsaw"
         originalTimeZoneName="Europe/Warsaw"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="萨格勒布"
+        cityName="Zagreb"
         originalTimeZoneName="Europe/Zagreb"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+2:00"
-        cityName="扎波罗热"
+        cityName="Zaporozhye"
         originalTimeZoneName="Europe/Zaporozhye"
-        shortGenericTimeZoneName="东欧时间" />
+        shortGenericTimeZoneName="Eastern European Time" />
     <TimeZoneBean
         abbreviation="GMT+1:00"
-        cityName="苏黎世"
+        cityName="Zurich"
         originalTimeZoneName="Europe/Zurich"
-        shortGenericTimeZoneName="中欧时间" />
+        shortGenericTimeZoneName="Central European Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="塔那那利佛"
+        cityName="Antananarivo"
         originalTimeZoneName="Indian/Antananarivo"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+6:00"
-        cityName="查戈斯"
+        cityName="Chagos"
         originalTimeZoneName="Indian/Chagos"
-        shortGenericTimeZoneName="印度洋时间" />
+        shortGenericTimeZoneName="Indian Ocean Time" />
     <TimeZoneBean
         abbreviation="GMT+7:00"
-        cityName="圣诞岛"
+        cityName="Christmas"
         originalTimeZoneName="Indian/Christmas"
-        shortGenericTimeZoneName="圣诞岛时间" />
+        shortGenericTimeZoneName="Christmas Island Time" />
     <TimeZoneBean
         abbreviation="GMT+6:30"
-        cityName="科科斯"
+        cityName="Cocos"
         originalTimeZoneName="Indian/Cocos"
-        shortGenericTimeZoneName="科科斯群岛时间" />
+        shortGenericTimeZoneName="Cocos Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="科摩罗"
+        cityName="Comoro"
         originalTimeZoneName="Indian/Comoro"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="凯尔盖朗"
+        cityName="Kerguelen"
         originalTimeZoneName="Indian/Kerguelen"
-        shortGenericTimeZoneName="法属南方和南极领地时间" />
+        shortGenericTimeZoneName="French Southern &amp; Antarctic Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="马埃岛"
+        cityName="Mahe"
         originalTimeZoneName="Indian/Mahe"
-        shortGenericTimeZoneName="塞舌尔时间" />
+        shortGenericTimeZoneName="Seychelles Time" />
     <TimeZoneBean
         abbreviation="GMT+5:00"
-        cityName="马尔代夫"
+        cityName="Maldives"
         originalTimeZoneName="Indian/Maldives"
-        shortGenericTimeZoneName="马尔代夫时间" />
+        shortGenericTimeZoneName="Maldives Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="毛里求斯"
+        cityName="Mauritius"
         originalTimeZoneName="Indian/Mauritius"
-        shortGenericTimeZoneName="毛里求斯标准时间" />
+        shortGenericTimeZoneName="Mauritius Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+3:00"
-        cityName="马约特岛"
+        cityName="Mayotte"
         originalTimeZoneName="Indian/Mayotte"
-        shortGenericTimeZoneName="东部非洲时间" />
+        shortGenericTimeZoneName="East Africa Time" />
     <TimeZoneBean
         abbreviation="GMT+4:00"
-        cityName="留尼汪"
+        cityName="Reunion"
         originalTimeZoneName="Indian/Reunion"
-        shortGenericTimeZoneName="留尼汪时间" />
+        shortGenericTimeZoneName="Réunion Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="阿皮亚"
+        cityName="Apia"
         originalTimeZoneName="Pacific/Apia"
-        shortGenericTimeZoneName="阿皮亚标准时间" />
+        shortGenericTimeZoneName="Apia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="奥克兰"
+        cityName="Auckland"
         originalTimeZoneName="Pacific/Auckland"
-        shortGenericTimeZoneName="新西兰时间" />
+        shortGenericTimeZoneName="New Zealand Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="布干维尔岛"
+        cityName="Bougainville"
         originalTimeZoneName="Pacific/Bougainville"
-        shortGenericTimeZoneName="布干维尔时间" />
+        shortGenericTimeZoneName="Bougainville Time" />
     <TimeZoneBean
         abbreviation="GMT+13:45"
-        cityName="查塔姆"
+        cityName="Chatham"
         originalTimeZoneName="Pacific/Chatham"
-        shortGenericTimeZoneName="查坦时间" />
+        shortGenericTimeZoneName="Chatham Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="楚克"
+        cityName="Chuuk"
         originalTimeZoneName="Pacific/Chuuk"
-        shortGenericTimeZoneName="楚克时间" />
+        shortGenericTimeZoneName="Chuuk Time" />
     <TimeZoneBean
         abbreviation="GMT-5:00"
-        cityName="复活节岛"
+        cityName="Easter"
         originalTimeZoneName="Pacific/Easter"
-        shortGenericTimeZoneName="复活节岛时间" />
+        shortGenericTimeZoneName="Easter Island Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="埃法特"
+        cityName="Efate"
         originalTimeZoneName="Pacific/Efate"
-        shortGenericTimeZoneName="瓦努阿图标准时间" />
+        shortGenericTimeZoneName="Vanuatu Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="恩德伯里"
+        cityName="Enderbury"
         originalTimeZoneName="Pacific/Enderbury"
-        shortGenericTimeZoneName="菲尼克斯群岛时间" />
+        shortGenericTimeZoneName="Phoenix Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="法考福"
+        cityName="Fakaofo"
         originalTimeZoneName="Pacific/Fakaofo"
-        shortGenericTimeZoneName="托克劳时间" />
+        shortGenericTimeZoneName="Tokelau Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="斐济"
+        cityName="Fiji"
         originalTimeZoneName="Pacific/Fiji"
-        shortGenericTimeZoneName="斐济标准时间" />
+        shortGenericTimeZoneName="Fiji Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="富那富提"
+        cityName="Funafuti"
         originalTimeZoneName="Pacific/Funafuti"
-        shortGenericTimeZoneName="图瓦卢时间" />
+        shortGenericTimeZoneName="Tuvalu Time" />
     <TimeZoneBean
         abbreviation="GMT-6:00"
-        cityName="加拉帕戈斯群岛"
+        cityName="Galapagos"
         originalTimeZoneName="Pacific/Galapagos"
-        shortGenericTimeZoneName="加拉帕戈斯时间" />
+        shortGenericTimeZoneName="Galapagos Time" />
     <TimeZoneBean
         abbreviation="GMT-9:00"
-        cityName="甘比尔"
+        cityName="Gambier"
         originalTimeZoneName="Pacific/Gambier"
-        shortGenericTimeZoneName="甘比尔时间" />
+        shortGenericTimeZoneName="Gambier Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="瓜达康纳尔岛"
+        cityName="Guadalcanal"
         originalTimeZoneName="Pacific/Guadalcanal"
-        shortGenericTimeZoneName="所罗门群岛时间" />
+        shortGenericTimeZoneName="Solomon Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="关岛"
+        cityName="Guam"
         originalTimeZoneName="Pacific/Guam"
-        shortGenericTimeZoneName="查莫罗时间" />
+        shortGenericTimeZoneName="Chamorro Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-10:00"
-        cityName="檀香山"
+        cityName="Honolulu"
         originalTimeZoneName="Pacific/Honolulu"
-        shortGenericTimeZoneName="夏威夷-阿留申标准时间" />
+        shortGenericTimeZoneName="Hawaii-Aleutian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-10:00"
-        cityName="约翰斯顿"
+        cityName="Johnston"
         originalTimeZoneName="Pacific/Johnston"
-        shortGenericTimeZoneName="夏威夷-阿留申标准时间" />
+        shortGenericTimeZoneName="Hawaii-Aleutian Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="坎顿"
+        cityName="Kanton"
         originalTimeZoneName="Pacific/Kanton"
-        shortGenericTimeZoneName="菲尼克斯群岛时间" />
+        shortGenericTimeZoneName="Phoenix Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+14:00"
-        cityName="基里地马地"
+        cityName="Kiritimati"
         originalTimeZoneName="Pacific/Kiritimati"
-        shortGenericTimeZoneName="莱恩群岛时间" />
+        shortGenericTimeZoneName="Line Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="科斯雷"
+        cityName="Kosrae"
         originalTimeZoneName="Pacific/Kosrae"
-        shortGenericTimeZoneName="科斯雷时间" />
+        shortGenericTimeZoneName="Kosrae Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="夸贾林环礁"
+        cityName="Kwajalein"
         originalTimeZoneName="Pacific/Kwajalein"
-        shortGenericTimeZoneName="马绍尔群岛时间" />
+        shortGenericTimeZoneName="Marshall Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="马朱罗"
+        cityName="Majuro"
         originalTimeZoneName="Pacific/Majuro"
-        shortGenericTimeZoneName="马绍尔群岛时间" />
+        shortGenericTimeZoneName="Marshall Islands Time" />
     <TimeZoneBean
         abbreviation="GMT-9:30"
-        cityName="马克萨斯"
+        cityName="Marquesas"
         originalTimeZoneName="Pacific/Marquesas"
-        shortGenericTimeZoneName="马克萨斯群岛时间" />
+        shortGenericTimeZoneName="Marquesas Time" />
     <TimeZoneBean
         abbreviation="GMT-11:00"
-        cityName="中途岛"
+        cityName="Midway"
         originalTimeZoneName="Pacific/Midway"
-        shortGenericTimeZoneName="萨摩亚标准时间" />
+        shortGenericTimeZoneName="Samoa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="瑙鲁"
+        cityName="Nauru"
         originalTimeZoneName="Pacific/Nauru"
-        shortGenericTimeZoneName="瑙鲁时间" />
+        shortGenericTimeZoneName="Nauru Time" />
     <TimeZoneBean
         abbreviation="GMT-11:00"
-        cityName="纽埃"
+        cityName="Niue"
         originalTimeZoneName="Pacific/Niue"
-        shortGenericTimeZoneName="纽埃时间" />
+        shortGenericTimeZoneName="Niue Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="诺福克"
+        cityName="Norfolk"
         originalTimeZoneName="Pacific/Norfolk"
-        shortGenericTimeZoneName="诺福克岛时间" />
+        shortGenericTimeZoneName="Norfolk Island Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="努美阿"
+        cityName="Noumea"
         originalTimeZoneName="Pacific/Noumea"
-        shortGenericTimeZoneName="新喀里多尼亚标准时间" />
+        shortGenericTimeZoneName="New Caledonia Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-11:00"
-        cityName="帕果-帕果"
+        cityName="Pago Pago"
         originalTimeZoneName="Pacific/Pago_Pago"
-        shortGenericTimeZoneName="萨摩亚标准时间" />
+        shortGenericTimeZoneName="Samoa Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+9:00"
-        cityName="帕劳群岛"
+        cityName="Palau"
         originalTimeZoneName="Pacific/Palau"
-        shortGenericTimeZoneName="帕劳时间" />
+        shortGenericTimeZoneName="Palau Time" />
     <TimeZoneBean
         abbreviation="GMT-8:00"
-        cityName="皮特凯恩"
+        cityName="Pitcairn"
         originalTimeZoneName="Pacific/Pitcairn"
-        shortGenericTimeZoneName="皮特凯恩时间" />
+        shortGenericTimeZoneName="Pitcairn Time" />
     <TimeZoneBean
         abbreviation="GMT+11:00"
-        cityName="波纳佩"
+        cityName="Pohnpei"
+        originalTimeZoneName="Pacific/Pohnpei"
+        shortGenericTimeZoneName="Ponape Time" />
+    <TimeZoneBean
+        abbreviation="GMT+11:00"
+        cityName="Ponape"
         originalTimeZoneName="Pacific/Ponape"
-        shortGenericTimeZoneName="波纳佩时间" />
+        shortGenericTimeZoneName="Ponape Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="莫尔兹比港"
+        cityName="Port Moresby"
         originalTimeZoneName="Pacific/Port_Moresby"
-        shortGenericTimeZoneName="巴布亚新几内亚时间" />
+        shortGenericTimeZoneName="Papua New Guinea Time" />
     <TimeZoneBean
         abbreviation="GMT-10:00"
-        cityName="拉罗汤加"
+        cityName="Rarotonga"
         originalTimeZoneName="Pacific/Rarotonga"
-        shortGenericTimeZoneName="库克群岛标准时间" />
+        shortGenericTimeZoneName="Cook Islands Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="塞班岛"
+        cityName="Saipan"
         originalTimeZoneName="Pacific/Saipan"
-        shortGenericTimeZoneName="查莫罗时间" />
+        shortGenericTimeZoneName="Chamorro Standard Time" />
     <TimeZoneBean
         abbreviation="GMT-10:00"
-        cityName="塔希提岛"
+        cityName="Tahiti"
         originalTimeZoneName="Pacific/Tahiti"
-        shortGenericTimeZoneName="塔希提岛时间" />
+        shortGenericTimeZoneName="Tahiti Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="塔拉瓦"
+        cityName="Tarawa"
         originalTimeZoneName="Pacific/Tarawa"
-        shortGenericTimeZoneName="吉尔伯特群岛时间" />
+        shortGenericTimeZoneName="Gilbert Islands Time" />
     <TimeZoneBean
         abbreviation="GMT+13:00"
-        cityName="汤加塔布"
+        cityName="Tongatapu"
         originalTimeZoneName="Pacific/Tongatapu"
-        shortGenericTimeZoneName="汤加标准时间" />
+        shortGenericTimeZoneName="Tonga Standard Time" />
     <TimeZoneBean
         abbreviation="GMT+10:00"
-        cityName="特鲁克岛"
+        cityName="Truk"
         originalTimeZoneName="Pacific/Truk"
-        shortGenericTimeZoneName="楚克时间" />
+        shortGenericTimeZoneName="Chuuk Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="威克岛"
+        cityName="Wake"
         originalTimeZoneName="Pacific/Wake"
-        shortGenericTimeZoneName="威克岛时间" />
+        shortGenericTimeZoneName="Wake Island Time" />
     <TimeZoneBean
         abbreviation="GMT+12:00"
-        cityName="瓦利斯"
+        cityName="Wallis"
         originalTimeZoneName="Pacific/Wallis"
-        shortGenericTimeZoneName="瓦利斯和富图纳时间" />
+        shortGenericTimeZoneName="Wallis &amp; Futuna Time" />
 </TimeZoneArray>

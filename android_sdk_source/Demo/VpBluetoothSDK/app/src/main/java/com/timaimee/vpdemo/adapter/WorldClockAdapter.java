@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * Description 世界时钟适配
+ * Description Relógio mundial
  *
  * @author KYM.
  * @date 2024/4/10 16:25

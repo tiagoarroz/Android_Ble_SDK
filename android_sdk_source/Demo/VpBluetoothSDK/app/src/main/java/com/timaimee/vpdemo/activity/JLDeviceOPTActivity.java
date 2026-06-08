@@ -114,8 +114,8 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
         btnSwitchServerDial.setOnClickListener(this);
         btnOTA.setOnClickListener(this);
 
-        tvOpenInfo.setText(VPOperateManager.getInstance().isJLNotifyOpened() ? "通知已打开" : "通知未打开");
-        tvAuthInfo.setText(RcspAuthManager.getInstance().isAuthPass() ? "设备认证已通过" : "设备认证未通过");
+        tvOpenInfo.setText(VPOperateManager.getInstance().isJLNotifyOpened() ? "Ativar" : "Ativar");
+        tvAuthInfo.setText(RcspAuthManager.getInstance().isAuthPass() ? "dispositivo" : "dispositivo");
 
         File dir = new File("/storage/emulated/0/Android/data/com.timaimee.vpdemo/files/imageMsgPush/");
         if(!dir.exists()) {
@@ -127,7 +127,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onClick(View v) {
                 if (mUIDataCustom == null) {
-                    showMsg("手表尺寸无法获取");
+                    showMsg("");
                     return;
                 }
                 String widthStr = etWidth.getText().toString();
@@ -165,7 +165,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
         UiUpdateUtil.getInstance().getCustomWatchUiInfo(new IUIBaseInfoFormCustomListener() {
             @Override
             public void onBaseUiInfoFormCustom(UIDataCustom uiDataCustom) {
-                Logger.t(TAG).i("2.自定义表盘的基本信息 uiDataCustom:" + uiDataCustom.toString());
+                Logger.t(TAG).i("2.Informação base uiDataCustom:" + uiDataCustom.toString());
                 mUIDataCustom = uiDataCustom;
                 WatchUIType watchUIType = WatchUIType.getInstance(mUIDataCustom.getCustomUIType());
                 etWidth.setText(watchUIType.getBigBitmapWidth() + "");
@@ -181,7 +181,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void selectAndCropPicture(int aspectRatioX, int aspectRatioY, boolean isCircle) {
-        Logger.t(TAG).i("selectAndCropPicture 选择和裁剪照片 aspectRatioX = " + aspectRatioX + " , aspectRatioY = " + aspectRatioY);
+        Logger.t(TAG).i("selectAndCropPicture  aspectRatioX = " + aspectRatioX + " , aspectRatioY = " + aspectRatioY);
         ImageVideoSelectorManager
                 .getInstance()
                 .width(aspectRatioX)
@@ -247,18 +247,18 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void switch2PhotoDial() {
-        showMsg("切换到照片表盘");
+        showMsg("");
         JLWatchFaceManager.switch2PicDial();
     }
 
     private void switch2ServerDial() {
-        showMsg("切换到市场表盘");
+        showMsg("");
         JLWatchFaceManager.switch2ServerDial();
     }
 
     private void openJLNotify() {
         if (VPOperateManager.getInstance().isJLNotifyOpened()) {
-            ToastUtil.show("通知已打开");
+            ToastUtil.show("Ativar");
             return;
         }
         VPOperateManager.getInstance().openJLDataNotify(new BleNotifyResponse() {
@@ -269,7 +269,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onResponse(int code) {
-                tvOpenInfo.setText("已开启通知");
+                tvOpenInfo.setText("Ativar");
                 VPOperateManager.getInstance().changeMTU(247, new IMtuChangeListener() {
                     @Override
                     public void onChangeMtuLength(int cmdLength) {
@@ -282,11 +282,11 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * 开始设备认证
+     * Iniciardispositivo
      */
     private void startDeviceAuth() {
         if (RcspAuthManager.getInstance().isAuthPass()) {
-            ToastUtil.show("设备认证已通过");
+            ToastUtil.show("dispositivo");
             return;
         }
 
@@ -297,7 +297,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
                     @Override
                     public void run() {
                         loadingDialog.showNoTips();
-                        tvAuthInfo.setText("开始设备认证");
+                        tvAuthInfo.setText("Iniciardispositivo");
                     }
                 });
             }
@@ -308,7 +308,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
                     @Override
                     public void run() {
                         loadingDialog.disMissDialog();
-                        tvAuthInfo.setText("设备认证已通过");
+                        tvAuthInfo.setText("dispositivo");
                     }
                 });
             }
@@ -319,7 +319,7 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
                     @Override
                     public void run() {
                         loadingDialog.disMissDialog();
-                        tvAuthInfo.setText("设备认证未通过");
+                        tvAuthInfo.setText("dispositivo");
                     }
                 });
             }
@@ -327,76 +327,76 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * 更新杰理文件系统
+     * Atualizar
      */
     private void getJLFileSystem() {
-        //杰理文件系统
+        //
         VPOperateManager.getInstance().listJLWatchList(new JLWatchFaceManager.OnWatchDialInfoGetListener() {
             @Override
             public void onGettingWatchDialInfo() {
-                //获取表盘信息中... 此时请勿做其他蓝牙操作
-                ToastUtil.show("正在获取中...请勿重复调用");
+                //... 
+                ToastUtil.show("...");
                 loadingDialog.showNoTips();
             }
 
             @Override
             public void onWatchDialInfoGetStart() {
-                //开始获取手表表盘信息
-                ToastUtil.show("获取文件系统列表-开始");
-                tvFileSystemInfo.setText("获取文件系统列表-开始");
+                //Iniciar
+                ToastUtil.show("-Iniciar");
+                tvFileSystemInfo.setText("-Iniciar");
                 loadingDialog.showNoTips();
             }
 
             @Override
             public void onWatchDialInfoGetComplete() {
-                //获取表盘信息流程完成
-                Logger.t(TAG).e("系统表盘--->Complete");
-                ToastUtil.show("获取文件系统列表-完成");
+                //
+                Logger.t(TAG).e("--->Complete");
+                ToastUtil.show("-");
                 loadingDialog.disMissDialog();
             }
 
             @Override
             public void onWatchDialInfoGetSuccess(List<FatFile> systemFatFiles, List<FatFile> serverFatFiles, FatFile picFatFile) {
-                //获取杰理平台的表盘信息成功
-                StringBuilder sb = new StringBuilder("杰理表盘系统更新=============================Start");
-                sb.append("\t\t\t\n").append("[照片表盘] picFatFile = ").append(picFatFile == null ? "NULL" : picFatFile.getPath());
+                //
+                StringBuilder sb = new StringBuilder("Atualizar=============================Start");
+                sb.append("\t\t\t\n").append("[] picFatFile = ").append(picFatFile == null ? "NULL" : picFatFile.getPath());
                 for (FatFile serverFatFile : serverFatFiles) {
-                    sb.append("\t\t\t\n").append("[服务器表盘] serverFatFile = ").append(serverFatFile == null ? "NULL" : serverFatFile.getPath());
+                    sb.append("\t\t\t\n").append("[] serverFatFile = ").append(serverFatFile == null ? "NULL" : serverFatFile.getPath());
                 }
                 for (FatFile systemFatFile : systemFatFiles) {
-                    sb.append("\t\t\t\n").append("[系统表盘] systemFatFile = ")
+                    sb.append("\t\t\t\n").append("[] systemFatFile = ")
                             .append(systemFatFile == null ? "NULL" : systemFatFile.getPath());
                 }
-                sb.append("\t\t\t\n").append("[当前的服务器表盘] serverFatFile = ")
-                        .append(serverFatFiles.isEmpty() ? "【还未设置】" : serverFatFiles.get(0).getPath())
+                sb.append("\t\t\t\n").append("[] serverFatFile = ")
+                        .append(serverFatFiles.isEmpty() ? "Configurar" : serverFatFiles.get(0).getPath())
                         .append("\n")
-                        .append("杰理表盘系统更新=============================End");
+                        .append("Atualizar=============================End");
                 Log.e(TAG, sb.toString());
                 tvFileSystemInfo.setText(sb.toString());
                 for (FatFile systemFatFile : systemFatFiles) {
-                    Logger.t(TAG).e("系统表盘--->" + systemFatFile.toString());
+                    Logger.t(TAG).e("--->" + systemFatFile.toString());
 
                 }
                 for (FatFile serverFatFile : serverFatFiles) {
-                    Logger.t(TAG).e("服务器表盘--->" + serverFatFile.toString());
+                    Logger.t(TAG).e("--->" + serverFatFile.toString());
                 }
-                Logger.t(TAG).e("照片表盘--->" + picFatFile.toString());
+                Logger.t(TAG).e("--->" + picFatFile.toString());
                 loadingDialog.disMissDialog();
             }
 
             @Override
             public void onWatchDialInfoGetFailed(BaseError error) {
-                //获取表盘信息失败
-                Logger.t(TAG).e("系统表盘--->Error:" + error.toString());
-                ToastUtil.show("获取文件系统列表-失败");
-                tvFileSystemInfo.setText("获取文件系统列表-失败:\n" + error.toString());
+                //
+                Logger.t(TAG).e("--->Error:" + error.toString());
+                ToastUtil.show("-");
+                tvFileSystemInfo.setText("-:\n" + error.toString());
                 loadingDialog.disMissDialog();
             }
         });
     }
 
     /**
-     * 设置照片表盘
+     * Configurar
      */
     private void setPhotoDial() {
 //        String dialPhotoPath = "/storage/emulated/0/Android/data/com.timaimee.vpdemo/files/hband/jlDail/img_wathch_face1.png";
@@ -405,13 +405,13 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
 //        }
 
         if (TextUtils.isEmpty(pushImagePath)) {
-            showMsg("请选择照片");
+            showMsg("");
             return;
         }
 
         File dialFile = new File(pushImagePath);
         if (!dialFile.exists() || !dialFile.isFile() || dialFile.length() <=100) {
-            showMsg("照片表盘不存在");
+            showMsg("");
             return;
         }
 
@@ -425,22 +425,22 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onJLTransferPicDialStart() {
-                tvDialInfo.setText("开始传输照片表盘");
-                Logger.t(TAG).e("【杰理表盘传输】onJLTransferPicDialStart--->" + Thread.currentThread().toString());
+                tvDialInfo.setText("Iniciar");
+                Logger.t(TAG).e("onJLTransferPicDialStart--->" + Thread.currentThread().toString());
             }
 
             @Override
             public void onTransferPicDialProgress(int progress) {
-                Logger.t(TAG).e("【杰理表盘传输】--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
+                Logger.t(TAG).e("--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
                 pbPhotoDial.setProgress(progress);
                 tvDialProgress.setText(progress + " %");
-                tvDialInfo.setText("表盘文件传输中");
+                tvDialInfo.setText("");
             }
 
             @Override
             public void onScaleBGPFileTransferComplete() {
-                Logger.t(TAG).e("【杰理表盘传输】--->缩略图传输完成" + " : Thread = " + Thread.currentThread().toString());
-                tvDialInfo.setText("表盘缩略图传输完成");
+                Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
+                tvDialInfo.setText("");
             }
 
             @Override
@@ -450,26 +450,26 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onBigBGPFileTransferComplete() {
-                Logger.t(TAG).e("【杰理表盘传输】--->大图传输完成" + " : Thread = " + Thread.currentThread().toString());
-                tvDialInfo.setText("表盘大图传输完成");
+                Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
+                tvDialInfo.setText("");
             }
 
             @Override
             public void onTransferComplete() {
-                Logger.t(TAG).e("【杰理表盘传输】--->表盘传输完成" + " : Thread = " + Thread.currentThread().toString());
-                tvDialInfo.setText("照片表盘传输成功");
+                Logger.t(TAG).e("--->" + " : Thread = " + Thread.currentThread().toString());
+                tvDialInfo.setText("");
             }
 
             @Override
             public void onTransferError(int code, String errorMsg) {
-                Logger.t(TAG).e("【杰理表盘传输】--->表盘传输失败 code = " + code + ", errorMsg = " + errorMsg + " : Thread = " + Thread.currentThread().toString());
-                tvDialInfo.setText("照片表盘传输失败，code = " + code + " , errorMsg = " + errorMsg);
+                Logger.t(TAG).e("---> code = " + code + ", errorMsg = " + errorMsg + " : Thread = " + Thread.currentThread().toString());
+                tvDialInfo.setText("，code = " + code + " , errorMsg = " + errorMsg);
             }
         });
     }
 
     /**
-     * 设置照片表盘
+     * Configurar
      */
     private void setServerDial() {
         String localServerDialPath = "/storage/emulated/0/Android/data/com.timaimee.vpdemo/files/hband/jlDail/watch040";
@@ -481,28 +481,28 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
         VPOperateManager.getInstance().setJLWatchDial(localServerDialPath, new JLWatchHolder.OnSetJLWatchDialListener() {
             @Override
             public void onStart() {
-                Logger.t(TAG).e("【杰理表盘传输】onStart--->" + Thread.currentThread().toString());
-                tvServerDialInfo.setText("开始传输市场表盘");
+                Logger.t(TAG).e("onStart--->" + Thread.currentThread().toString());
+                tvServerDialInfo.setText("Iniciar");
             }
 
             @Override
             public void onProgress(int progress) {
-                Logger.t(TAG).e("【杰理表盘传输】--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
+                Logger.t(TAG).e("--->progress = " + progress + " : Thread = " + Thread.currentThread().toString());
                 pbServerDial.setProgress(progress);
                 tvServerDialProgress.setText(progress + " %");
-                tvServerDialInfo.setText("表盘文件传输中");
+                tvServerDialInfo.setText("");
             }
 
             @Override
             public void onComplete(String watchPath) {
                 pbServerDial.setProgress(100);
                 tvServerDialProgress.setText("100%");
-                tvServerDialInfo.setText("设置成功:" + watchPath);
+                tvServerDialInfo.setText("Configurar:" + watchPath);
             }
 
             @Override
             public void onFiled(int code, String errorMsg) {
-                tvServerDialInfo.setText("市场表盘传输失败，code = " + code + " , msg = " + errorMsg);
+                tvServerDialInfo.setText("，code = " + code + " , msg = " + errorMsg);
             }
         });
     }
@@ -516,44 +516,44 @@ public class JLDeviceOPTActivity extends AppCompatActivity implements View.OnCli
         VPOperateManager.getInstance().startJLDeviceOTAUpgrade(firmwareFilePath, new JLOTAHolder.OnJLDeviceOTAListener() {
             @Override
             public void onOTAStart() {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【开始】");
-                tvOTAInfo.setText("开始升级");
+                Logger.t(TAG).e("OTA--->OTAIniciar");
+                tvOTAInfo.setText("Iniciar atualização");
             }
 
             @Override
             public void onProgress(float progress) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级中:" + progress + "%");
+                Logger.t(TAG).e("OTA--->OTA:" + progress + "%");
                 tvOTAProgress.setText(String.format(Locale.CHINA, "%.2f", progress) + "%");
                 pbOTAProgress.setProgress((int) (progress * 100));
             }
 
             @Override
             public void onNeedReconnect(String address, String dfuLangAddress, boolean isReconnectBySdk) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级dfuLang重连中: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , 是否由SDK重连 = " + isReconnectBySdk);
-                tvOTAInfo.setText("数据传输结束，开始搜索DFULang设备->设备内部升级");
+                Logger.t(TAG).e("OTA--->OTAdfuLang: address = " + address + " , dfuLangAddress = " + dfuLangAddress + " , SDK = " + isReconnectBySdk);
+                tvOTAInfo.setText("dadosTerminar，IniciarDFULangdispositivo->dispositivo");
             }
 
             @Override
             public void onDFULangConnectSuccess(String dfuLangAddress) {
-                tvOTAInfo.setText("DFULang设备连接成功->设备内部升级");
+                tvOTAInfo.setText("DFULangdispositivo->dispositivo");
             }
 
             @Override
             public void onDFULangConnectFailed(String dfuLangAddress) {
-                tvOTAInfo.setText("【错误】DFULang设备连接失败，请手动连接DFULang设备重新升级");
+                tvOTAInfo.setText("DFULangdispositivo，DFULangdispositivo");
             }
 
             @Override
             public void onOTASuccess() {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【成功】");
-                tvOTAInfo.setText("OTA升级成功");
+                Logger.t(TAG).e("OTA--->OTA");
+                tvOTAInfo.setText("OTA");
                 tvOTAProgress.setText("100%");
             }
 
             @Override
             public void onOTAFailed(com.jieli.jl_bt_ota.model.base.BaseError error) {
-                Logger.t(TAG).e("【杰理OTA】--->OTA升级【失败】:" + error.toString());
-                tvOTAInfo.setText("升级失败，error: code = " + error.getSubCode() + " , msg = " + error.getMessage());
+                Logger.t(TAG).e("OTA--->OTA:" + error.toString());
+                tvOTAInfo.setText("Falha na atualização，error: code = " + error.getSubCode() + " , msg = " + error.getMessage());
             }
         });
     }

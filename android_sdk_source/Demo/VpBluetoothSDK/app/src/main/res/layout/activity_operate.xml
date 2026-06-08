@@ -13,7 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="DEMO测试"
+            android:text="Teste DEMO"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </RelativeLayout>
@@ -26,7 +26,7 @@
     android:textColor="@color/colorAccent"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
-    android:text="请执行密码验证操作以及同步个人信息操作"
+    android:text="Execute primeiro a validação da palavra-passe e a sincronização de dados pessoais"
     />
     <GridView
         android:id="@+id/main_gridview"

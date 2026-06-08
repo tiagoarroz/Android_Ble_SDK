@@ -95,15 +95,15 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
     }
 
     private void initDeviceStateView() {
-        String sb = "设备地址：" + oadSetting.getDeviceAddress() +
+        String sb = "dispositivo：" + oadSetting.getDeviceAddress() +
                 "\n" +
-                "设备编号：" + oadSetting.getDeviceNumber() +
+                "dispositivoNúmero:" + oadSetting.getDeviceNumber() +
                 "\n" +
-                "正式版本号：" + oadSetting.getDeviceVersion() +
+                "：" + oadSetting.getDeviceVersion() +
                 "\n" +
-                "测试版本号：" + oadSetting.getDeviceTestVersion() +
+                "：" + oadSetting.getDeviceTestVersion() +
                 "\n" +
-                "是否DFU模式：" + oadSetting.isOadModel();
+                "DFU：" + oadSetting.isOadModel();
         deviceStateTv.setText(sb);
 
     }
@@ -111,17 +111,17 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
     @Override
     public void onClick(View v) {
         if (isCanEnterOadModel) {
-            //文件以及版本确定无误
+            //Confirmar
             if (isFindOadDevice) {
-                //如果当前是dfulang模式,直接进行升级
+                //dfulang,
                 ECpuType cpuType = VPOperateManager.getMangerInstance(mContext).getCpuType();
                 selectOad(cpuType);
             } else {
-                //如果当前是正常模式,需要进入固件升级模式
+                //,Atualização de firmware
                 findOadModelDevice();
             }
         } else {
-            //文件以及版本还没有确定
+            //Confirmar
             checkVersionAndFile();
         }
     }
@@ -131,13 +131,13 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
 //        oadSetting.setDeviceVersion("00.23.00");
 //        oadSetting.setDeviceTestVersion("00.23.00.00");
 //        oadSetting.setHostUrl("http://www.baidu.com");
-        Logger.t(TAG).i("升级前：版本验证->文件验证->查找目标设备");
+        Logger.t(TAG).i("：->->dispositivo");
         oadSetting.setDebug(true);
-        oadSetting.setAutoDownload(false);//不自动下载，如果设置为false则会回调onRemoteOadFileGet方法获取远程ota文件信息
+        oadSetting.setAutoDownload(false);//，ConfigurarfalseonRemoteOadFileGetota
         VPOperateManager.getInstance().checkVersionAndFile(oadSetting, new OnUpdateCheckListener() {
             @Override
             public void onNetVersionInfo(int deviceNumber, String deviceVersion, String des) {
-                Logger.t(TAG).i("服务器版本信息,设备号=" + deviceNumber + ",最新版本=" + deviceVersion + ",升级描述=" + des);
+                Logger.t(TAG).i(",dispositivo=" + deviceNumber + ",=" + deviceVersion + ",=" + des);
             }
 
             @Override
@@ -154,7 +154,7 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
                         progressBar.setVisibility(View.VISIBLE);
                         int percent = (int) (progress * 100);
                         progressBar.setProgress(percent);
-                        textPercentTv.setText("下载进度：" + percent + "%");
+                        textPercentTv.setText("：" + percent + "%");
                     }
                 });
             }
@@ -163,29 +163,29 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
             public void onCheckFail(int endState) {
                 switch (endState) {
                     case OadErrorState.UNCONNECT_NETWORK:
-                        Logger.t(TAG).i("网络出错");
+                        Logger.t(TAG).i("");
                         break;
                     case OadErrorState.UNCONNECT_SERVER:
-                        Logger.t(TAG).i("服务器连接不上");
+                        Logger.t(TAG).i("");
                         break;
                     case OadErrorState.SERVER_NOT_HAVE_NEW:
-                        Logger.t(TAG).i("服务器无此版本");
+                        Logger.t(TAG).i("");
                         break;
                     case OadErrorState.DEVICE_IS_NEW:
-                        Logger.t(TAG).i("设备是最新版本");
+                        Logger.t(TAG).i("dispositivo");
                         break;
                     case OadErrorState.OAD_FILE_UNEXITS:
-                        Logger.t(TAG).i("文件不存在");
+                        Logger.t(TAG).i("");
                         break;
                     case OadErrorState.OAD_FILE_MD5_UNSAME:
-                        Logger.t(TAG).i("文件md5不一致");
+                        Logger.t(TAG).i("md5");
                         break;
                 }
             }
 
             @Override
             public void onCheckSuccess(String oadFileName) {
-                Logger.t(TAG).i("版本确认无误，文件确认无误 oadFileName = " + oadFileName);
+                Logger.t(TAG).i("， oadFileName = " + oadFileName);
                 mOadFileName = oadFileName;
                 if (!TextUtils.isEmpty(mOadFileName)) {
                     isCanEnterOadModel = true;
@@ -194,7 +194,7 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
 
             @Override
             public void findOadDevice(String oadAddress, final ECpuType eCpuType) {
-                Logger.t(TAG).i("找到OAD模式下的设备了:" + eCpuType);
+                Logger.t(TAG).i("OADdispositivo:" + eCpuType);
                 mOadAddress = oadAddress;
                 if (!TextUtils.isEmpty(mOadAddress)) {
                     isFindOadDevice = true;
@@ -214,7 +214,7 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
 
             @Override
             public void unKnowCpu() {
-                Logger.t(TAG).i("不知道设备的CPU是什么类型");
+                Logger.t(TAG).i("dispositivoCPU");
             }
         });
     }
@@ -284,7 +284,7 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
     }
 
     private void startOadNoric() {
-        Logger.t(TAG).i("执行升级程序，最多尝试5次");
+        Logger.t(TAG).i("，5");
         showProgressBar();
         Boolean isBinder = false;
         final DfuServiceInitiator dfuServiceInitiator = new DfuServiceInitiator(mOadAddress)
@@ -436,8 +436,8 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
     private void oadSuccess() {
         isFindOadDevice = false;
         disMissProgressBar();
-        Toast.makeText(mContext, "升级成功", Toast.LENGTH_SHORT).show();
-        Logger.t(TAG).e("升级成功");
+        Toast.makeText(mContext, "", Toast.LENGTH_SHORT).show();
+        Logger.t(TAG).e("");
         this.finish();
     }
 
@@ -452,7 +452,7 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
         }
 
         if (failCount < MAX_ALLOW_FAIL_COUNT) {
-            Logger.t(TAG).e("再试一次=" + failCount);
+            Logger.t(TAG).e("=" + failCount);
             showProgressBar();
             startOadNoric();
         } else {
@@ -463,9 +463,9 @@ public class OadActivity extends Activity implements View.OnClickListener, DfuPr
 
     private void showOadFailDialog() {
         isFindOadDevice = false;
-        String mStringContent = "升级失败，设备名字会变成DfuLang";
-        String mStringTitle = "提示";
-        String mStringOk = "知道了";
+        String mStringContent = "Falha na atualização，dispositivoDfuLang";
+        String mStringTitle = "";
+        String mStringOk = "";
         AlertDialog oadFailDialog = new AlertDialog.Builder(mContext).setTitle(mStringTitle)
                 .setIconAttribute(android.R.attr.alertDialogIcon).setCancelable(false)
                 .setMessage(mStringContent)

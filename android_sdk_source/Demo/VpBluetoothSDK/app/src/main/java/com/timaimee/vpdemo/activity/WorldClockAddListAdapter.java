@@ -15,7 +15,7 @@ import com.timaimee.vpdemo.bean.TimeZoneBean;
 import java.util.List;
 
 /**
- * Description 世界时钟适配
+ * Description Relógio mundial
  *
  * @author KYM.
  * @date 2024/4/10 16:25

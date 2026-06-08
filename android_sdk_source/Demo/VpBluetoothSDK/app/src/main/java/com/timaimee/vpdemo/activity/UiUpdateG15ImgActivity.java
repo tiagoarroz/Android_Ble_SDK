@@ -24,7 +24,7 @@ import java.util.Arrays;
 /**
  * Author: YWX
  * Date: 2021/9/18 10:19
- * Description: G15 图片传输
+ * Description: G15 
  */
 public class UiUpdateG15ImgActivity extends Activity implements View.OnClickListener {
 
@@ -64,8 +64,8 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 方便测试我们都是用纯色的图片
-     * 建议使用者定义的图片为黑色背景叠加白色二维码的图片
+     * 
+     * 
      * @param color
      * @return
      */
@@ -83,10 +83,10 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
         mUiUpdateUtil.getG15ImgAppDownloadQRCode(new IUIBaseInfoFormG15ImgListener() {
             @Override
             public void onBaseUiInfoFormG15Img(UIDataG15Img uiDataG15Img) {
-                Logger.t(TAG).i("获取G15手表App下载二维码图片UI设置信息:" + uiDataG15Img.toString());
+                Logger.t(TAG).i("G15AppUIConfigurar:" + uiDataG15Img.toString());
                 mUIDataAppDownloadQRCode = uiDataG15Img;
                 /*
-                 * 建议使用者定义的图片为黑色背景叠加白色二维码的图片。
+                 * 
                  */
                 startTransmission(EUIFromType.G15_IMG_QR_CODE_APP_DOWNLOAD, createBitmap(Color.parseColor("#8F205F")));
             }
@@ -94,10 +94,10 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 设置用户信息图片
+     * Configurar
      */
     private void setG15ImgProfile() {
-        //先读取手表关于用户信息图片设置的信息，读取成功后调用startTransmission设置图片
+        //LerConfigurar，LerstartTransmissionConfigurar
         readProfileInfo();
     }
 
@@ -105,7 +105,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
         mUiUpdateUtil.getG15ImgProfileInfo(new IUIBaseInfoFormG15ImgListener() {
             @Override
             public void onBaseUiInfoFormG15Img(UIDataG15Img uiDataG15Img) {
-                Logger.t(TAG).i("获取G15手表个人信息图片UI设置信息:" + uiDataG15Img.toString());
+                Logger.t(TAG).i("G15UIConfigurar:" + uiDataG15Img.toString());
                 mUIDataProfile = uiDataG15Img;
                 startTransmission(EUIFromType.G15_IMG_PROFILE, createBitmap(Color.parseColor("#F830A0")));
             }
@@ -113,7 +113,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 赛米加G15定制项目图片主题1
+     * Projeto G15: tema de imagem 1
      */
     private void setG15ImgTheme1() {
         readTheme1Info();
@@ -123,7 +123,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
         mUiUpdateUtil.getG15ImgTheme1Info(new IUIBaseInfoFormG15ImgListener() {
             @Override
             public void onBaseUiInfoFormG15Img(UIDataG15Img uiDataG15Img) {
-                Logger.t(TAG).i("获取G15手表赛米加G15定制项目图片主题1图片UI设置信息:" + uiDataG15Img.toString());
+                Logger.t(TAG).i("G15Projeto G15: tema de imagem 1UIConfigurar:" + uiDataG15Img.toString());
                 mUIDataQRCode1 = uiDataG15Img;
                 startTransmission(EUIFromType.G15_IMG_THEME_1, createBitmap(Color.parseColor("#0FC2FF")));
             }
@@ -131,7 +131,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 赛米加G15定制项目图片主题2
+     * G15Tema de imagem 2
      */
     private void setG15ImgTheme2() {
         readTheme2Info();
@@ -141,7 +141,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
         mUiUpdateUtil.getG15ImgTheme2Info(new IUIBaseInfoFormG15ImgListener() {
             @Override
             public void onBaseUiInfoFormG15Img(UIDataG15Img uiDataG15Img) {
-                Logger.t(TAG).i("获取G15手表赛米加G15定制项目图片主题2图片UI设置信息:" + uiDataG15Img.toString());
+                Logger.t(TAG).i("G15G15Tema de imagem 2UIConfigurar:" + uiDataG15Img.toString());
                 mUIDataQRCode2 = uiDataG15Img;
                 startTransmission(EUIFromType.G15_IMG_THEME_2, createBitmap(Color.parseColor("#5F80FF")));
             }
@@ -149,21 +149,21 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 获取bitmap的像素值
+     * bitmap
      *
      * @param bitmap
      * @return
      */
     private static byte[] getBitmapBytes(Bitmap bitmap) {
-        int rowBytes = bitmap.getRowBytes();//行的byte数，像素的个数*像素的占位
+        int rowBytes = bitmap.getRowBytes();//byte，*
         int height = bitmap.getHeight();
         int size = rowBytes * height;
         ByteBuffer byteBuffer = ByteBuffer.allocate(size);
         bitmap.copyPixelsToBuffer(byteBuffer);
         byte[] byteArray = byteBuffer.array();
-        //给设备发送，需要处理一下大小端
+        //dispositivoEnviar，
         changeBigSmall(byteArray);
-        //对齐4byte
+        //4byte
         if (byteArray.length % 4 == 0) {
             return byteArray;
         } else {
@@ -177,7 +177,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     /**
-     * 两两互换位置[1,2,3,4]-->[2,1,4,3]
+     * [1,2,3,4]-->[2,1,4,3]
      *
      * @param array
      */
@@ -191,7 +191,7 @@ public class UiUpdateG15ImgActivity extends Activity implements View.OnClickList
     }
 
     private void startTransmission(EUIFromType type, Bitmap bitmap) {
-        Logger.t(TAG).i("开始传输:" + type);
+        Logger.t(TAG).i("Iniciar:" + type);
         int bytes = bitmap.getByteCount();
         ByteBuffer buf = ByteBuffer.allocate(bytes);
         bitmap.copyPixelsToBuffer(buf);
