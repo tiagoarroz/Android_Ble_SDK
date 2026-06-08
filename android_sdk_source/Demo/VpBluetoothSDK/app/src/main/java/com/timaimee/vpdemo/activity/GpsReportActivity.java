@@ -22,6 +22,7 @@ import com.amap.api.maps2d.model.MyLocationStyle;
 import com.amap.api.maps2d.model.PolylineOptions;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.IReportGpsDataListener;
@@ -89,9 +90,9 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
             @Override
             public void onReportGpsDataDataChange(ReportGpsLatLongData reportGpsLatLongData) {
                 String message = "AtivarGps:" + reportGpsLatLongData.toString();
-                mResultTv.setText(message);
+                mResultTv.setText(DemoTextTranslator.translate(message));
                 addPolyline(new LatLng(reportGpsLatLongData.getLat(), reportGpsLatLongData.getLon()));
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
         });
     }
@@ -101,8 +102,8 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
             @Override
             public void onReportGpsDataDataChange(ReportGpsLatLongData reportGpsLatLongData) {
                 String message = "DesativarGps:" + reportGpsLatLongData.toString();
-                mResultTv.setText(message);
-                Logger.t(TAG).i(message);
+                mResultTv.setText(DemoTextTranslator.translate(message));
+                logInfo(message);
             }
         });
     }
@@ -126,6 +127,13 @@ public class GpsReportActivity extends Activity implements LocationSource, AMapL
                 // .setFlat(true)
                 .position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.fit_start_point));
         aMap.addMarker(mark);
+    }
+
+    /**
+     * Regista mensagens vindas do SDK com as etiquetas conhecidas traduzidas.
+     */
+    private static void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 
     void setUpMap() {

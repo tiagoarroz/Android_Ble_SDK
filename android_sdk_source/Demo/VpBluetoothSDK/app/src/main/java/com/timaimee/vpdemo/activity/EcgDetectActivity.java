@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.IECGDetectListener;
@@ -56,19 +57,19 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
                     String message = "-onEcgDetectInfoChange-:" + ecgDetectInfo.toString()+",ecgType="+ecgType;
                     mEcgHeartView.setEcgType(ecgType);
                     mEcgHeartView.setDrawHz(ecgDetectInfo.getFrequency());
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onEcgDetectStateChange(EcgDetectState ecgDetectState) {
                     String message = "-onEcgDetectStateChange-:" + ecgDetectState.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onEcgDetectResultChange(EcgDetectResult ecgDetectResult) {
                     String message = "-onEcgDetectResultChange-:" + ecgDetectResult.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 //                    @Override
@@ -80,13 +81,13 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
 
                 @Override
                 public void onEcgDetectDiagnosisChange(EcgDiagnosis ecgDiagnosis) {
-                    Logger.t(TAG).i("ecg :: = " + ecgDiagnosis.toString());
+                    logInfo("ecg :: = " + ecgDiagnosis.toString());
                 }
 
                 @Override
                 public void onEcgADCChange(int[] ecgData, int[] powerData) {
                     String message = "-onEcgADCChange-:" + Arrays.toString(ecgData);
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     List<Integer> filterList = new ArrayList<>();
                     List<Integer> powerList = new ArrayList<>();
                     for (int i = 0; i < ecgData.length; i++) {
@@ -123,5 +124,12 @@ public class EcgDetectActivity extends Activity implements View.OnClickListener 
             Logger.t(TAG).i("write cmd status:" + code);
 
         }
+    }
+
+    /**
+     * Regista mensagens vindas do SDK com as etiquetas conhecidas traduzidas.
+     */
+    private void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 }

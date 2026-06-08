@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.IOriginData3Listener;
@@ -96,7 +97,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
     private void initOriginDataLog(List<OriginData3> originDataList, int tag) {
         for (OriginData3 data : originDataList) {
             String timeTag = "" + data.getmTime().toFullDateTimeString() + "-" + data.getPackageNumber() + "/" + data.getAllPackage() + "";
-            String log = timeTag + data.toString();
+            String log = DemoTextTranslator.translate(timeTag + data.toString());
             logs.add(new ShowLog(log, isContainTime(timeTag) ? ShowLog.Level.ERROR : tag == 0 ? ShowLog.Level.GREEN : tag == 1 ? ShowLog.Level.BLACK : ShowLog.Level.BLUE));
         }
         mAdapter.notifyDataSetChanged();
@@ -132,7 +133,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
             @Override
             public void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList) {
                 String message = "dados-:" + originDataList.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 if (isShowOrigin) {
                     initOriginDataLog(originDataList, count);
                     count++;
@@ -142,7 +143,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
             @Override
             public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
                 String message = "dados[30]-:" + originHalfHourDataList.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
                 Logger.t(TAG).i("dados[30]-:30pressão arterialdados size = " + originHalfHourDataList.getHalfHourBps().size());
                 Logger.t(TAG).i("dados[30]-:30dados size = " + originHalfHourDataList.getHalfHourSportDatas().size());
@@ -182,7 +183,7 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
             @Override
             public void onReadOriginComplete() {
                 String message = "dados-LerTerminar";
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 isReadFinished = true;
                 mProgressBar.setVisibility(View.GONE);
             }
@@ -202,6 +203,13 @@ public class OriginalDataLogActivity extends Activity implements View.OnClickLis
             Logger.t(TAG).i("write cmd status:" + code);
 
         }
+    }
+
+    /**
+     * Regista mensagens vindas do SDK com as etiquetas conhecidas traduzidas.
+     */
+    private static void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 
     private void initRecycler() {

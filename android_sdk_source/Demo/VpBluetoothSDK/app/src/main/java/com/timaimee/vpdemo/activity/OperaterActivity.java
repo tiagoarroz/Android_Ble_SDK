@@ -37,6 +37,7 @@ import com.jieli.jl_rcsp.model.base.BaseError;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
 import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.timaimee.vpdemo.adapter.GridAdatper;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.timaimee.vpdemo.oad.activity.OadActivity;
@@ -309,14 +310,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         @Override
         public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
             String message = "FunctionSocailMsgData:\n" + socailMsgData.toString();
-            Logger.t(TAG).i(message);
+            logInfo(message);
             sendMsg(message, 3);
         }
 
         @Override
         public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
             String message = "FunctionSocailMsgData2:\n" + socailMsgData.toString();
-            Logger.t(TAG).i(message);
+            logInfo(message);
             sendMsg(message, 3);
         }
     };
@@ -596,7 +597,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(HeartData heart) {
                     String message = "heart:\n" + heart.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -605,7 +606,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(TemptureDetectData temptureDetectData) {
                     String message = "startDetectTempture temptureDetectData:\n" + temptureDetectData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
 
 //                    sendMsg(message, 1);
                 }
@@ -615,7 +616,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(TemptureDetectData temptureDetectData) {
                     String message = "stopDetectTempture temptureDetectData:\n" + temptureDetectData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -626,7 +627,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void response(int state) {
                     String message = "settingTime response :\n" + state;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, deviceTimeSetting);
         } else if (oprater.equals(WEATHER_READ_STATUEINFO)) {
@@ -634,7 +635,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                     String message = "readWeatherStatusInfo onWeatherDataChange read:\n" + weatherStatusData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(UI_UPDATE_AGPS)) {
@@ -705,7 +706,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                     String message = "settingWeatherStatusInfo onWeatherDataChange read:\n" + weatherStatusData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(WEATHER_SETTING_STATUEINFO_OFF)) {
@@ -714,7 +715,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                     String message = "settingWeatherStatusInfo onWeatherDataChange read:\n" + weatherStatusData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(WEATHER_SETTING_DATA)) {
@@ -736,7 +737,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLowpowerDataDataChange(LowPowerData lowPowerData) {
                     String message = "onLowpowerDataDataChange read:\n" + lowPowerData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(LOW_POWER_OPEN)) {
@@ -744,7 +745,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLowpowerDataDataChange(LowPowerData lowPowerData) {
                     String message = "onLowpowerDataDataChange open:\n" + lowPowerData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, true);
         } else if (oprater.equals(LOW_POWER_CLOSE)) {
@@ -752,7 +753,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLowpowerDataDataChange(LowPowerData lowPowerData) {
                     String message = "onLowpowerDataDataChange close:\n" + lowPowerData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, false);
         } else if (oprater.equals(BP_FUNCTION_READ)) {
@@ -760,7 +761,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpFunctionData bpFunctionData) {
                     String message = "readBpFunctionState close:\n" + bpFunctionData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(BP_FUNCTION_SETTING)) {
@@ -768,7 +769,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpFunctionData bpFunctionData) {
                     String message = "settingBpFunctionState close:\n" + bpFunctionData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, true);
         } else if (oprater.equals(DETECT_PTT)) {
@@ -788,7 +789,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpData bpData) {
                     String message = "BpData date statues:\n" + bpData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, EBPDetectModel.DETECT_MODEL_PUBLIC);
@@ -805,7 +806,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpSettingData bpSettingData) {
                     String message = "BpSettingData:\n" + bpSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, bpSetting);
@@ -815,7 +816,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 public void onDataChange(BpSettingData bpSettingData) {
 
                     String message = "BpSettingData:\n" + bpSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
 
                 }
@@ -830,7 +831,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpSettingData bpSettingData) {
                     String message = "BpSettingData:\n" + bpSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
 //                    sendMsg(message, 1);
                 }
             }, bpSetting);
@@ -844,7 +845,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BpSettingData bpSettingData) {
                     String message = "BpSettingData:\n" + bpSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, bpSetting);
@@ -856,7 +857,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         @Override
                         public void onPwdDataChange(PwdData pwdData) {
                             String message = "PwdData:\n" + pwdData.toString();
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                             deviceNumber = pwdData.getDeviceNumber();
                             deviceVersion = pwdData.getDeviceVersion();
                             deviceTestVersion = pwdData.getDeviceTestVersion();
@@ -873,7 +874,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         @Override
                         public void onFunctionSupportDataChange(FunctionDeviceSupportData functionSupport) {
                             String message = "FunctionDeviceSupportData:\n" + functionSupport.toString();
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                             EFunctionStatus newCalcSport = functionSupport.getNewCalcSport();
                             if (newCalcSport != null && newCalcSport.equals(SUPPORT)) {
                                 isNewSportCalc = true;
@@ -917,7 +918,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         @Override
                         public void OnSettingDataChange(CustomSettingData customSettingData) {
                             String message = "CustomSettingData:\n" + customSettingData.toString();
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
 //                    sendMsg(message, 4);
                         }
                     },
@@ -949,7 +950,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onPwdDataChange(PwdData pwd) {
                     String message = "PwdData:\n" + pwd.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
@@ -963,7 +964,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSportDataChange(SportData sportData) {
                     String message = ":\n" + sportData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -972,7 +973,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnPersoninfoDataChange(EOprateStauts EOprateStauts) {
                     String message = ":\n" + EOprateStauts.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new PersonInfoData(ESex.MAN, 178, 60, 20, 8000));
@@ -1009,7 +1010,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListener(AlarmData alarmData) {
                     String message = "Configuraralarme:\n" + alarmData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, alarmSettingList);
@@ -1018,7 +1019,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListener(AlarmData alarmData) {
                     String message = "Leralarme:\n" + alarmData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1027,7 +1028,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
                     String message = "Leralarme[]:\n" + alarmData2.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1039,7 +1040,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
                     String message = "Eliminaralarme[]:\n" + alarmData2.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
                 //String bluetoothAddress, int alarmId, int alarmHour, int alarmMinute, String repeatStatus, int scene, String unRepeatDate, boolean isOpen
@@ -1058,7 +1059,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
                     String message = "Adicionaralarme[]:\n" + alarmData2.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, alarm2Setting);
@@ -1072,7 +1073,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAlarmDataChangeListListener(AlarmData2 alarmData2) {
                     String message = "alarme[]:\n" + alarmData2.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, alarm2Setting);
@@ -1083,7 +1084,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
                     String message = "Configurar-Ativar:\n" + longSeat.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1093,7 +1094,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
                     String message = "Configurar-Desativar:\n" + longSeat.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1102,7 +1103,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLongSeatDataChange(LongSeatData longSeat) {
                     String message = "Configurar-Ler:\n" + longSeat.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1111,7 +1112,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLanguageDataChange(LanguageData languageData) {
                     String message = "Configurar():\n" + languageData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, ELanguage.CHINA);
@@ -1120,7 +1121,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onLanguageDataChange(LanguageData languageData) {
                     String message = "Configurar():\n" + languageData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, ELanguage.ENGLISH);
@@ -1129,7 +1130,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDataChange(BatteryData batteryData) {
                     String message = ":\n" + batteryData.getBatteryLevel() + "\n" + ":" + batteryData.getBatteryLevel() * 25 + "%";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1138,7 +1139,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
                     String message = "-Ler:\n" + nightTurnWristeData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1147,7 +1148,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
                     String message = "-Ativar:\n" + nightTurnWristeData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, true);
@@ -1156,7 +1157,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
                     String message = "-Desativar:\n" + nightTurnWristeData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, false);
@@ -1168,7 +1169,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
                     String message = "-" + isOpen + ":\n" + nightTurnWristeData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, isOpen, startTime, endTime);
@@ -1181,7 +1182,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onNightTurnWristeDataChange(NightTurnWristeData nightTurnWristeData) {
                     String message = "-" + isOpen + ":\n" + nightTurnWristeData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new NightTurnWristSetting(isOpen, startTime, endTime, level));
@@ -1193,7 +1194,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void findPhone() {
                     String message = "()-where is the phone,make some noise!";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
@@ -1207,7 +1208,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
                     String message = "estado-/(12/24)/5(Frequência cardíaca/pressão arterial)-Ler:\n" + customSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1275,7 +1276,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
                     String message = "estado-/(12/24)/5(Frequência cardíaca/pressão arterial)-Configurar:\n" + customSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, customSetting);
@@ -1328,7 +1329,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
                     String message = "estado--Configurar:\n" + customSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, customSetting);
@@ -1381,7 +1382,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnSettingDataChange(CustomSettingData customSettingData) {
                     String message = "estado--Configurar:\n" + customSettingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, customSetting);
@@ -1392,7 +1393,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onCheckWearDataChange(CheckWearData checkWearData) {
                     String message = "-Ativar:\n" + checkWearData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, checkWearSetting);
@@ -1403,7 +1404,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onCheckWearDataChange(CheckWearData checkWearData) {
                     String message = "-Desativar:\n" + checkWearData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, checkWearSetting);
@@ -1412,7 +1413,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
                     String message = "-Ativar:\n" + findDeviceData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, true);
@@ -1421,7 +1422,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
                     String message = "-Desativar:\n" + findDeviceData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, false);
@@ -1430,7 +1431,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onFindDevice(FindDeviceData findDeviceData) {
                     String message = "-Ler:\n" + findDeviceData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1439,14 +1440,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                     String message = " 1-Ler:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                     String message = " 2-Ler:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1479,14 +1480,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                     String message = " -Configurar:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                     String message = " -Configurar2:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, socailMsgData);
@@ -1520,14 +1521,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                     String message = " -Configurar:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                     String message = " -Configurar2:\n" + socailMsgData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, socailMsgData);
@@ -1546,7 +1547,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void response(int state) {
                     String message = "liansuo send cmd call back:" + state;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1555,7 +1556,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void response(int state) {
                     String message = "liansuo send content call back:" + state;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1627,85 +1628,85 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void inPttModel() {
                     String message = ":ptt\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void outPttModel() {
                     String message = ":ptt\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void rejectPhone() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void cliencePhone() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void appAnswerCall() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void knocknotify(int type) {
                     String message = ":，1，2\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void sos() {
                     String message = ":sos\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 public void nextMusic() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 public void previousMusic() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 public void pauseAndPlayMusic() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void pauseMusic() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void playMusic() {
                     String message = ":\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void voiceUp() {
                     String message = ":volume\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void voiceDown() {
                     String message = ":volume\n";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -1728,7 +1729,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
                     String message = "Frequência cardíaca-Ler:\n" + heartWaringData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1737,7 +1738,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
                     String message = "Frequência cardíaca-Ativar:\n" + heartWaringData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new HeartWaringSetting(120, 110, true));
@@ -1746,7 +1747,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onHeartWaringDataChange(HeartWaringData heartWaringData) {
                     String message = "Frequência cardíaca-Desativar:\n" + heartWaringData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new HeartWaringSetting(120, 110, false));
@@ -1759,14 +1760,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSpO2HADataChange(Spo2hData spo2HData) {
                     String message = "SpO2-:\n" + spo2HData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new ILightDataCallBack() {
                 @Override
                 public void onGreenLightDataChange(int[] data) {
                     String message = "SpO2-:\n" + Arrays.toString(data);
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(SPO2H_CLOSE)) {
@@ -1774,7 +1775,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSpO2HADataChange(Spo2hData spo2HData) {
                     String message = "SpO2-Terminar:\n" + spo2HData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1783,7 +1784,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
                     String message = "SpO2-Ler\n" + allSetData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1794,7 +1795,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
                     String message = "SpO2-Ativar\n" + allSetData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, mAlarmSetting);
@@ -1805,7 +1806,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onAllSetDataChangeListener(AllSetData allSetData) {
                     String message = "SpO2-Ativar\n" + allSetData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, mAlarmSetting);
@@ -1814,7 +1815,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onFatigueDataListener(FatigueData fatigueData) {
                     String message = "fadiga-Iniciar:\n" + fatigueData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1823,7 +1824,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onFatigueDataListener(FatigueData fatigueData) {
                     String message = "fadiga-Terminar:\n" + fatigueData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1832,7 +1833,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onWomenDataChange(WomenData womenData) {
                     String message = "Femininoestado-Configurar:\n" + womenData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new WomenSetting(EWomenStatus.PREING, new TimeData(2016, 3, 1), new TimeData(2017, 1, 14)));
@@ -1841,7 +1842,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onWomenDataChange(WomenData womenData) {
                     String message = "Femininoestado-Ler:\n" + womenData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1854,7 +1855,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
                     String message = "contagem decrescente-watch:\n" + countDownData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1867,7 +1868,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
                     String message = "contagem decrescente-App:\n" + countDownData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1880,7 +1881,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
                     String message = "contagem decrescente-App:\n" + countDownData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1889,7 +1890,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void OnCountDownDataChange(CountDownData countDownData) {
                     String message = "contagem decrescente-Ler:\n" + countDownData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1906,7 +1907,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onChantingDataChange(ChantingData chantingData) {
                     String message = "Ler:" + chantingData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1922,7 +1923,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onScreenLightDataChange(ScreenLightData screenLightData) {
                     String message = "dados-Configurar:" + screenLightData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, new ScreenSetting(22, 0, 7, 0, 2, 4));
@@ -1931,7 +1932,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onScreenLightDataChange(ScreenLightData screenLightData) {
                     String message = "dados-Ler:" + screenLightData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1940,7 +1941,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onScreenStyleDataChange(ScreenStyleData screenLightData) {
                     String message = "-Ler:" + screenLightData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             });
@@ -1950,7 +1951,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onScreenStyleDataChange(ScreenStyleData screenLightData) {
                     String message = "-Configurar:" + screenLightData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
             }, screenstyle);
@@ -1964,25 +1965,25 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onTemptureDataListDataChange(List<TemptureData> temptureDataList) {
                     String message = "onTemptureDataListDataChange:" + temptureDataList.size();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "temperaturadados-Ler:" + "day=" + day + ",currentPackage=" + currentPackage + ",allPackage=" + allPackage;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "onReadOriginProgress:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "onReadOriginComplete";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, readOriginSetting);
         } else if (oprater.equals(READ_HEALTH_SLEEP)) {
@@ -1996,7 +1997,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                             } else {
                                 message = "dados-:" + sleepData.toString();
                             }
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                             sendMsg(message, 1);
                         }
 
@@ -2004,19 +2005,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         public void onSleepProgress(float progress) {
 
                             String message = "dados-Ler:" + "progress=" + progress;
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
 
                         @Override
                         public void onSleepProgressDetail(String day, int packagenumber) {
                             String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
 
                         @Override
                         public void onReadSleepComplete() {
                             String message = "dados-LerTerminar";
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
                     }, watchDataDay
             );
@@ -2026,26 +2027,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         @Override
                         public void onSleepDataChange(String day, SleepData sleepData) {
                             String message = getDay(day) + "-dados-:" + sleepData.toString();
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                             sendMsg(message, 1);
                         }
 
                         @Override
                         public void onSleepProgress(float progress) {
                             String message = "dados-Ler:" + "progress=" + progress;
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
 
                         @Override
                         public void onSleepProgressDetail(String day, int packagenumber) {
                             String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
 
                         @Override
                         public void onReadSleepComplete() {
                             String message = "dados-LerTerminar";
-                            Logger.t(TAG).i(message);
+                            logInfo(message);
                         }
                     }
                     , beforeYesterday, watchDataDay);
@@ -2055,26 +2056,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSleepDataChange(String day, SleepData sleepData) {
                     String message = getDay(day) + "-dados-:" + sleepData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onSleepProgress(float progress) {
                     String message = "dados-Ler:" + "progress=" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onSleepProgressDetail(String day, int packagenumber) {
                     String message = "dados-Ler:" + "day=" + day + ",packagenumber=" + packagenumber;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadSleepComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, yesterday, watchDataDay);
         } else if (oprater.equals(READ_HEALTH_DRINK)) {
@@ -2082,14 +2083,14 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onDrinkDataChange(int packagenumber, DrinkData drinkdata) {
                     String message = "dados-:" + drinkdata.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     sendMsg(message, 1);
                 }
 
                 @Override
                 public void onReadDrinkComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(READ_HEALTH_ORIGINAL)) {
@@ -2099,7 +2100,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "dados[5]-Ler:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2133,7 +2134,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
                     String message = "dados[30]-:" + originHalfHourDataList.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     Logger.t(TAG).i("dados[30]-: = " + originHalfHourDataList.getDate());
                     Logger.t(TAG).i("dados[30]-: = " + originHalfHourDataList.getAllStep());
                     Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
@@ -2169,20 +2170,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "onReadOriginProgress dados[5]-Ler:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "onReadOriginProgressDetail dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             };
             int protype = 3;
@@ -2196,32 +2197,32 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onOringinFiveMinuteDataChange(OriginData originData) {
                     String message = "dados[5]-:" + originData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData) {
                     String message = "dados[30]-:" + originHalfHourData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "dados[5]-Ler:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             }, yesterday, 10, watchDataDay);
         } else if (oprater.equals(READ_HEALTH_ORIGINAL_SINGLEDAY)) {
@@ -2231,33 +2232,33 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onOringinFiveMinuteDataChange(OriginData originData) {
                     String message = "dados[5]-:" + originData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData) {
                     String message = "dados[30]-:" + originHalfHourData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "dados[5]-Ler:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             };
             IOriginProgressListener originData3Listener = new IOriginData3Listener() {
@@ -2268,13 +2269,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         String s = originData3List.get(i).toString();
                         Logger.t(TAG).i(s);
                     }
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourData) {
                     String message = "dados[30]-:" + originHalfHourData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
 
                 }
 
@@ -2285,7 +2286,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
 //                        String s = originHrvDataList.get(i).toString();
 //                        Logger.t(TAG).i(s);
 //                    }
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2296,28 +2297,28 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                         String s = originSpo2hDataList.get(i).toString();
                         Logger.t(TAG).i(s);
                     }
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                     List<Map<String, Float>> tenMinuteData = spo2hOriginUtil.getTenMinuteData(ESpo2hDataType.TYPE_SPO2H_MIN);
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "dados[5]-Ler:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "dados-LerTerminar";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             };
             IOriginProgressListener originProgressListener;
@@ -2332,37 +2333,37 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onProgress(float progress) {
                     String message = "onAllProgress:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onOringinFiveMinuteDataChange(OriginData originData) {
                     String message = "onOringinFiveMinuteDataChange:" + originData;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onOringinHalfHourDataChange(OriginHalfHourData originHalfHourData) {
                     String message = "onOringinHalfHourDataChange:" + originHalfHourData;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginComplete() {
                     String message = "onReadOriginComplete";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onSleepDataChange(String day, SleepData sleepData) {
                     String message = getDay(day) + "-onSleepDataChange:" + sleepData;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadSleepComplete() {
                     String message = "onReadSleepComplete";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
 
                 }
             }, watchDataDay);
@@ -2390,7 +2391,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
                     String message = "estado:" + sportModelStateData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2403,7 +2404,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
                     String message = "estado" + sportModelStateData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2416,7 +2417,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
                     String message = "" + sportModelStateData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2429,7 +2430,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onSportModelStateChange(SportModelStateData sportModelStateData) {
                     String message = "estado" + sportModelStateData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2442,26 +2443,26 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onReadOriginProgress(float progress) {
                     String message = "dados[Ler]:" + progress;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                     String message = "dados[Ler]:" + day +
                             ",allPackage=" + allPackage + ",currentPackage=" + currentPackage;
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onHeadChangeListListener(SportModelOriginHeadData sportModelHeadData) {
                     String message = "dados[]:" + sportModelHeadData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
                 public void onGPSWatchSportModeHeadChange(SportModelGPSWatchOriginHeadData sportModelGPSWatchOriginHeadData) {
                     String message = "dados[]:" + sportModelGPSWatchOriginHeadData.toString();
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
 
                 @Override
@@ -2479,7 +2480,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
                 @Override
                 public void onReadOriginComplete() {
                     String message = "dados[LerTerminar]";
-                    Logger.t(TAG).i(message);
+                    logInfo(message);
                 }
             });
         } else if (oprater.equals(HRV_ORIGIN_READ)) {
@@ -3592,7 +3593,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                 String message = "settingWeatherData onWeatherDataChange read:\n" + weatherStatusData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
         });
@@ -3759,7 +3760,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                 String message = "settingWeatherData onWeatherDataChange read:\n" + weatherStatusData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
         });
@@ -3853,7 +3854,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                 String message = "settingWeatherData onWeatherDataChange read:\n" + weatherStatusData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
         });
@@ -3871,7 +3872,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onWeatherDataChange(WeatherStatusData weatherStatusData) {
                 String message = "settingWeatherData onWeatherDataChange read:\n" + weatherStatusData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
         });
@@ -3884,11 +3885,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
      * @param what canal de visualização (tv1/tv2/tv3).
      */
     private void sendMsg(String message, int what) {
-        DemoStepLogger.featureEvent("OPERATION_RESULT", "canal=" + what + ", mensagem=" + message);
+        String translatedMessage = DemoTextTranslator.translate(message);
+        DemoStepLogger.featureEvent("OPERATION_RESULT", "canal=" + what + ", mensagem=" + translatedMessage);
         msg = Message.obtain();
         msg.what = what;
-        msg.obj = message;
+        msg.obj = translatedMessage;
         mHandler.sendMessage(msg);
+    }
+
+    /**
+     * Regista mensagens de resultado com tradução dos textos devolvidos pelo SDK.
+     */
+    private void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 
     /**
@@ -3944,98 +3953,98 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             public void inPttModel() {
                 String message = ":ptt\n";
                 isInPttModel = true;
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void outPttModel() {
                 isInPttModel = false;
                 String message = ":ptt\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void rejectPhone() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void cliencePhone() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void appAnswerCall() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 sendMsg(message, 1);
             }
 
             @Override
             public void knocknotify(int type) {
                 String message = ":，1，2\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void sos() {
                 String message = ":sos\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             public void nextMusic() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             public void previousMusic() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             public void pauseAndPlayMusic() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void pauseMusic() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void playMusic() {
                 String message = ":\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void voiceUp() {
                 String message = ":volume\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void voiceDown() {
                 String message = ":volume\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void oprateMusicSuccess() {
                 String message = ":música\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void oprateMusicFail() {
                 String message = ":música\n";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
         });
@@ -4065,7 +4074,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onGreenLightDataChange(int[] data) {
                 String message = "-:\n" + Arrays.toString(data);
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
         });
         VPOperateManager.getInstance().stopDetectSPO2H(writeResponse, new ISpo2hDataListener() {
@@ -4079,7 +4088,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onDataChange(HeartData heartData) {
                 String message = "-Frequência cardíaca:" + heartData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
         });
     }
@@ -4106,7 +4115,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                 String message = "dados[5]-Ler:currentPackage" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
@@ -4133,13 +4142,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onOriginFiveMinuteListDataChange(List<OriginData3> originDataList) {
                 String message = "dados-:" + originDataList.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void onOriginHalfHourDataChange(OriginHalfHourData originHalfHourDataList) {
                 String message = "dados[30]-:" + originHalfHourDataList.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 Logger.t(TAG).i("dados[30]-:30Frequência cardíacadados size = " + originHalfHourDataList.getHalfHourRateDatas().size());
                 Logger.t(TAG).i("dados[30]-:30pressão arterialdados size = " + originHalfHourDataList.getHalfHourBps().size());
                 Logger.t(TAG).i("dados[30]-:30dados size = " + originHalfHourDataList.getHalfHourSportDatas().size());
@@ -4160,20 +4169,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             @Override
             public void onReadOriginProgress(float progress) {
                 String message = "onReadOriginProgress dados[5]-Ler:" + progress;
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
             public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {
                 String message = "onReadOriginProgressDetail dados[5]-Ler:currentPackage=" + currentPackage + ",allPackage=" + allPackage + ",dates=" + date + ",day=" + day;
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
 
             @Override
             public void onReadOriginComplete() {
                 String message = "dados-LerTerminar";
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
         };
         int protype = 3;

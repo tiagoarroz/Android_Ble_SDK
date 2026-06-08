@@ -21,6 +21,7 @@ import com.inuker.bluetooth.library.Code;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
 import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
@@ -158,7 +159,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onPwdDataChange(PwdData pwdData) {
                 String message = "PwdData:\n" + pwdData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 deviceNumber = pwdData.getDeviceNumber();
                 deviceVersion = pwdData.getDeviceVersion();
                 deviceTestVersion = pwdData.getDeviceTestVersion();
@@ -176,7 +177,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onFunctionSupportDataChange(FunctionDeviceSupportData functionSupport) {
                 String message = "FunctionDeviceSupportData:\n" + functionSupport.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 EFunctionStatus newCalcSport = functionSupport.getNewCalcSport();
                 if (newCalcSport != null && newCalcSport.equals(SUPPORT)) {
                     isNewSportCalc = true;
@@ -199,7 +200,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "funcionalidade1:\n" + functionPackage1.toString();
                 DeviceCapabilityStore.setPackage1(functionPackage1);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage1");
             }
 
@@ -208,7 +209,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "funcionalidade2:\n" + functionPackage2.toString();
                 DeviceCapabilityStore.setPackage2(functionPackage2);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage2");
             }
 
@@ -217,7 +218,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "funcionalidade3:\n" + functionPackage3.toString();
                 DeviceCapabilityStore.setPackage3(functionPackage3);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage3");
             }
 
@@ -226,7 +227,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "funcionalidade4:\n" + functionPackage4.toString();
                 DeviceCapabilityStore.setPackage4(functionPackage4);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage4");
             }
 
@@ -235,7 +236,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "funcionalidade5:\n" + functionPackage5.toString();
                 DeviceCapabilityStore.setPackage5(functionPackage5);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage5");
             }
         }, new ISocialMsgDataListener() {
@@ -244,7 +245,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "1:\n" + socailMsgData.toString();
                 DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
 
             @Override
@@ -252,7 +253,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 String message = "2:\n" + socailMsgData.toString();
                 DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
             }
         }, new ICustomSettingDataListener() {
             @Override
@@ -261,7 +262,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 updateFunctionButtonState("CustomSettingData");
                 String message = "Configurar:\n" + customSettingData.toString();
                 appendDeviceInfo(message);
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 DemoStepLogger.stepSuccess("PWD_VALIDATE", "Handshake concluído; a aguardar capacidades antes de desbloquear testes");
             }
         }, password, true);
@@ -310,17 +311,25 @@ public class PwdConfirmActivity extends AppCompatActivity {
     }
 
     private void appendDeviceInfo(String msg) {
+        String translatedMsg = DemoTextTranslator.translate(msg);
         runOnUiThread(() -> {
             String line = "########################";
             String coloredLine = "<font color='#0000FF' size='16'>" + line + "</font>";
             String styledMsg = "<font color='#FF0000'><b>"
-                    + android.text.TextUtils.htmlEncode(msg)
+                    + android.text.TextUtils.htmlEncode(translatedMsg)
                     + "</b></font>";
             sb.append("\n").append(coloredLine);
             sb.append("\n").append(styledMsg).append("\n");
             tvDeviceInfo.setText(android.text.Html.fromHtml(sb.toString()));
             svInfo.fullScroll(View.FOCUS_DOWN);
         });
+    }
+
+    /**
+     * Regista mensagens de dados já normalizadas para português.
+     */
+    private void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 
     private int watchDataDay = 0;

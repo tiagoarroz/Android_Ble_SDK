@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
 import com.timaimee.vpdemo.adapter.GridAdatper;
+import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.IG15MessageListener;
@@ -62,7 +63,7 @@ public class NotificationSettingsActivity extends Activity {
             @Override
             public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                 String message = " 1-Ler:\n" + socailMsgData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 functions = getNotificationFunctionList(socailMsgData);
                 initGridView();
             }
@@ -70,7 +71,7 @@ public class NotificationSettingsActivity extends Activity {
             @Override
             public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                 String message = " 2-Ler:\n" + socailMsgData.toString();
-                Logger.t(TAG).i(message);
+                logInfo(message);
                 functions = getNotificationFunctionList(socailMsgData);
                 initGridView();
             }
@@ -84,7 +85,7 @@ public class NotificationSettingsActivity extends Activity {
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(mGridView.getContext(), functions.get(position).toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mGridView.getContext(), DemoTextTranslator.translate(functions.get(position).toString()), Toast.LENGTH_SHORT).show();
                 NotificationFunction function = functions.get(position);
                 String msg = mInput.getText().toString();
                 if (TextUtils.isEmpty(msg)) {
@@ -105,11 +106,18 @@ public class NotificationSettingsActivity extends Activity {
                         }
                         VPOperateManager.getInstance().sendSocialMsgContent(new OperaterActivity.WriteResponse(), contentSetting);
                     } else {
-                        Toast.makeText(mGridView.getContext(), "dispositivoAtivar！", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mGridView.getContext(), "Ative esta função no dispositivo.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
+    }
+
+    /**
+     * Regista mensagens vindas do SDK com as etiquetas conhecidas traduzidas.
+     */
+    private static void logInfo(String message) {
+        Logger.t(TAG).i(DemoTextTranslator.translate(message));
     }
 
     private void testG15(String msg) {
