@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.inuker.bluetooth.library.Code;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
-import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
 import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
@@ -131,18 +130,10 @@ public class PwdConfirmActivity extends AppCompatActivity {
         DemoStepLogger.stepStart("PWD_VALIDATE", "Envio de password e recolha de capacidades do dispositivo");
         btnConfirm.setEnabled(false);
         btn2Function.setEnabled(false);
-        DeviceCapabilityStore.reset();
         sb.setLength(0);
         tvDeviceInfo.setText("");
         tvPwdInfo.setText("A validar palavra-passe...");
         btn2Function.setText("A aguardar capacidades do dispositivo");
-        btn2Function.postDelayed(() -> {
-            if (!DeviceCapabilityStore.hasDeviceCapabilities()) {
-                tvPwdInfo.setText("Password validada, mas as capacidades ainda não foram recebidas");
-                appendDeviceInfo("Capacidades do dispositivo ainda não recebidas. Aguarde ou volte a ligar a pulseira.");
-                DemoStepLogger.stepError("PWD_CAPABILITIES", "Timeout à espera dos callbacks de capacidades");
-            }
-        }, 5000);
         VPOperateManager.getInstance().confirmDevicePwd(new IBleWriteResponse() {
             @Override
             public void onResponse(int code) {
@@ -189,7 +180,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 contactMsgLength = functionSupport.getContactMsgLength();
                 allMsgLenght = functionSupport.getAllMsgLength();
                 isSleepPrecision = functionSupport.getPrecisionSleep() == SUPPORT;
-                DeviceCapabilityStore.setFunctionSupport(functionSupport);
                 appendDeviceInfo(message);
                 updateFunctionButtonState("FunctionDeviceSupportData");
                 DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Pacote principal de capacidades recebido");
@@ -198,7 +188,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage1Report(DeviceFunctionPackage1 functionPackage1) {
                 String message = "funcionalidade1:\n" + functionPackage1.toString();
-                DeviceCapabilityStore.setPackage1(functionPackage1);
                 appendDeviceInfo(message);
                 logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage1");
@@ -207,7 +196,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage2Report(DeviceFunctionPackage2 functionPackage2) {
                 String message = "funcionalidade2:\n" + functionPackage2.toString();
-                DeviceCapabilityStore.setPackage2(functionPackage2);
                 appendDeviceInfo(message);
                 logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage2");
@@ -216,7 +204,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage3Report(DeviceFunctionPackage3 functionPackage3) {
                 String message = "funcionalidade3:\n" + functionPackage3.toString();
-                DeviceCapabilityStore.setPackage3(functionPackage3);
                 appendDeviceInfo(message);
                 logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage3");
@@ -225,7 +212,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage4Report(DeviceFunctionPackage4 functionPackage4) {
                 String message = "funcionalidade4:\n" + functionPackage4.toString();
-                DeviceCapabilityStore.setPackage4(functionPackage4);
                 appendDeviceInfo(message);
                 logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage4");
@@ -234,7 +220,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage5Report(DeviceFunctionPackage5 functionPackage5) {
                 String message = "funcionalidade5:\n" + functionPackage5.toString();
-                DeviceCapabilityStore.setPackage5(functionPackage5);
                 appendDeviceInfo(message);
                 logInfo(message);
                 updateFunctionButtonState("DeviceFunctionPackage5");
@@ -243,7 +228,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                 String message = "1:\n" + socailMsgData.toString();
-                DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
                 logInfo(message);
             }
@@ -251,7 +235,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                 String message = "2:\n" + socailMsgData.toString();
-                DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
                 logInfo(message);
             }
@@ -269,36 +252,14 @@ public class PwdConfirmActivity extends AppCompatActivity {
     }
 
     /**
-     * Só desbloqueia o ecrã de testes quando o SDK já reportou capacidades.
-     * Sem esse relatório, a demo não consegue distinguir funções reais de funções de outros modelos.
+     * Desbloqueia o ecrã de testes quando chega pelo menos um callback do handshake.
      */
     private void updateFunctionButtonState(String source) {
-        captureManualDetectCapabilities(source);
         runOnUiThread(() -> {
-            boolean hasCapabilities = DeviceCapabilityStore.hasDeviceCapabilities();
-            btn2Function.setEnabled(hasCapabilities);
-            btn2Function.setText(hasCapabilities
-                    ? "Ir para teste de funcionalidades"
-                    : "A aguardar capacidades do dispositivo");
-            if (hasCapabilities) {
-                DemoStepLogger.stepSuccess("PWD_CAPABILITIES", "Capacidades recebidas via " + source);
-            } else {
-                DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Ainda sem capacidades após " + source);
-            }
+            btn2Function.setEnabled(true);
+            btn2Function.setText("Ir para teste de funcionalidades");
+            DemoStepLogger.stepSuccess("PWD_CAPABILITIES", "Callback recebido via " + source);
         });
-    }
-
-    /**
-     * Sincroniza a lista de medições manuais que o SDK calcula durante o handshake.
-     * Alguns modelos reportam uma função geral como suportada, mas recusam iniciar
-     * a medição manual se o tipo não existir nesta lista.
-     */
-    private void captureManualDetectCapabilities(String source) {
-        DeviceCapabilityStore.setManualDetectTypes(VPOperateManager.getInstance().supportManualDetectTypes);
-        DemoStepLogger.featureEvent(
-                "PWD_MANUAL_CAPABILITIES",
-                source + " -> " + VPOperateManager.getInstance().supportManualDetectTypes
-        );
     }
 
     private void appendDeviceInfo1(String msg) {
@@ -342,11 +303,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
     private String deviceaddress = "";
 
     private void toFunctionTestPager() {
-        if (!DeviceCapabilityStore.hasDeviceCapabilities()) {
-            Toast.makeText(this, "Aguarde pelo relatório de capacidades do dispositivo", Toast.LENGTH_LONG).show();
-            DemoStepLogger.stepError("OPERATE_SCREEN_OPEN", "Tentativa de abrir funcionalidades sem capacidades reportadas");
-            return;
-        }
         DemoStepLogger.stepStart("OPERATE_SCREEN_OPEN", "Pedido de entrada no ecrã de funcionalidades");
         new AlertDialog.Builder(this)
                 .setTitle("Ir para teste de funcionalidades")
@@ -366,7 +322,6 @@ public class PwdConfirmActivity extends AppCompatActivity {
                     intent.putExtra("isNewSportCalc", isNewSportCalc);
                     intent.putExtra("isOadModel", isOadModel);
                     intent.putExtra("deviceaddress", deviceaddress);
-                    intent.putExtra("hasDeviceCapabilities", DeviceCapabilityStore.hasDeviceCapabilities());
                     startActivity(intent);
                     DemoStepLogger.stepSuccess("OPERATE_SCREEN_OPEN", "Transição para OperaterActivity concluída");
                     dialog.dismiss();

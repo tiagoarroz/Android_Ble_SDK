@@ -36,7 +36,6 @@ import com.jieli.jl_fatfs.model.FatFile;
 import com.jieli.jl_rcsp.model.base.BaseError;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
-import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
 import com.timaimee.vpdemo.demo.DemoTextTranslator;
 import com.timaimee.vpdemo.adapter.GridAdatper;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
@@ -301,7 +300,6 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private int deviceNumber = -1;
     private String deviceVersion;
     private String deviceTestVersion;
-    private boolean hasDeviceCapabilities = false;
     private boolean isBleConnected = false;
     boolean isOadModel = false;
     boolean isNewSportCalc = false;
@@ -449,8 +447,6 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         isSleepPrecision = getIntent().getBooleanExtra("isSleepPrecision", false);
         isNewSportCalc = getIntent().getBooleanExtra("isNewSportCalc", false);
         isOadModel = getIntent().getBooleanExtra("isOadModel", false);
-        hasDeviceCapabilities = getIntent().getBooleanExtra("hasDeviceCapabilities", false)
-                && DeviceCapabilityStore.hasDeviceCapabilities();
         isBleConnected = isDeviceConnected();
         titleBleInfo.setText(buildTitleBleInfo());
     }
@@ -469,32 +465,12 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     /**
-     * Resume o estado da ligação e a contagem de operações desbloqueadas.
-     * A contagem ajuda a confirmar visualmente se o filtro de capacidades foi aplicado.
+     * Resume o estado da ligação BLE apresentado no cabeçalho do ecrã.
      */
     private String buildTitleBleInfo() {
-        String capabilityInfo;
-        if (hasDeviceCapabilities) {
-            int enabled = DeviceCapabilityStore.countEnabledOperations(oprateStr);
-            capabilityInfo = "\nFuncionalidades desbloqueadas: " + enabled + "/" + oprateStr.length;
-        } else {
-            capabilityInfo = "\nCapacidades não recebidas; funções testáveis bloqueadas";
-        }
         return "：" + deviceaddress + ", dispositivo：" + deviceNumber
                 + "\n：" + deviceVersion + ", ：" + deviceTestVersion
-                + "\nBLE: " + (isBleConnected ? "ligado" : "desligado")
-                + capabilityInfo;
-    }
-
-    /**
-     * Valida o estado guardado no item da grelha antes de executar comandos BLE.
-     * Isto evita que um toque num item cinzento dispare comandos que o firmware rejeita.
-     */
-    private boolean isGridOperationEnabled(int position) {
-        if (position < 0 || position >= mGridData.size()) {
-            return false;
-        }
-        return !"false".equals(mGridData.get(position).get("enabled"));
+                + "\nBLE: " + (isBleConnected ? "ligado" : "desligado");
     }
 
     /**
@@ -572,7 +548,6 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             String s = oprateStr[i];
             Map<String, String> map = new HashMap<>();
             map.put("str", s);
-            map.put("enabled", String.valueOf(DeviceCapabilityStore.isOperationEnabled(i, s)));
             mGridData.add(map);
             i++;
         }
@@ -585,13 +560,6 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
         String oprater = mGridData.get(position).get("str");
-        if (!isGridOperationEnabled(position)) {
-            String message = "Funcionalidade não suportada pela pulseira atual";
-            DemoStepLogger.featureEvent("OPERATION_BLOCKED", "posição=" + position + ", operação=" + oprater);
-            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-            sendMsg(message + "\n" + oprater, 1);
-            return;
-        }
         if (isUnsafeOperation(oprater)) {
             String message = "Operação bloqueada na demo para evitar limpar dados do dispositivo";
             DemoStepLogger.stepError("OPERATION_BLOCKED", "Comando sensível bloqueado. operação=" + oprater);
