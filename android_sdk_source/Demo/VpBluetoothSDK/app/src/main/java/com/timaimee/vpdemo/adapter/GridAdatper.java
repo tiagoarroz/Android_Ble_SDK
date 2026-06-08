@@ -56,7 +56,17 @@ public class GridAdatper extends BaseAdapter {
             mGridHold = (GridHold) convertView.getTag();
         }
         Map<String, String> map = mGridData.get(i);
+        boolean enabled = !"false".equals(map.get("enabled"));
         mGridHold.mButton.setText(map.get("str"));
+        mGridHold.mButton.setEnabled(enabled);
+        mGridHold.mButton.setAlpha(enabled ? 1.0f : 0.55f);
+        if (!enabled) {
+            mGridHold.mButton.setBackgroundColor(Color.parseColor("#777777"));
+            mGridHold.mButton.setTextColor(Color.parseColor("#E0E0E0"));
+            return convertView;
+        }
+
+        mGridHold.mButton.setTextColor(Color.WHITE);
         if (i % 4 == 0) {
             mGridHold.mButton.setBackgroundColor(Color.parseColor("#FF7032"));
         } else if (i % 4 == 1) {

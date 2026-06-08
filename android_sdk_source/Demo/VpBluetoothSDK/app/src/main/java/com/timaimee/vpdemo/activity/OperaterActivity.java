@@ -34,6 +34,7 @@ import com.jieli.jl_fatfs.model.FatFile;
 import com.jieli.jl_rcsp.model.base.BaseError;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
 import com.timaimee.vpdemo.adapter.GridAdatper;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.timaimee.vpdemo.oad.activity.OadActivity;
@@ -296,6 +297,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private int deviceNumber = -1;
     private String deviceVersion;
     private String deviceTestVersion;
+    private boolean hasDeviceCapabilities = false;
     boolean isOadModel = false;
     boolean isNewSportCalc = false;
     boolean isInPttModel = false;
@@ -428,8 +430,39 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         isSleepPrecision = getIntent().getBooleanExtra("isSleepPrecision", false);
         isNewSportCalc = getIntent().getBooleanExtra("isNewSportCalc", false);
         isOadModel = getIntent().getBooleanExtra("isOadModel", false);
-        titleBleInfo.setText("：" + deviceaddress + ", dispositivo：" + deviceNumber + "\n：" + deviceVersion + ", ：" + deviceTestVersion);
+        hasDeviceCapabilities = getIntent().getBooleanExtra("hasDeviceCapabilities", false)
+                && DeviceCapabilityStore.hasDeviceCapabilities();
+        titleBleInfo.setText(buildTitleBleInfo());
     }
+
+    /**
+     * Resume o estado da ligação e a contagem de operações desbloqueadas.
+     * A contagem ajuda a confirmar visualmente se o filtro de capacidades foi aplicado.
+     */
+    private String buildTitleBleInfo() {
+        String capabilityInfo;
+        if (hasDeviceCapabilities) {
+            int enabled = DeviceCapabilityStore.countEnabledOperations(oprateStr);
+            capabilityInfo = "\nFuncionalidades desbloqueadas: " + enabled + "/" + oprateStr.length;
+        } else {
+            capabilityInfo = "\nCapacidades não recebidas; grelha em modo diagnóstico";
+        }
+        return "：" + deviceaddress + ", dispositivo：" + deviceNumber
+                + "\n：" + deviceVersion + ", ：" + deviceTestVersion
+                + capabilityInfo;
+    }
+
+    /**
+     * Valida o estado guardado no item da grelha antes de executar comandos BLE.
+     * Isto evita que um toque num item cinzento dispare comandos que o firmware rejeita.
+     */
+    private boolean isGridOperationEnabled(int position) {
+        if (position < 0 || position >= mGridData.size()) {
+            return false;
+        }
+        return !"false".equals(mGridData.get(position).get("enabled"));
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -458,6 +491,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             String s = oprateStr[i];
             Map<String, String> map = new HashMap<>();
             map.put("str", s);
+            map.put("enabled", String.valueOf(DeviceCapabilityStore.isOperationEnabled(i, s)));
             mGridData.add(map);
             i++;
         }
@@ -470,6 +504,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     @Override
     public void onItemClick(final AdapterView<?> parent, View view, int position, long id) {
         String oprater = mGridData.get(position).get("str");
+        if (!isGridOperationEnabled(position)) {
+            String message = "Funcionalidade não suportada pela pulseira atual";
+            DemoStepLogger.featureEvent("OPERATION_BLOCKED", "posição=" + position + ", operação=" + oprater);
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+            sendMsg(message + "\n" + oprater, 1);
+            return;
+        }
         DemoStepLogger.featureEvent("OPERATION_SELECT", "posição=" + position + ", operação=" + oprater);
         Toast.makeText(mContext, oprater, Toast.LENGTH_SHORT).show();
         tv1.setText("");

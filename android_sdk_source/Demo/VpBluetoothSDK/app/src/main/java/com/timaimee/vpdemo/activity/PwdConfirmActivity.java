@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.inuker.bluetooth.library.Code;
 import com.orhanobut.logger.Logger;
 import com.timaimee.vpdemo.R;
+import com.timaimee.vpdemo.demo.DeviceCapabilityStore;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
@@ -129,6 +130,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
         DemoStepLogger.stepStart("PWD_VALIDATE", "Envio de password e recolha de capacidades do dispositivo");
         btnConfirm.setEnabled(false);
         btn2Function.setEnabled(false);
+        DeviceCapabilityStore.reset();
         sb.setLength(0);
         tvDeviceInfo.setText("");
         tvPwdInfo.setText("A validar palavra-passe...");
@@ -178,12 +180,14 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 contactMsgLength = functionSupport.getContactMsgLength();
                 allMsgLenght = functionSupport.getAllMsgLength();
                 isSleepPrecision = functionSupport.getPrecisionSleep() == SUPPORT;
+                DeviceCapabilityStore.setFunctionSupport(functionSupport);
                 DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Pacote principal de capacidades recebido");
             }
 
             @Override
             public void onDeviceFunctionPackage1Report(DeviceFunctionPackage1 functionPackage1) {
                 String message = "funcionalidade1:\n" + functionPackage1.toString();
+                DeviceCapabilityStore.setPackage1(functionPackage1);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -191,6 +195,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage2Report(DeviceFunctionPackage2 functionPackage2) {
                 String message = "funcionalidade2:\n" + functionPackage2.toString();
+                DeviceCapabilityStore.setPackage2(functionPackage2);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -198,6 +203,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage3Report(DeviceFunctionPackage3 functionPackage3) {
                 String message = "funcionalidade3:\n" + functionPackage3.toString();
+                DeviceCapabilityStore.setPackage3(functionPackage3);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -205,6 +211,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage4Report(DeviceFunctionPackage4 functionPackage4) {
                 String message = "funcionalidade4:\n" + functionPackage4.toString();
+                DeviceCapabilityStore.setPackage4(functionPackage4);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -212,6 +219,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onDeviceFunctionPackage5Report(DeviceFunctionPackage5 functionPackage5) {
                 String message = "funcionalidade5:\n" + functionPackage5.toString();
+                DeviceCapabilityStore.setPackage5(functionPackage5);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -219,6 +227,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onSocialMsgSupportDataChange(FunctionSocailMsgData socailMsgData) {
                 String message = "1:\n" + socailMsgData.toString();
+                DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -226,6 +235,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void onSocialMsgSupportDataChange2(FunctionSocailMsgData socailMsgData) {
                 String message = "2:\n" + socailMsgData.toString();
+                DeviceCapabilityStore.setSocialMessageSupport(socailMsgData);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
             }
@@ -292,6 +302,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                     intent.putExtra("isNewSportCalc", isNewSportCalc);
                     intent.putExtra("isOadModel", isOadModel);
                     intent.putExtra("deviceaddress", deviceaddress);
+                    intent.putExtra("hasDeviceCapabilities", DeviceCapabilityStore.hasDeviceCapabilities());
                     startActivity(intent);
                     DemoStepLogger.stepSuccess("OPERATE_SCREEN_OPEN", "Transição para OperaterActivity concluída");
                     dialog.dismiss();
