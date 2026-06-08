@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 
 import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.jieli.dial.JLWatchFaceManager;
 import com.inuker.bluetooth.library.jieli.ota.JLOTAHolder;
 import com.inuker.bluetooth.library.jieli.response.RcspAuthResponse;
@@ -476,7 +477,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             int enabled = DeviceCapabilityStore.countEnabledOperations(oprateStr);
             capabilityInfo = "\nFuncionalidades desbloqueadas: " + enabled + "/" + oprateStr.length;
         } else {
-            capabilityInfo = "\nCapacidades não recebidas; grelha em modo diagnóstico";
+            capabilityInfo = "\nCapacidades não recebidas; funções testáveis bloqueadas";
         }
         return "：" + deviceaddress + ", dispositivo：" + deviceNumber
                 + "\n：" + deviceVersion + ", ：" + deviceTestVersion
@@ -3910,7 +3911,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     /**
      * Variante local do callback de escrita que atualiza o estado visual da sessão BLE.
      */
-    private class GuardedWriteResponse extends WriteResponse {
+    private class GuardedWriteResponse extends WriteResponse implements BleWriteResponse {
         @Override
         public void onResponse(int code) {
             super.onResponse(code);

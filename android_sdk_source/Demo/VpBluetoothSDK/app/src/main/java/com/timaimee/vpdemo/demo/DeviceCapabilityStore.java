@@ -12,10 +12,12 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage4;
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5;
 import com.veepoo.protocol.model.datas.FunctionDeviceSupportData;
 import com.veepoo.protocol.model.datas.FunctionSocailMsgData;
+import com.veepoo.protocol.model.enums.DeviceManualDataType;
 import com.veepoo.protocol.model.enums.EFunctionStatus;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,6 +33,7 @@ public final class DeviceCapabilityStore {
     private static DeviceFunctionPackage4 package4;
     private static DeviceFunctionPackage5 package5;
     private static boolean socialMessageSupportReported;
+    private static final Set<DeviceManualDataType> manualDetectTypes = new HashSet<>();
 
     private static final Set<String> ALWAYS_AVAILABLE = new HashSet<>(Arrays.asList(
             PWD_COMFIRM_2_DISCONNECT,
@@ -63,6 +66,7 @@ public final class DeviceCapabilityStore {
         package4 = null;
         package5 = null;
         socialMessageSupportReported = false;
+        manualDetectTypes.clear();
     }
 
     public static void setFunctionSupport(FunctionDeviceSupportData data) {
@@ -93,6 +97,17 @@ public final class DeviceCapabilityStore {
         socialMessageSupportReported = data != null;
     }
 
+    /**
+     * Guarda os tipos que o firmware aceita para medições manuais iniciadas pela app.
+     * Estes dados vêm do próprio SDK depois dos pacotes A7/B8 do handshake.
+     */
+    public static void setManualDetectTypes(List<DeviceManualDataType> dataTypes) {
+        manualDetectTypes.clear();
+        if (dataTypes != null) {
+            manualDetectTypes.addAll(dataTypes);
+        }
+    }
+
     public static boolean hasDeviceCapabilities() {
         return functionSupport != null
                 || package1 != null
@@ -103,11 +118,11 @@ public final class DeviceCapabilityStore {
     }
 
     public static boolean isOperationEnabled(int index, String operation) {
-        if (!hasDeviceCapabilities()) {
-            return true;
-        }
         if (ALWAYS_AVAILABLE.contains(operation) || isHistoricalRead(operation)) {
             return true;
+        }
+        if (!hasDeviceCapabilities()) {
+            return false;
         }
         if (isEmptyOperation(index)) {
             return resolveEmptyOperation(index);
@@ -127,12 +142,18 @@ public final class DeviceCapabilityStore {
 
     private static boolean resolveOperation(String operation) {
         if (matches(operation, HEART_DETECT_START, HEART_DETECT_STOP)) {
-            return isSupported(firstStatus(statusPackage1Heart(), statusLegacyHeart()));
+            return isManualSupported(DeviceManualDataType.HEART_RATE);
         }
-        if (matches(operation, TEMPTURE_DETECT_START, TEMPTURE_DETECT_STOP, READ_TEMPTURE_DATA)) {
+        if (matches(operation, TEMPTURE_DETECT_START, TEMPTURE_DETECT_STOP)) {
+            return isManualSupported(DeviceManualDataType.BODY_TEMPERATURE);
+        }
+        if (matches(operation, READ_TEMPTURE_DATA)) {
             return isSupported(firstStatus(statusPackage3Temperature(), statusLegacyTemperature()));
         }
-        if (matches(operation, BP_DETECT_START, BP_DETECT_STOP, BP_DETECTMODEL_SETTING, BP_DETECTMODEL_READ)) {
+        if (matches(operation, BP_DETECT_START, BP_DETECT_STOP)) {
+            return isManualSupported(DeviceManualDataType.BLOOD_PRESSURE);
+        }
+        if (matches(operation, BP_DETECTMODEL_SETTING, BP_DETECTMODEL_READ)) {
             return isSupported(firstStatus(statusPackage1BloodPressure(), statusLegacyBloodPressure()));
         }
         if (matches(operation, BP_DETECTMODEL_SETTING_ADJUSTE, BP_DETECTMODEL_SETTING_ADJUSTE_CANCEL,
@@ -162,12 +183,15 @@ public final class DeviceCapabilityStore {
         if (matches(operation, HEARTWRING_READ, HEARTWRING_OPEN, HEARTWRING_CLOSE)) {
             return isSupported(firstStatus(statusPackage1HeartWarning(), statusLegacyHeartWarning()));
         }
-        if (matches(operation, SPO2H_OPEN, SPO2H_CLOSE, SPO2H_AUTO_DETECT_READ, SPO2H_AUTO_DETECT_OPEN,
+        if (matches(operation, SPO2H_OPEN, SPO2H_CLOSE)) {
+            return isManualSupported(DeviceManualDataType.BLOOD_OXYGEN);
+        }
+        if (matches(operation, SPO2H_AUTO_DETECT_READ, SPO2H_AUTO_DETECT_OPEN,
                 SPO2H_AUTO_DETECT_CLOSE, SPO2H_ORIGIN_READ)) {
             return isSupported(firstStatus(statusPackage1Spo2h(), statusLegacySpo2h()));
         }
         if (matches(operation, FATIGUE_OPEN, FATIGUE_CLOSE)) {
-            return isSupported(firstStatus(statusPackage1Fatigue(), statusLegacyFatigue()));
+            return isManualSupported(DeviceManualDataType.FATIGUE);
         }
         if (matches(operation, WOMEN_SETTING, WOMEN_READ)) {
             return isSupported(firstStatus(statusPackage1Women(), statusLegacyWomen()));
@@ -201,7 +225,10 @@ public final class DeviceCapabilityStore {
                 SPORT_MODE_START_INDOOR, SPORT_MODE_ORIGIN_START, SPORT_MODE_ORIGIN_END)) {
             return isSupported(firstStatus(statusPackage2SportModel(), statusLegacySportModel()));
         }
-        if (matches(operation, HRV_ORIGIN_READ, HRV_START_DETECT, HRV_STOP_DETECT)) {
+        if (matches(operation, HRV_START_DETECT, HRV_STOP_DETECT)) {
+            return isManualSupported(DeviceManualDataType.HRV);
+        }
+        if (matches(operation, HRV_ORIGIN_READ)) {
             return isSupported(firstStatus(statusPackage2Hrv(), statusLegacyHrv()));
         }
         if (matches(operation, TEXT_ALARM_READ, TEXT_ALARM_ADD, TEXT_ALARM_MODIFY, TEXT_ALARM_DELETE,
@@ -221,7 +248,7 @@ public final class DeviceCapabilityStore {
             return getWatchUiServerCount() > 0;
         }
         if (matches(operation, START_BLOOD_GLUCOSE, STOP_BLOOD_GLUCOSE)) {
-            return isSupported(firstStatus(statusPackage3BloodGlucose(), statusLegacyBloodGlucose()));
+            return isManualSupported(DeviceManualDataType.BLOOD_GLUCOSE);
         }
         if (matches(operation, BLOOD_GLUCOSE_P_READ, BLOOD_GLUCOSE_P_SETTING)) {
             return isSupported(firstStatus(statusPackage3BloodGlucoseAdjust(), statusLegacyBloodGlucoseAdjust()));
@@ -237,7 +264,7 @@ public final class DeviceCapabilityStore {
             return isSupported(firstStatus(statusPackage4BloodComponentCalibration(), statusLegacyBloodComponentCalibration()));
         }
         if (matches(operation, DETECT_START_BLOOD_COMPONENT, DETECT_STOP_BLOOD_COMPONENT)) {
-            return isSupported(firstStatus(statusPackage4BloodComponent(), statusLegacyBloodComponent()));
+            return isManualSupported(DeviceManualDataType.BLOOD_COMPOSITION);
         }
         if (matches(operation, WORLD_CLOCK)) {
             return isSupported(firstStatus(statusPackage4WorldClock(), statusLegacyWorldClock()));
@@ -246,13 +273,13 @@ public final class DeviceCapabilityStore {
             return isSupported(firstStatus(statusPackage5TextImagePush(), statusLegacyTextImagePush()));
         }
         if (matches(operation, GSR_START, GSR_STOP)) {
-            return isSupported(firstStatus(statusPackage5Gsr(), statusLegacyGsr()));
+            return isManualSupported(DeviceManualDataType.SKIN_CONDUCTANCE);
         }
         if (matches(operation, GNSS_SOS_SAFETY_PROTECTION)) {
             return isSupported(firstStatus(statusPackage5SafetyProtection(), statusLegacySafetyProtection()));
         }
         if (matches(operation, MINI_CHECKUP)) {
-            return isSupported(firstStatus(statusPackage4MiniCheckup(), statusLegacyMiniCheckup()));
+            return isManualSupported(DeviceManualDataType.MINI_CHECKUP);
         }
         if (matches(operation, FUN_4G)) {
             return isSupported(statusLegacy4g());
@@ -301,6 +328,10 @@ public final class DeviceCapabilityStore {
 
     private static boolean isSupported(EFunctionStatus status) {
         return status == SUPPORT || status == SUPPORT_OPEN || status == SUPPORT_CLOSE;
+    }
+
+    private static boolean isManualSupported(DeviceManualDataType dataType) {
+        return manualDetectTypes.contains(DeviceManualDataType.ALL) || manualDetectTypes.contains(dataType);
     }
 
     private static EFunctionStatus firstStatus(EFunctionStatus first, EFunctionStatus second) {

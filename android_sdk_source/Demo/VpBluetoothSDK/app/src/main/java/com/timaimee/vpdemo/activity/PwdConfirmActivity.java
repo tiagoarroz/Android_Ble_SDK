@@ -134,6 +134,14 @@ public class PwdConfirmActivity extends AppCompatActivity {
         sb.setLength(0);
         tvDeviceInfo.setText("");
         tvPwdInfo.setText("A validar palavra-passe...");
+        btn2Function.setText("A aguardar capacidades do dispositivo");
+        btn2Function.postDelayed(() -> {
+            if (!DeviceCapabilityStore.hasDeviceCapabilities()) {
+                tvPwdInfo.setText("Password validada, mas as capacidades ainda não foram recebidas");
+                appendDeviceInfo("Capacidades do dispositivo ainda não recebidas. Aguarde ou volte a ligar a pulseira.");
+                DemoStepLogger.stepError("PWD_CAPABILITIES", "Timeout à espera dos callbacks de capacidades");
+            }
+        }, 5000);
         VPOperateManager.getInstance().confirmDevicePwd(new IBleWriteResponse() {
             @Override
             public void onResponse(int code) {
@@ -181,6 +189,8 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 allMsgLenght = functionSupport.getAllMsgLength();
                 isSleepPrecision = functionSupport.getPrecisionSleep() == SUPPORT;
                 DeviceCapabilityStore.setFunctionSupport(functionSupport);
+                appendDeviceInfo(message);
+                updateFunctionButtonState("FunctionDeviceSupportData");
                 DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Pacote principal de capacidades recebido");
             }
 
@@ -190,6 +200,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 DeviceCapabilityStore.setPackage1(functionPackage1);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                updateFunctionButtonState("DeviceFunctionPackage1");
             }
 
             @Override
@@ -198,6 +209,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 DeviceCapabilityStore.setPackage2(functionPackage2);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                updateFunctionButtonState("DeviceFunctionPackage2");
             }
 
             @Override
@@ -206,6 +218,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 DeviceCapabilityStore.setPackage3(functionPackage3);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                updateFunctionButtonState("DeviceFunctionPackage3");
             }
 
             @Override
@@ -214,6 +227,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 DeviceCapabilityStore.setPackage4(functionPackage4);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                updateFunctionButtonState("DeviceFunctionPackage4");
             }
 
             @Override
@@ -222,6 +236,7 @@ public class PwdConfirmActivity extends AppCompatActivity {
                 DeviceCapabilityStore.setPackage5(functionPackage5);
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
+                updateFunctionButtonState("DeviceFunctionPackage5");
             }
         }, new ISocialMsgDataListener() {
             @Override
@@ -243,13 +258,46 @@ public class PwdConfirmActivity extends AppCompatActivity {
             @Override
             public void OnSettingDataChange(CustomSettingData customSettingData) {
                 btnConfirm.setEnabled(true);
-                btn2Function.setEnabled(true);
+                updateFunctionButtonState("CustomSettingData");
                 String message = "Configurar:\n" + customSettingData.toString();
                 appendDeviceInfo(message);
                 Logger.t(TAG).i(message);
-                DemoStepLogger.stepSuccess("PWD_VALIDATE", "Handshake concluído; botões de teste desbloqueados");
+                DemoStepLogger.stepSuccess("PWD_VALIDATE", "Handshake concluído; a aguardar capacidades antes de desbloquear testes");
             }
         }, password, true);
+    }
+
+    /**
+     * Só desbloqueia o ecrã de testes quando o SDK já reportou capacidades.
+     * Sem esse relatório, a demo não consegue distinguir funções reais de funções de outros modelos.
+     */
+    private void updateFunctionButtonState(String source) {
+        captureManualDetectCapabilities(source);
+        runOnUiThread(() -> {
+            boolean hasCapabilities = DeviceCapabilityStore.hasDeviceCapabilities();
+            btn2Function.setEnabled(hasCapabilities);
+            btn2Function.setText(hasCapabilities
+                    ? "Ir para teste de funcionalidades"
+                    : "A aguardar capacidades do dispositivo");
+            if (hasCapabilities) {
+                DemoStepLogger.stepSuccess("PWD_CAPABILITIES", "Capacidades recebidas via " + source);
+            } else {
+                DemoStepLogger.featureEvent("PWD_CAPABILITIES", "Ainda sem capacidades após " + source);
+            }
+        });
+    }
+
+    /**
+     * Sincroniza a lista de medições manuais que o SDK calcula durante o handshake.
+     * Alguns modelos reportam uma função geral como suportada, mas recusam iniciar
+     * a medição manual se o tipo não existir nesta lista.
+     */
+    private void captureManualDetectCapabilities(String source) {
+        DeviceCapabilityStore.setManualDetectTypes(VPOperateManager.getInstance().supportManualDetectTypes);
+        DemoStepLogger.featureEvent(
+                "PWD_MANUAL_CAPABILITIES",
+                source + " -> " + VPOperateManager.getInstance().supportManualDetectTypes
+        );
     }
 
     private void appendDeviceInfo1(String msg) {
@@ -265,7 +313,9 @@ public class PwdConfirmActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             String line = "########################";
             String coloredLine = "<font color='#0000FF' size='16'>" + line + "</font>";
-            String styledMsg = msg.replaceAll("([^]+)", "<font color='#FF0000'><b>$1</b></font>");
+            String styledMsg = "<font color='#FF0000'><b>"
+                    + android.text.TextUtils.htmlEncode(msg)
+                    + "</b></font>";
             sb.append("\n").append(coloredLine);
             sb.append("\n").append(styledMsg).append("\n");
             tvDeviceInfo.setText(android.text.Html.fromHtml(sb.toString()));
@@ -283,6 +333,11 @@ public class PwdConfirmActivity extends AppCompatActivity {
     private String deviceaddress = "";
 
     private void toFunctionTestPager() {
+        if (!DeviceCapabilityStore.hasDeviceCapabilities()) {
+            Toast.makeText(this, "Aguarde pelo relatório de capacidades do dispositivo", Toast.LENGTH_LONG).show();
+            DemoStepLogger.stepError("OPERATE_SCREEN_OPEN", "Tentativa de abrir funcionalidades sem capacidades reportadas");
+            return;
+        }
         DemoStepLogger.stepStart("OPERATE_SCREEN_OPEN", "Pedido de entrada no ecrã de funcionalidades");
         new AlertDialog.Builder(this)
                 .setTitle("Ir para teste de funcionalidades")
