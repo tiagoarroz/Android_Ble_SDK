@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.response.BleNotifyResponse;
 import com.inuker.bluetooth.library.jieli.dial.JLWatchFaceManager;
 import com.inuker.bluetooth.library.jieli.ota.JLOTAHolder;
@@ -39,6 +40,7 @@ import com.timaimee.vpdemo.adapter.GridAdatper;
 import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.timaimee.vpdemo.oad.activity.OadActivity;
 import com.veepoo.protocol.VPOperateManager;
+import com.veepoo.protocol.listener.base.IABleConnectStatusListener;
 import com.veepoo.protocol.listener.base.IBleNotifyResponse;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.AbsBloodGlucoseChangeListener;
@@ -284,7 +286,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             }
         }
     };
-    WriteResponse writeResponse = new WriteResponse();
+    WriteResponse writeResponse = new GuardedWriteResponse();
 
 
     /**
@@ -298,6 +300,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     private String deviceVersion;
     private String deviceTestVersion;
     private boolean hasDeviceCapabilities = false;
+    private boolean isBleConnected = false;
     boolean isOadModel = false;
     boolean isNewSportCalc = false;
     boolean isInPttModel = false;
@@ -318,6 +321,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     };
     String PID = "";
 
+    private final IABleConnectStatusListener bleConnectStatusListener = new IABleConnectStatusListener() {
+        @Override
+        public void onConnectStatusChanged(String mac, int status) {
+            if (deviceaddress != null && !deviceaddress.equals(mac)) {
+                return;
+            }
+            isBleConnected = status == Constants.STATUS_CONNECTED;
+            Logger.t(TAG).i("BLE status em OperaterActivity: " + status);
+            DemoStepLogger.featureEvent("BLE_STATUS", "mac=" + mac + ", connected=" + isBleConnected);
+            runOnUiThread(() -> titleBleInfo.setText(buildTitleBleInfo()));
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -330,6 +346,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         tv3 = (TextView) super.findViewById(R.id.tv3);
         titleBleInfo = (TextView) super.findViewById(R.id.main_title_ble);
         initDataByIntent();
+        registerBleConnectionGuard();
         initGridView();
         listenDeviceCallbackData();
         listenCamera();
@@ -432,6 +449,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         isOadModel = getIntent().getBooleanExtra("isOadModel", false);
         hasDeviceCapabilities = getIntent().getBooleanExtra("hasDeviceCapabilities", false)
                 && DeviceCapabilityStore.hasDeviceCapabilities();
+        isBleConnected = isDeviceConnected();
+        titleBleInfo.setText(buildTitleBleInfo());
+    }
+
+    /**
+     * Regista um listener de estado BLE neste ecrã, porque o listener do ecrã de scan
+     * pode deixar de estar visível quando o Android recria activities.
+     */
+    private void registerBleConnectionGuard() {
+        if (deviceaddress == null || deviceaddress.length() == 0) {
+            return;
+        }
+        VPOperateManager.getInstance().registerConnectStatusListener(deviceaddress, bleConnectStatusListener);
+        isBleConnected = isDeviceConnected();
         titleBleInfo.setText(buildTitleBleInfo());
     }
 
@@ -449,6 +480,7 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         }
         return "：" + deviceaddress + ", dispositivo：" + deviceNumber
                 + "\n：" + deviceVersion + ", ：" + deviceTestVersion
+                + "\nBLE: " + (isBleConnected ? "ligado" : "desligado")
                 + capabilityInfo;
     }
 
@@ -461,6 +493,44 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             return false;
         }
         return !"false".equals(mGridData.get(position).get("enabled"));
+    }
+
+    /**
+     * Confirma a ligação antes de enviar comandos para evitar erros -1 do SDK.
+     */
+    private boolean canSendBleCommand(String operation) {
+        if (!requiresBleConnection(operation)) {
+            return true;
+        }
+        isBleConnected = isDeviceConnected();
+        if (isBleConnected) {
+            return true;
+        }
+        String message = "Pulseira desligada. Volte ao ecrã inicial e ligue novamente.";
+        DemoStepLogger.stepError("BLE_CONNECTION", "Comando bloqueado sem ligação BLE ativa. operação=" + operation);
+        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+        sendMsg(message + "\n" + operation, 1);
+        titleBleInfo.setText(buildTitleBleInfo());
+        return false;
+    }
+
+    /**
+     * Algumas ações só alteram estado local ou fecham sessões; as restantes exigem BLE.
+     */
+    private boolean requiresBleConnection(String operation) {
+        return !(operation.equals(BT_CONNECT)
+                || operation.equals(BT_CLOSE)
+                || operation.equals(DISCONNECT)
+                || operation.equals(BLE_DISCONNECT)
+                || operation.equals(GATT_CLOSE)
+                || operation.equals(SHOW_SP)
+                || operation.equals(SHARE_LOG));
+    }
+
+    private boolean isDeviceConnected() {
+        return deviceaddress != null
+                && deviceaddress.length() > 0
+                && VPOperateManager.getInstance().isDeviceConnected(deviceaddress);
     }
 
     @Override
@@ -509,6 +579,9 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             DemoStepLogger.featureEvent("OPERATION_BLOCKED", "posição=" + position + ", operação=" + oprater);
             Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
             sendMsg(message + "\n" + oprater, 1);
+            return;
+        }
+        if (!canSendBleCommand(oprater)) {
             return;
         }
         DemoStepLogger.featureEvent("OPERATION_SELECT", "posição=" + position + ", operação=" + oprater);
@@ -3835,6 +3908,20 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     /**
+     * Variante local do callback de escrita que atualiza o estado visual da sessão BLE.
+     */
+    private class GuardedWriteResponse extends WriteResponse {
+        @Override
+        public void onResponse(int code) {
+            super.onResponse(code);
+            if (code == -1) {
+                isBleConnected = false;
+                titleBleInfo.setText(buildTitleBleInfo());
+            }
+        }
+    }
+
+    /**
      * palavra-passe，
      * palavra-passe，inPttModel/outPttModel
      */
@@ -4098,14 +4185,19 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     @Override
     protected void onDestroy() {
         if (deviceaddress != null && !deviceaddress.trim().isEmpty()) {
+            VPOperateManager.getInstance().unregisterConnectStatusListener(deviceaddress, bleConnectStatusListener);
+        }
+        if (deviceaddress != null && !deviceaddress.trim().isEmpty() && isDeviceConnected()) {
             VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int i) {
                     DemoStepLogger.featureEvent("BLE_DISCONNECT", "Disconnect no OperaterActivity.onDestroy. code=" + i);
                 }
             });
-        } else {
+        } else if (deviceaddress == null || deviceaddress.trim().isEmpty()) {
             DemoStepLogger.featureEvent("BLE_DISCONNECT", "OperaterActivity.onDestroy sem endereço válido; sem disconnect");
+        } else {
+            DemoStepLogger.featureEvent("BLE_DISCONNECT", "OperaterActivity.onDestroy com BLE já desligado; sem disconnect");
         }
         super.onDestroy();
     }

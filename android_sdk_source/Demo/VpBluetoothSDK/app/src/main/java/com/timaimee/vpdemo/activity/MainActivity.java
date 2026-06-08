@@ -99,17 +99,20 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
     private boolean mIsOadModel;
     BluetoothLeScannerCompat mScanner;
     private boolean mHasActiveBleSession;
+    private boolean mBleSessionHandedOff;
 
     @Override
     protected void onDestroy() {
         VPLocalLogger.stopMonitor();
-        if (mHasActiveBleSession) {
+        if (mHasActiveBleSession && !mBleSessionHandedOff) {
             VPOperateManager.getInstance().disconnectWatch(new IBleWriteResponse() {
                 @Override
                 public void onResponse(int code) {
                     DemoStepLogger.featureEvent("BLE_DISCONNECT", "Disconnect no onDestroy. code=" + code);
                 }
             });
+        } else if (mBleSessionHandedOff) {
+            DemoStepLogger.featureEvent("BLE_DISCONNECT", "Sessão BLE entregue ao ecrã de funcionalidades; sem disconnect no MainActivity.onDestroy");
         } else {
             DemoStepLogger.featureEvent("BLE_DISCONNECT", "onDestroy sem sessão BLE ativa; sem disconnect");
         }
@@ -142,6 +145,15 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
         createFile();
         VPLocalLogger.startMonitor(this);
         DemoStepLogger.stepSuccess("MAIN_INIT", "Inicialização base concluída e monitorização de logs ativa");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mBleSessionHandedOff) {
+            mBleSessionHandedOff = false;
+            DemoStepLogger.featureEvent("BLE_SESSION", "MainActivity retomou a posse da sessão BLE");
+        }
     }
 
 
@@ -503,6 +515,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
                     Intent intent = new Intent(mContext, PwdConfirmActivity.class);
                     intent.putExtra("isoadmodel", mIsOadModel);
                     intent.putExtra("deviceaddress", mac);
+                    mBleSessionHandedOff = true;
                     startActivity(intent);
 
 //                    VPOperateManager.getInstance().confirmDevicePwd(new IBleWriteResponse() {
