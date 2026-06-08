@@ -498,6 +498,15 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
     }
 
     /**
+     * Bloqueia comandos destrutivos herdados da demo original do SDK.
+     * Estes comandos não são necessários para validar funcionalidades e podem
+     * limpar dados ou alterar o estado da pulseira durante testes manuais.
+     */
+    private boolean isUnsafeOperation(String operation) {
+        return CLEAR_DEVICE_DATA.equals(operation);
+    }
+
+    /**
      * Confirma a ligação antes de enviar comandos para evitar erros -1 do SDK.
      */
     private boolean canSendBleCommand(String operation) {
@@ -580,6 +589,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
             String message = "Funcionalidade não suportada pela pulseira atual";
             DemoStepLogger.featureEvent("OPERATION_BLOCKED", "posição=" + position + ", operação=" + oprater);
             Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+            sendMsg(message + "\n" + oprater, 1);
+            return;
+        }
+        if (isUnsafeOperation(oprater)) {
+            String message = "Operação bloqueada na demo para evitar limpar dados do dispositivo";
+            DemoStepLogger.stepError("OPERATION_BLOCKED", "Comando sensível bloqueado. operação=" + oprater);
+            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
             sendMsg(message + "\n" + oprater, 1);
             return;
         }

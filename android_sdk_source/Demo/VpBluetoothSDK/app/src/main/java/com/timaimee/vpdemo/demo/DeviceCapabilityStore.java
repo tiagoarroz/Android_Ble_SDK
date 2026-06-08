@@ -49,10 +49,13 @@ public final class DeviceCapabilityStore {
             LANGUAGE_CHINESE,
             LANGUAGE_ENGLISH,
             BATTERY,
-            CLEAR_DEVICE_DATA,
             SET_WATCH_TIME,
             SHOW_SP,
             GATT_CLOSE
+    ));
+
+    private static final Set<String> BLOCKED_UNSAFE = new HashSet<>(Arrays.asList(
+            CLEAR_DEVICE_DATA
     ));
 
     private DeviceCapabilityStore() {
@@ -118,6 +121,9 @@ public final class DeviceCapabilityStore {
     }
 
     public static boolean isOperationEnabled(int index, String operation) {
+        if (BLOCKED_UNSAFE.contains(operation)) {
+            return false;
+        }
         if (ALWAYS_AVAILABLE.contains(operation) || isHistoricalRead(operation)) {
             return true;
         }
