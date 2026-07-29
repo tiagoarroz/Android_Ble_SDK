@@ -6,9 +6,9 @@ Android_Ble_SDK is a toolkit for quickly interacting with Bluetooth BLE. It is o
 
 A aplicação multiplataforma de demonstração encontra-se em
 [`hband-sdk-demo`](./hband-sdk-demo/README.md). Inclui uma interface Ionic com
-Angular, plugins Capacitor nativos para os SDKs Android e iOS, catálogo
-funcional agrupado e visualizações adaptadas aos dados clínicos, atividade,
-sono e diagnóstico.
+Angular e plugins Capacitor nativos para Android e iOS, focados em frequência
+cardíaca, pressão arterial, SpO₂, temperatura, glicemia, HRV, ECG, composição
+corporal, MET, stress e histórico diário por data.
 
 ## 必要条件 | Necessary dependencies jar
 
@@ -317,7 +317,6 @@ en:
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 
 
 

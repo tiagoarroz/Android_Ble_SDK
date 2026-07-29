@@ -1121,6 +1121,124 @@ ion-content {
   }
 }
 
+.met-visual {
+  display: grid;
+  gap: 16px;
+}
+
+.met-visual__chart {
+  align-items: end;
+  background:
+    linear-gradient(to top, rgba(228, 88, 98, 0.06) 0 25%, transparent 25% 100%),
+    repeating-linear-gradient(to top, var(--app-border) 0 1px, transparent 1px 25%);
+  border-bottom: 1px solid var(--app-border);
+  display: flex;
+  gap: 10px;
+  height: 180px;
+  overflow-x: auto;
+  padding: 12px 4px 0;
+}
+
+.met-visual__point {
+  align-items: center;
+  display: grid;
+  flex: 1 0 54px;
+  gap: 4px;
+  height: 100%;
+  justify-items: center;
+  min-width: 54px;
+
+  strong {
+    color: var(--app-ink);
+    font-size: 11px;
+  }
+
+  time {
+    color: var(--app-ink-soft);
+    font-size: 9px;
+  }
+}
+
+.met-visual__track {
+  align-items: end;
+  display: flex;
+  height: 128px;
+  width: 22px;
+
+  i {
+    background: #74818a;
+    border-radius: 7px 7px 3px 3px;
+    box-shadow: 0 5px 16px rgba(20, 34, 42, 0.12);
+    display: block;
+    width: 100%;
+  }
+}
+
+.met-visual__point[data-intensity="light"] .met-visual__track i {
+  background: #2ebd93;
+}
+
+.met-visual__point[data-intensity="moderate"] .met-visual__track i {
+  background: #efa53d;
+}
+
+.met-visual__point[data-intensity="vigorous"] .met-visual__track i {
+  background: #e45862;
+}
+
+.met-visual__legend {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+
+  span {
+    align-items: center;
+    color: var(--app-ink-soft);
+    display: flex;
+    font-size: 11px;
+    gap: 7px;
+  }
+
+  span::before {
+    background: #74818a;
+    border-radius: 50%;
+    content: "";
+    height: 9px;
+    width: 9px;
+  }
+
+  span[data-intensity="light"]::before {
+    background: #2ebd93;
+  }
+
+  span[data-intensity="moderate"]::before {
+    background: #efa53d;
+  }
+
+  span[data-intensity="vigorous"]::before {
+    background: #e45862;
+  }
+}
+
+.met-visual__reference {
+  background: #f3f7f5;
+  border-radius: 12px;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+
+  strong {
+    color: var(--app-ink);
+    font-size: 12px;
+  }
+
+  span {
+    color: var(--app-ink-soft);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+}
+
 .sleep-visual {
   display: grid;
   gap: 16px;
@@ -1327,6 +1445,148 @@ ion-content {
 
   .profile-form__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Superfícies específicas do catálogo clínico reduzido. */
+.hero-panel--focused {
+  min-height: 310px;
+}
+
+.history-date-panel {
+  align-items: center;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  box-shadow: var(--app-shadow);
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin: 22px 0 30px;
+  padding: 18px 22px;
+
+  > div {
+    align-items: center;
+    display: flex;
+    gap: 14px;
+  }
+
+  strong {
+    display: block;
+    font-size: 15px;
+  }
+
+  p {
+    color: var(--app-ink-soft);
+    font-size: 13px;
+    margin: 4px 0 0;
+  }
+}
+
+.history-date-panel__icon {
+  align-items: center;
+  background: var(--app-mint-soft);
+  border-radius: 13px;
+  color: var(--ion-color-primary);
+  display: inline-flex;
+  font-size: 23px;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
+}
+
+.history-date-input {
+  --background: #f7faf8;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  max-width: 220px;
+  min-width: 190px;
+  padding-inline: 12px !important;
+}
+
+.metric-data-section {
+  border-top: 1px solid var(--app-border);
+  margin-top: 22px;
+  padding-top: 20px;
+
+  > h3,
+  .metric-data-section__heading h3 {
+    font-size: 14px;
+    margin: 0 0 14px;
+  }
+}
+
+.metric-data-section__heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    color: var(--app-ink-soft);
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.detail-empty--small {
+  min-height: 120px;
+}
+
+.line-visual--ecg {
+  background-image:
+    linear-gradient(rgba(217, 83, 95, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 83, 95, 0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+
+  .line-visual__stroke {
+    stroke: var(--app-danger);
+  }
+}
+
+.composition-visual {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.history-record-list {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  margin-top: 18px;
+  max-height: 260px;
+  overflow: auto;
+
+  > div {
+    align-items: start;
+    border-bottom: 1px solid var(--app-border);
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 62px 1fr;
+    padding: 10px 2px;
+  }
+
+  time {
+    color: var(--ion-color-primary);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  span {
+    color: var(--app-ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    gap: 5px 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .history-date-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .history-date-input {
+    max-width: none;
+    width: 100%;
   }
 }
 

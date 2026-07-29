@@ -29,7 +29,7 @@
 
 <ion-content [fullscreen]="true">
   <main class="demo-shell">
-    <section class="hero-panel">
+    <section class="hero-panel hero-panel--focused">
       <div class="hero-copy">
         <ion-chip class="eyebrow-chip">
           <ion-icon name="watch-outline"></ion-icon>
@@ -62,11 +62,7 @@
             {{ statusLabel() }}
           </span>
           <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
-          <small>
-            {{ hband.status().device?.firmware
-              ? i18n.translate('device.firmware', { version: hband.status().device?.firmware || '' })
-              : i18n.translate('device.readyToScan') }}
-          </small>
+          <small>{{ i18n.translate('device.readyToScan') }}</small>
           @if (hband.status().device?.rssi; as rssi) {
             <span class="signal-pill">
               <ion-icon name="radio-outline"></ion-icon>
@@ -77,35 +73,24 @@
       </aside>
     </section>
 
-    <section class="control-strip">
-      <ion-searchbar
-        [placeholder]="i18n.translate('catalog.search')"
-        [value]="searchTerm()"
-        (ionInput)="setSearch($event.detail.value)"
-      ></ion-searchbar>
-      <div class="simulation-control">
-        <ion-toggle
-          [checked]="hband.simulation()"
-          [disabled]="!hband.isNative"
-          (ionChange)="hband.setSimulation($event.detail.checked)"
-        >
-          {{ i18n.translate('catalog.simulation') }}
-        </ion-toggle>
+    <section class="history-date-panel">
+      <div>
+        <span class="history-date-panel__icon"><ion-icon name="calendar-outline"></ion-icon></span>
+        <div>
+          <strong>{{ i18n.translate('history.title') }}</strong>
+          <p>{{ i18n.translate('history.description') }}</p>
+        </div>
       </div>
+      <ion-input
+        class="history-date-input"
+        type="date"
+        [label]="i18n.translate('history.date')"
+        labelPlacement="stacked"
+        [max]="today"
+        [value]="selectedDate()"
+        (ionInput)="setDate($event.detail.value)"
+      ></ion-input>
     </section>
-
-    <ion-segment
-      class="category-segment"
-      scrollable
-      [value]="selectedCategory()"
-      (ionChange)="setCategory($event.detail.value)"
-    >
-      @for (category of categories; track category.id) {
-        <ion-segment-button [value]="category.id">
-          <ion-label>{{ i18n.translate(category.labelKey) }}</ion-label>
-        </ion-segment-button>
-      }
-    </ion-segment>
 
     <div class="section-heading">
       <div>
@@ -113,89 +98,45 @@
         <h2>{{ i18n.translate('catalog.title') }}</h2>
       </div>
       <ion-badge color="light">
-        {{ i18n.translate('catalog.featureCount', { count: filteredFeatures().length }) }}
+        {{ i18n.translate('catalog.featureCount', { count: features.length }) }}
       </ion-badge>
     </div>
 
     <section class="feature-grid">
-      @for (feature of filteredFeatures(); track feature.id) {
+      @for (feature of features; track feature.id) {
         <article
           class="feature-card"
           [class.feature-card--unsupported]="capability(feature) === 'unsupported'"
           tabindex="0"
           role="button"
-          (click)="openFeature(feature)"
-          (keydown.enter)="openFeature(feature)"
+          (click)="selectedFeature.set(feature)"
+          (keydown.enter)="selectedFeature.set(feature)"
         >
           <header>
             <span class="feature-icon"><ion-icon [name]="feature.icon"></ion-icon></span>
-            @if (feature.capability) {
-              <span class="capability-badge" [attr.data-state]="capability(feature)">
-                <ion-icon [name]="statusIcon(feature)"></ion-icon>
-                {{ i18n.translate('capabilities.' + capability(feature)) }}
-              </span>
-            }
+            <span class="capability-badge" [attr.data-state]="capability(feature)">
+              <ion-icon [name]="statusIcon(feature)"></ion-icon>
+              {{ i18n.translate('capabilities.' + capability(feature)) }}
+            </span>
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
           <p>{{ i18n.translate(feature.descriptionKey) }}</p>
-          @if (hband.latestFor(feature.id); as event) {
-            <app-data-visualizer
-              [event]="event"
-              [type]="feature.visualization"
-              [compact]="true"
-            ></app-data-visualizer>
+          @if (hband.latestFor(feature.metric); as event) {
+            <app-data-visualizer [event]="event" [type]="feature.visualization" [compact]="true"></app-data-visualizer>
           } @else {
-            <div class="feature-placeholder">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
+            <div class="feature-placeholder"><span></span><span></span><span></span><span></span><span></span></div>
           }
           <footer>
             <span>{{ i18n.translate('actions.open') }}</span>
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </footer>
         </article>
-      } @empty {
-        <div class="empty-state">
-          <ion-icon name="search-outline"></ion-icon>
-          <h3>{{ i18n.translate('catalog.noResults') }}</h3>
-          <p>{{ i18n.translate('catalog.noResultsDescription') }}</p>
-        </div>
       }
-    </section>
-
-    <section class="activity-panel">
-      <div class="section-heading section-heading--compact">
-        <div>
-          <span>{{ i18n.translate('activity.eyebrow') }}</span>
-          <h2>{{ i18n.translate('activity.title') }}</h2>
-        </div>
-      </div>
-      <div class="activity-log">
-        @for (entry of hband.logs(); track entry.id) {
-          <div class="activity-entry" [attr.data-level]="entry.level">
-            <span class="activity-entry__dot"></span>
-            <div>
-              <strong>{{ entry.operation || i18n.translate('activity.sdkEvent') }}</strong>
-              <p>{{ entry.message }}</p>
-            </div>
-            <time>{{ entry.timestamp | date:'HH:mm:ss' }}</time>
-          </div>
-        } @empty {
-          <div class="activity-empty">
-            <ion-icon name="information-circle-outline"></ion-icon>
-            {{ i18n.translate('activity.empty') }}
-          </div>
-        }
-      </div>
     </section>
   </main>
 </ion-content>
 
-<ion-modal
-  class="scan-modal"
-  [isOpen]="scanOpen()"
-  (didDismiss)="scanOpen.set(false)"
->
+<ion-modal class="scan-modal" [isOpen]="scanOpen()" (didDismiss)="scanOpen.set(false)">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -229,17 +170,9 @@
         @for (device of hband.devices(); track device.id) {
           <ion-item button detail (click)="connect(device.id)">
             <span class="device-list__icon" slot="start"><ion-icon name="watch-outline"></ion-icon></span>
-            <ion-label>
-              <h3>{{ device.name || i18n.translate('device.unknown') }}</h3>
-              <p>{{ device.id }}</p>
-            </ion-label>
+            <ion-label><h3>{{ device.name || i18n.translate('device.unknown') }}</h3><p>{{ device.id }}</p></ion-label>
             <ion-note slot="end">{{ device.rssi }} {{ i18n.translate('units.dbm') }}</ion-note>
           </ion-item>
-        } @empty {
-          <div class="scan-empty">
-            <ion-spinner name="crescent"></ion-spinner>
-            <p>{{ i18n.translate('scan.waiting') }}</p>
-          </div>
         }
       </ion-list>
       <div class="modal-actions">
@@ -252,18 +185,14 @@
   </ng-template>
 </ion-modal>
 
-<ion-modal
-  class="feature-modal"
-  [isOpen]="selectedFeature() !== null"
-  (didDismiss)="closeFeature()"
->
+<ion-modal class="feature-modal" [isOpen]="selectedFeature() !== null" (didDismiss)="selectedFeature.set(null)">
   <ng-template>
     @if (selectedFeature(); as feature) {
       <ion-header>
         <ion-toolbar>
           <ion-title>{{ i18n.translate(feature.titleKey) }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeFeature()">{{ i18n.translate('actions.close') }}</ion-button>
+            <ion-button (click)="selectedFeature.set(null)">{{ i18n.translate('actions.close') }}</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -281,12 +210,10 @@
             </div>
           </header>
 
-          <div class="detail-visualization">
-            @if (hband.latestFor(feature.id); as event) {
-              <app-data-visualizer
-                [event]="event"
-                [type]="feature.visualization"
-              ></app-data-visualizer>
+          <section class="metric-data-section">
+            <h3>{{ i18n.translate('data.live') }}</h3>
+            @if (hband.latestFor(feature.metric); as event) {
+              <app-data-visualizer [event]="event" [type]="feature.visualization"></app-data-visualizer>
             } @else {
               <div class="detail-empty">
                 <ion-icon name="analytics-outline"></ion-icon>
@@ -294,7 +221,22 @@
                 <span>{{ i18n.translate('data.runAction') }}</span>
               </div>
             }
-          </div>
+          </section>
+
+          <section class="metric-data-section">
+            <div class="metric-data-section__heading">
+              <h3>{{ i18n.translate('data.history') }}</h3>
+              <span>{{ selectedDate() }}</span>
+            </div>
+            @if (hband.historyFor(feature.metric); as history) {
+              <app-data-visualizer [event]="history" [type]="feature.visualization"></app-data-visualizer>
+            } @else {
+              <div class="detail-empty detail-empty--small">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ i18n.translate('history.noData') }}</span>
+              </div>
+            }
+          </section>
 
           @if (capability(feature) === 'unsupported') {
             <div class="support-warning">
@@ -303,78 +245,12 @@
             </div>
           }
 
-          @if (feature.id === 'authentication') {
-            <section class="profile-form">
-              <header>
-                <strong>{{ i18n.translate('profile.title') }}</strong>
-                <span>{{ i18n.translate('profile.description') }}</span>
-              </header>
-              <div class="profile-form__grid">
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [label]="i18n.translate('profile.height')"
-                  labelPlacement="stacked"
-                  [value]="profileHeight()"
-                  (ionInput)="profileHeight.set($event.detail.value || '')"
-                ></ion-input>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [label]="i18n.translate('profile.weight')"
-                  labelPlacement="stacked"
-                  [value]="profileWeight()"
-                  (ionInput)="profileWeight.set($event.detail.value || '')"
-                ></ion-input>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [label]="i18n.translate('profile.birthYear')"
-                  labelPlacement="stacked"
-                  [value]="profileBirthYear()"
-                  (ionInput)="profileBirthYear.set($event.detail.value || '')"
-                ></ion-input>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [label]="i18n.translate('profile.age')"
-                  labelPlacement="stacked"
-                  [value]="profileAge()"
-                  (ionInput)="profileAge.set($event.detail.value || '')"
-                ></ion-input>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [label]="i18n.translate('profile.targetSteps')"
-                  labelPlacement="stacked"
-                  [value]="profileTargetSteps()"
-                  (ionInput)="profileTargetSteps.set($event.detail.value || '')"
-                ></ion-input>
-                <ion-select
-                  interface="popover"
-                  [label]="i18n.translate('profile.sex')"
-                  labelPlacement="stacked"
-                  [placeholder]="i18n.translate('profile.select')"
-                  [value]="profileSex()"
-                  (ionChange)="profileSex.set($event.detail.value || '')"
-                >
-                  <ion-select-option value="female">{{ i18n.translate('profile.female') }}</ion-select-option>
-                  <ion-select-option value="male">{{ i18n.translate('profile.male') }}</ion-select-option>
-                </ion-select>
-              </div>
-              @if (profileError()) {
-                <ion-note color="danger">{{ i18n.translate('profile.required') }}</ion-note>
-              }
-            </section>
-          }
-
           <div class="feature-actions">
             @for (action of feature.actions; track action.id) {
               <ion-button
                 [fill]="action.tone === 'secondary' ? 'outline' : 'solid'"
-                [color]="action.tone === 'danger' ? 'danger' : 'primary'"
                 [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
-                (click)="run(action.operation)"
+                (click)="run(action, feature)"
               >
                 @if (hband.busyOperation() === action.operation) {
                   <ion-spinner slot="start" name="crescent"></ion-spinner>
@@ -383,16 +259,9 @@
               </ion-button>
             }
           </div>
-          @if (!hband.simulation() && !hband.operationAvailable(feature.actions[0].operation)) {
-            <ion-note class="bridge-note">
-              {{ i18n.translate('capabilities.catalogOnly') }}
-            </ion-note>
+          @if (feature.metric === 'met') {
+            <ion-note class="bridge-note">{{ i18n.translate('features.met.historyOnly') }}</ion-note>
           }
-
-          <div class="technical-note">
-            <span>{{ i18n.translate('data.operation') }}</span>
-            <code>{{ feature.actions[0].operation }}</code>
-          </div>
         </div>
       </ion-content>
     }

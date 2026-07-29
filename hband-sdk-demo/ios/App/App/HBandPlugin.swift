@@ -190,6 +190,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             testBloodComposition(false, call: call, operation: operation)
         case "measure.miniCheckup.start":
             testHealthGlance(call, operation: operation)
+        case "history.metric":
+            readMetricHistory(call, operation: operation)
         default:
             call.reject("OPERATION_NOT_IMPLEMENTED:\(operation)")
         }
@@ -441,8 +443,11 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                 values: [
                     "state": state.rawValue,
                     "progress": progress,
-                    "result": model?.description ?? ""
-                ]
+                    "bpm": Int(model?.aveHeart ?? "0") ?? 0,
+                    "hrvMilliseconds": Int(model?.aveHrv ?? "0") ?? 0,
+                    "qtMilliseconds": Int(model?.aveQT ?? "0") ?? 0
+                ],
+                samples: model?.filterSignals.compactMap { ($0 as? NSNumber)?.doubleValue }
             )
         }
         accept(call, operation: operation)
@@ -456,9 +461,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                 values: ["lead": lead, "progress": Int((progress?.fractionCompleted ?? 0) * 100)]
             )
         } testResult: { [weak self] state, model in
+            guard let model else { return }
             self?.emitData(
                 type: "bodyComposition",
-                values: ["state": state.rawValue, "result": model?.description ?? ""]
+                values: self?.bodyCompositionValues(model, state: state.rawValue) ?? [:]
             )
         }
         accept(call, operation: operation)
@@ -495,6 +501,277 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         accept(call, operation: operation)
     }
 
+    /**
+     * Sincroniza primeiro a área de dados apropriada do dispositivo e só
+     * consulta a base local do SDK quando este assinala a leitura como completa.
+     */
+    private func readMetricHistory(_ call: CAPPluginCall, operation: String) {
+        guard
+            let params = call.getObject("params"),
+            let metric = params["metric"] as? String,
+            let date = params["date"] as? String,
+            isValidDate(date)
+        else {
+            call.reject("HISTORY_METRIC_AND_DATE_REQUIRED")
+            return
+        }
+
+        let completion: (VPReadDeviceBaseDataState, UInt, UInt, UInt) -> Void = {
+            [weak self] state, _, _, _ in
+            guard state == .complete else { return }
+            self?.queryHistory(metric: metric, date: date)
+        }
+
+        switch metric {
+        case "oxygen":
+            manager.peripheralManage.veepooSdkStartReadDeviceOxygenData(completion)
+        case "hrv":
+            manager.peripheralManage.veepooSdkStartReadDeviceHrvData(completion)
+        case "temperature" where manager.peripheralModel?.temperatureType != 5:
+            manager.peripheralManage.veepooSdkStartReadDeviceTemperatureData(completion)
+        case "heartRate", "bloodPressure", "temperature", "bloodGlucose",
+             "ecg", "bodyComposition", "met", "stress":
+            manager.peripheralManage.veepooSdkStartReadDeviceAllData(readStateChange: completion)
+        default:
+            call.reject("HISTORY_METRIC_UNSUPPORTED:\(metric)")
+            return
+        }
+        accept(call, operation: operation)
+    }
+
+    /**
+     * Converte os formatos heterogéneos da base Veepoo num contrato único de
+     * registos temporais consumido pelas visualizações Angular.
+     */
+    private func queryHistory(metric: String, date: String) {
+        guard let tableID = manager.peripheralModel?.deviceAddress, !tableID.isEmpty else {
+            emitLog(level: "error", message: "DEVICE_ADDRESS_UNAVAILABLE", operation: "history.metric")
+            return
+        }
+
+        let records: [[String: Any]]
+        switch metric {
+        case "heartRate", "met", "stress":
+            let original = VPDataBaseOperation.veepooSDKGetOriginalData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [String: [String: Any]] ?? [:]
+            records = original.keys.sorted().compactMap { time in
+                guard let source = original[time] else { return nil }
+                let key = metric == "heartRate" ? "heartValue" : metric
+                guard let value = number(source[key]), value > 0 else { return nil }
+                let field = metric == "heartRate" ? "bpm" : metric == "stress" ? "score" : "met"
+                let samples = metric == "heartRate"
+                    ? numericArray(source["ecgs"] ?? source["ppgs"])
+                    : []
+                return historyRecord(
+                    date: date,
+                    time: time,
+                    values: [field: value],
+                    samples: samples
+                )
+            }
+        case "bloodPressure":
+            let source = VPDataBaseOperation.veepooSDKGetBloodData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [[String: Any]] ?? []
+            records = source.map {
+                historyRecord(
+                    date: date,
+                    time: string($0["Time"]),
+                    values: [
+                        "systolic": number($0["systolic"]) ?? 0,
+                        "diastolic": number($0["diastolic"]) ?? 0
+                    ]
+                )
+            }
+        case "oxygen":
+            let source = VPDataBaseOperation.veepooSDKGetDeviceOxygenData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [[String: Any]] ?? []
+            records = source.map {
+                historyRecord(
+                    date: date,
+                    time: string($0["Time"]),
+                    values: [
+                        "percent": number($0["OxygenValue"]) ?? 0,
+                        "pulseBpm": number($0["HeartValue"]) ?? 0
+                    ]
+                )
+            }
+        case "hrv":
+            let source = VPDataBaseOperation.veepooSDKGetDeviceHrvData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [[String: Any]] ?? []
+            records = source.map {
+                historyRecord(
+                    date: date,
+                    time: string($0["time"]),
+                    values: ["milliseconds": number($0["hrvValue"]) ?? 0],
+                    samples: numericArray($0["hearts"]).map { $0 * 10 }
+                )
+            }
+        case "temperature":
+            let source = VPDataBaseOperation.veepooSDKGetDeviceTemperatureData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [[String: Any]] ?? []
+            records = source.map {
+                let time = String(
+                    format: "%02d:%02d",
+                    Int(number($0["hour"]) ?? 0),
+                    Int(number($0["minute"]) ?? 0)
+                )
+                return historyRecord(
+                    date: date,
+                    time: time,
+                    values: [
+                        "celsius": number($0["value"]) ?? 0,
+                        "surfaceCelsius": number($0["riginalValue"]) ?? 0
+                    ]
+                )
+            }
+        case "bloodGlucose":
+            let source = VPDataBaseOperation.veepooSDKGetDeviceBloodGlucoseData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [[String: Any]] ?? []
+            records = source.flatMap { item -> [[String: Any]] in
+                let values = numericArray(item["bloodGlucoses"])
+                return values.enumerated().map { index, value in
+                    historyRecord(
+                        date: date,
+                        time: string(item["time"]),
+                        values: ["mmolL": value, "sample": index + 1]
+                    )
+                }
+            }
+        case "ecg":
+            let source: [VPECGTestDataModel] = VPDataBaseOperation.veepooSDKGetDeviceOffStoreECG(
+                withDate: date,
+                andTableID: tableID
+            ) ?? []
+            records = source.map { ecgHistoryRecord($0, date: date) }
+        case "bodyComposition":
+            let source: [VPBodyCompositionValueModel] = VPDataBaseOperation.veepooSDKGetDeviceOffStoreBodyComposition(
+                withDate: date,
+                andTableID: tableID
+            ) ?? []
+            records = source.map {
+                historyRecord(
+                    date: date,
+                    time: $0.testTime,
+                    values: bodyCompositionValues($0)
+                )
+            }
+        default:
+            records = []
+        }
+        emitHistory(metric: metric, date: date, records: records)
+    }
+
+    private func ecgHistoryRecord(_ model: VPECGTestDataModel, date: String) -> [String: Any] {
+        let values: [String: Any] = [
+            "bpm": number(model.aveHeart) ?? 0,
+            "hrvMilliseconds": number(model.aveHrv) ?? 0,
+            "qtMilliseconds": number(model.aveQT) ?? 0,
+            "durationSeconds": number(model.duration) ?? 0
+        ]
+        return historyRecord(
+            date: date,
+            time: model.testTime,
+            values: values,
+            samples: numericArray(model.filterSignals)
+        )
+    }
+
+    private func bodyCompositionValues(
+        _ model: VPBodyCompositionValueModel,
+        state: Any? = nil
+    ) -> [String: Any] {
+        var values: [String: Any] = [
+            "bmi": Double(model.bmi) ?? 0,
+            "bodyFatPercent": Double(model.bodyFatPercentage) ?? 0,
+            "waterPercent": Double(model.bodyMoisture) ?? 0,
+            "muscleMassKg": Double(model.muscleMass) ?? 0,
+            "boneMassKg": Double(model.boneMass) ?? 0,
+            "basalMetabolismKcal": Double(model.basalMetabolicRate) ?? 0
+        ]
+        if let state {
+            values["state"] = state
+        }
+        return values
+    }
+
+    private func historyRecord(
+        date: String,
+        time: String,
+        values: [String: Any],
+        samples: [Double] = []
+    ) -> [String: Any] {
+        var record: [String: Any] = [
+            "timestamp": "\(date)T\(normalisedTime(time))",
+            "values": values
+        ]
+        if !samples.isEmpty {
+            record["samples"] = samples
+        }
+        return record
+    }
+
+    private func emitHistory(metric: String, date: String, records: [[String: Any]]) {
+        let samples = records.flatMap { ($0["samples"] as? [Double]) ?? [] }
+        var payload: [String: Any] = [
+            "type": "history",
+            "metric": metric,
+            "date": date,
+            "timestamp": isoFormatter.string(from: Date()),
+            "values": ["records": records.count],
+            "records": records
+        ]
+        if !samples.isEmpty {
+            payload["samples"] = samples
+        }
+        notifyListeners("data", data: payload, retainUntilConsumed: true)
+    }
+
+    private func number(_ value: Any?) -> Double? {
+        if let number = value as? NSNumber {
+            return number.doubleValue
+        }
+        if let text = value as? String {
+            return Double(text)
+        }
+        return nil
+    }
+
+    private func numericArray(_ value: Any?) -> [Double] {
+        (value as? [Any] ?? []).compactMap(number)
+    }
+
+    private func string(_ value: Any?) -> String {
+        value as? String ?? "00:00:00"
+    }
+
+    private func normalisedTime(_ time: String) -> String {
+        let parts = time.split(separator: ":")
+        if parts.count == 2 {
+            return "\(time):00"
+        }
+        return parts.count == 3 ? time : "00:00:00"
+    }
+
+    private func isValidDate(_ value: String) -> Bool {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.isLenient = false
+        return formatter.date(from: value) != nil
+    }
+
     private func capabilitiesPayload() -> [String: String] {
         guard let model = manager.peripheralModel else {
             return [:]
@@ -511,6 +788,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             "bloodGlucose": support(model.bloodGlucoseType > 0),
             "fatigue": "unknown",
             "stress": support(model.stressType > 1),
+            "met": support(model.metType > 0),
             "bodyComposition": support(model.bodyCompositionType > 0),
             "bloodComposition": support(model.bloodAnalysisType > 0),
             "gsr": support(model.gsrType > 0),
@@ -571,14 +849,18 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         notifyListeners("statusChanged", data: statusPayload(), retainUntilConsumed: true)
     }
 
-    private func emitData(type: String, values: [String: Any]) {
+    private func emitData(type: String, values: [String: Any], samples: [Double]? = nil) {
+        var payload: [String: Any] = [
+            "type": type,
+            "timestamp": isoFormatter.string(from: Date()),
+            "values": values
+        ]
+        if let samples {
+            payload["samples"] = samples
+        }
         notifyListeners(
             "data",
-            data: [
-                "type": type,
-                "timestamp": isoFormatter.string(from: Date()),
-                "values": values
-            ],
+            data: payload,
             retainUntilConsumed: true
         )
     }

@@ -13,8 +13,8 @@
     }
   },
   "hero": {
-    "title": "Explore the MF91, signal by signal.",
-    "description": "A visual demonstration of the H Band SDKs for Android and iOS. Connect the band, confirm the capabilities reported by its firmware, and test each flow independently."
+    "title": "Ten metrics, one day at a time.",
+    "description": "Connect the MF91, confirm its firmware capabilities, and view live measurements or history for a specific date."
   },
   "common": {
     "yes": "Yes",
@@ -77,9 +77,24 @@
   "data": {
     "noData": "No data yet",
     "runAction": "Run an action to populate this visualisation.",
+    "live": "Live measurement",
+    "history": "Daily history",
     "operation": "First native operation",
     "chart": "Sample chart",
+    "ecgChart": "Electrocardiogram trace",
     "gauge": "Value gauge",
+    "met": {
+      "chart": "Metabolic equivalent progression throughout the day",
+      "value": "{{value}} MET",
+      "definition": "MET compares energy expenditure during activity with energy expenditure at rest.",
+      "oxygenReference": "1 MET corresponds to the reference of 3.5 ml of oxygen per kilogram of body weight per minute.",
+      "ranges": {
+        "rest": "Rest · about 1.0 MET",
+        "light": "Light activity · 1.6–2.9 MET",
+        "moderate": "Moderate activity · 3.0–5.9 MET",
+        "vigorous": "Vigorous activity · 6.0+ MET"
+      }
+    },
     "fields": {
       "bpm": "Heart rate (bpm)",
       "state": "State",
@@ -114,8 +129,21 @@
       "awakeMinutes": "Awake (min)",
       "charging": "Charging",
       "dbm": "Signal (dBm)",
-      "score": "Score"
+      "score": "Score",
+      "met": "MET",
+      "bmi": "BMI",
+      "bodyFatPercent": "Body fat (%)",
+      "waterPercent": "Body water (%)",
+      "muscleMassKg": "Muscle mass (kg)",
+      "boneMassKg": "Bone mass (kg)",
+      "basalMetabolismKcal": "Basal metabolism (kcal)"
     }
+  },
+  "history": {
+    "title": "History by date",
+    "description": "Choose the day used by each metric's history button.",
+    "date": "Date",
+    "noData": "Read history for this date."
   },
   "profile": {
     "title": "Personal data synchronization",
@@ -207,7 +235,7 @@
     },
     "bloodPressure": {
       "title": "Blood pressure",
-      "description": "Systolic, diastolic, progress, and private mode configuration."
+      "description": "Live systolic and diastolic pressure and records for the selected day."
     },
     "oxygen": {
       "title": "Blood oxygen",
@@ -227,11 +255,11 @@
     },
     "ecg": {
       "title": "ECG",
-      "description": "Real-time trace, progress, saved results, and multi-lead ECG."
+      "description": "Real-time trace and ECG results stored by the device."
     },
     "bloodGlucose": {
       "title": "Blood glucose",
-      "description": "Measurement, private calibration, and multiple meal-based calibration."
+      "description": "Live blood glucose and value progression throughout the day."
     },
     "fatigueStress": {
       "title": "Fatigue and stress",
@@ -240,6 +268,15 @@
     "bodyComposition": {
       "title": "Body composition",
       "description": "Measurement and history of body components reported by the device."
+    },
+    "met": {
+      "title": "MET",
+      "description": "Metabolic equivalent: the ratio between energy spent during activity and at rest.",
+      "historyOnly": "The SDK does not expose a live MET measurement; this metric is read from historical records."
+    },
+    "stress": {
+      "title": "Stress",
+      "description": "Live stress score and its progression throughout the day."
     },
     "bloodComposition": {
       "title": "Blood composition",

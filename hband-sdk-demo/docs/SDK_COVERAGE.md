@@ -1,45 +1,28 @@
-# Cobertura dos SDKs
+# Cobertura das métricas
 
-Estado desta versão da aplicação:
+| Métrica | Visualização | Android | iOS | Histórico por data |
+| --- | --- | --- | --- | --- |
+| Frequência cardíaca | Série em bpm | Iniciar/parar | Iniciar/parar | Sim |
+| Pressão arterial | Barras sistólica/diastólica | Iniciar/parar | Iniciar/parar | Sim |
+| Oxigénio no sangue | Medidor SpO₂ | Iniciar/parar | Iniciar/parar | Sim |
+| Temperatura corporal | Série em °C | Iniciar/parar | Iniciar/parar | Sim |
+| Glicemia | Série em mmol/L | Iniciar/parar | Iniciar/parar | Sim |
+| HRV | Série em ms | Iniciar/parar | Iniciar/parar | Sim |
+| ECG | Traçado | Iniciar/parar | Iniciar/parar | Sim |
+| Composição corporal | Grelha de componentes | Iniciar/parar | Iniciar/parar | Sim |
+| MET | Barras | Sem medição live no SDK | Sem medição live no SDK | Sim |
+| Stress | Medidor 0–100 | Iniciar/parar | Iniciar/parar | Sim |
 
-| Grupo | Interface | Android | iOS |
-| --- | --- | --- | --- |
-| Pesquisa, ligação, password e desligar | Completa | Bridge direto | Bridge direto |
-| Bateria, RSSI e sincronização de hora | Completa | Bridge direto | Bridge direto |
-| Perfil pessoal | Formulário explícito | Bridge direto | Bridge direto |
-| Ritmo cardíaco | Série/valor | Iniciar/parar | Iniciar/parar |
-| Pressão arterial | Barras/progresso | Iniciar/parar | Iniciar/parar |
-| SpO₂ | Medidor/série | Iniciar/parar | Iniciar/parar |
-| Respiração | Série/progresso | Iniciar/parar | Iniciar/parar |
-| Temperatura | Série/valores | Iniciar/parar | Iniciar/parar |
-| HRV | Série/valor | Iniciar/parar | Iniciar/parar |
-| Fadiga e stress | Medidor/progresso | Iniciar/parar | Iniciar/parar |
-| Glicose | Série/valor | Iniciar/parar | Iniciar/parar |
-| GSR | Série/progresso | Iniciar/parar | Iniciar/parar |
-| ECG | Série/progresso | Catalogado | Iniciar/parar |
-| Composição corporal e sanguínea | Barras/progresso | Catalogado | Iniciar/parar |
-| Microexame | Progresso/resultado | Catalogado | Iniciar |
-| Atividade do dia | Barras | Leitura direta | Catalogado |
-| Sono e históricos clínicos | Sono/tabela | Leitura direta para sono, dados brutos, SpO₂, HRV e temperatura | Catalogado |
-| Automação, alarmes e lembretes | Cronologia/tabela | Catalogado | Catalogado |
-| Ecrã, idioma, unidades e procura | Tabela/estado | Catalogado | Catalogado |
-| Câmara, notificações, música e tempo | Eventos/cronologia | Catalogado | Catalogado |
-| Contactos, SOS, relógios e contagem | Tabela/cronologia | Catalogado | Catalogado |
-| Mostradores, GPS/GNSS/AGPS e OTA | Tabela/eventos | Catalogado e bloqueado | Catalogado e bloqueado |
-| Sensores brutos e projetos especiais | Série/eventos | Catalogado | Catalogado |
-| BT clássico, 4G, IA e conteúdo | Eventos | Catalogado | Catalogado |
+## Origem do histórico
 
-## Significado dos estados
+- Android: `readDeviceManualData`, `readECGData` e
+  `readBodyComponentData`.
+- iOS: sincronização serializada do tipo de dados e consultas de
+  `VPDataBaseOperation` pela data exata.
+- MET e stress no iOS são extraídos dos dados originais diários, onde o próprio
+  SDK documenta os campos `met` e `stress`.
 
-- **Bridge direto**: existe implementação nativa compilada e os callbacks são
-  normalizados como eventos Capacitor.
-- **Catalogado**: a função aparece no módulo adequado com descrição,
-  visualização prevista e identificador de operação, mas não é executável no
-  bridge desta versão.
-- **Bloqueado**: função potencialmente destrutiva ou dependente de um ficheiro,
-  serviço ou payload que não foi fornecido. A aplicação não inventa esses
-  contratos.
-
-Após autenticação, a aplicação sobrepõe as capacidades declaradas pelo
-firmware. Uma capacidade `unsupported` bloqueia todos os comandos desse módulo;
-`unknown` não é apresentado como confirmação de suporte.
+O estado `supported`, `unsupported` ou `unknown` é calculado depois da
+autenticação a partir das capacidades do dispositivo. A compilação das bridges
+confirma apenas a compatibilidade com as versões de SDK incluídas; a cobertura
+real da MF91 continua dependente de ensaio físico.

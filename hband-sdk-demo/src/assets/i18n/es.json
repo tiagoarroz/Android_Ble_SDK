@@ -13,8 +13,8 @@
     }
   },
   "hero": {
-    "title": "Explora la MF91, señal a señal.",
-    "description": "Una demostración visual de los SDK H Band para Android e iOS. Conecta la pulsera, confirma las capacidades informadas por el firmware y prueba cada flujo de forma aislada."
+    "title": "Diez métricas, un día cada vez.",
+    "description": "Conecta la MF91, confirma las capacidades del firmware y consulta mediciones actuales o el historial de una fecha concreta."
   },
   "common": {
     "yes": "Sí",
@@ -77,9 +77,24 @@
   "data": {
     "noData": "Todavía no hay datos",
     "runAction": "Ejecuta una acción para completar esta visualización.",
+    "live": "Medición en tiempo real",
+    "history": "Historial del día",
     "operation": "Primera operación nativa",
     "chart": "Gráfico de muestras",
+    "ecgChart": "Trazado de electrocardiograma",
     "gauge": "Indicador de valor",
+    "met": {
+      "chart": "Evolución del equivalente metabólico a lo largo del día",
+      "value": "{{value}} MET",
+      "definition": "MET compara el gasto energético durante la actividad con el gasto en reposo.",
+      "oxygenReference": "1 MET corresponde a la referencia de 3,5 ml de oxígeno por kilogramo de peso corporal por minuto.",
+      "ranges": {
+        "rest": "Reposo · cerca de 1,0 MET",
+        "light": "Actividad ligera · 1,6–2,9 MET",
+        "moderate": "Actividad moderada · 3,0–5,9 MET",
+        "vigorous": "Actividad vigorosa · 6,0+ MET"
+      }
+    },
     "fields": {
       "bpm": "Frecuencia cardíaca (bpm)",
       "state": "Estado",
@@ -114,8 +129,21 @@
       "awakeMinutes": "Despierto (min)",
       "charging": "Cargando",
       "dbm": "Señal (dBm)",
-      "score": "Puntuación"
+      "score": "Puntuación",
+      "met": "MET",
+      "bmi": "IMC",
+      "bodyFatPercent": "Grasa corporal (%)",
+      "waterPercent": "Agua corporal (%)",
+      "muscleMassKg": "Masa muscular (kg)",
+      "boneMassKg": "Masa ósea (kg)",
+      "basalMetabolismKcal": "Metabolismo basal (kcal)"
     }
+  },
+  "history": {
+    "title": "Historial por fecha",
+    "description": "Elige el día utilizado por el botón de historial de cada métrica.",
+    "date": "Fecha",
+    "noData": "Lee el historial de esta fecha."
   },
   "profile": {
     "title": "Datos personales para sincronizar",
@@ -207,7 +235,7 @@
     },
     "bloodPressure": {
       "title": "Presión arterial",
-      "description": "Sistólica, diastólica, progreso y configuración del modo privado."
+      "description": "Presión sistólica y diastólica en directo y registros del día elegido."
     },
     "oxygen": {
       "title": "Oxígeno en sangre",
@@ -227,11 +255,11 @@
     },
     "ecg": {
       "title": "ECG",
-      "description": "Trazado en tiempo real, progreso, resultados guardados y ECG multiderivación."
+      "description": "Trazado en tiempo real y resultados de ECG guardados en el dispositivo."
     },
     "bloodGlucose": {
       "title": "Glucosa",
-      "description": "Medición, calibración privada y calibración múltiple por comida."
+      "description": "Glucemia en tiempo real y evolución de los valores durante el día."
     },
     "fatigueStress": {
       "title": "Fatiga y estrés",
@@ -240,6 +268,15 @@
     "bodyComposition": {
       "title": "Composición corporal",
       "description": "Medición e historial de componentes corporales informados por el dispositivo."
+    },
+    "met": {
+      "title": "MET",
+      "description": "Equivalente metabólico: relación entre la energía gastada durante la actividad y en reposo.",
+      "historyOnly": "El SDK no expone una medición MET en tiempo real; esta métrica se lee de los registros históricos."
+    },
+    "stress": {
+      "title": "Estrés",
+      "description": "Puntuación de estrés en tiempo real y evolución durante el día."
     },
     "bloodComposition": {
       "title": "Composición sanguínea",

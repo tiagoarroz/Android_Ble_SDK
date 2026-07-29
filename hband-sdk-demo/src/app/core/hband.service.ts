@@ -3,10 +3,7 @@ import { Capacitor } from '@capacitor/core';
 
 import { HBand } from './hband.plugin';
 import type {
-  HBandDataEvent,
-  HBandDevice,
-  HBandLogEntry,
-  HBandStatus,
+  HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry, HBandStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -17,54 +14,17 @@ const INITIAL_STATUS: HBandStatus = {
   platform: Capacitor.getPlatform(),
 };
 
-const COMMON_NATIVE_OPERATIONS = new Set([
-  'session.authenticate',
-  'session.disconnect',
-  'device.battery',
-  'device.rssi',
-  'device.time',
-  'device.profile',
-  'measure.heartRate.start',
-  'measure.heartRate.stop',
-  'measure.bloodPressure.start',
-  'measure.bloodPressure.stop',
-  'measure.oxygen.start',
-  'measure.oxygen.stop',
-  'measure.breathing.start',
-  'measure.breathing.stop',
-  'measure.temperature.start',
-  'measure.temperature.stop',
-  'measure.fatigue.start',
-  'measure.fatigue.stop',
-  'measure.hrv.start',
-  'measure.hrv.stop',
-  'measure.stress.start',
-  'measure.stress.stop',
-  'measure.gsr.start',
-  'measure.gsr.stop',
-  'measure.bloodGlucose.start',
-  'measure.bloodGlucose.stop',
-]);
-
-const ANDROID_OPERATIONS = new Set([
-  ...COMMON_NATIVE_OPERATIONS,
-  'history.activity.current',
-  'history.sleep',
-  'history.origin',
-  'history.oxygen',
-  'history.hrv',
-  'history.temperature',
-]);
-
-const IOS_OPERATIONS = new Set([
-  ...COMMON_NATIVE_OPERATIONS,
-  'measure.ecg.start',
-  'measure.ecg.stop',
-  'measure.bodyComposition.start',
-  'measure.bodyComposition.stop',
-  'measure.bloodComposition.start',
-  'measure.bloodComposition.stop',
-  'measure.miniCheckup.start',
+const METRIC_OPERATIONS = new Set([
+  'measure.heartRate.start', 'measure.heartRate.stop',
+  'measure.bloodPressure.start', 'measure.bloodPressure.stop',
+  'measure.oxygen.start', 'measure.oxygen.stop',
+  'measure.temperature.start', 'measure.temperature.stop',
+  'measure.bloodGlucose.start', 'measure.bloodGlucose.stop',
+  'measure.hrv.start', 'measure.hrv.stop',
+  'measure.ecg.start', 'measure.ecg.stop',
+  'measure.bodyComposition.start', 'measure.bodyComposition.stop',
+  'measure.stress.start', 'measure.stress.stop',
+  'history.metric',
 ]);
 
 @Injectable({ providedIn: 'root' })
@@ -72,7 +32,8 @@ export class HBandService {
   readonly isNative = Capacitor.isNativePlatform();
   readonly status = signal<HBandStatus>(INITIAL_STATUS);
   readonly devices = signal<HBandDevice[]>([]);
-  readonly data = signal<Record<string, HBandDataEvent>>({});
+  readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
+  readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly logs = signal<HBandLogEntry[]>([]);
   readonly busyOperation = signal<string | null>(null);
   readonly simulation = signal(!this.isNative);
@@ -80,19 +41,17 @@ export class HBandService {
   private queue: Promise<unknown> = Promise.resolve();
 
   /**
-   * Liga os eventos do plugin uma única vez e recupera o estado nativo atual.
+   * Liga os eventos uma única vez e recupera o estado da bridge nativa.
    */
   async initialize(): Promise<void> {
     if (this.simulation()) {
       this.seedSimulation();
       return;
     }
-
     await HBand.addListener('deviceFound', (device) => this.upsertDevice(device));
     await HBand.addListener('statusChanged', (status) => this.status.set(status));
     await HBand.addListener('data', (event) => this.storeData(event));
     await HBand.addListener('log', (entry) => this.appendLog(entry));
-
     try {
       this.status.set(await HBand.getStatus());
     } catch (error) {
@@ -100,9 +59,6 @@ export class HBandService {
     }
   }
 
-  /**
-   * Solicita permissões e inicia uma pesquisa limitada no tempo.
-   */
   async scan(): Promise<void> {
     if (this.simulation()) {
       this.simulateScan();
@@ -116,18 +72,6 @@ export class HBandService {
     await HBand.startScan({ timeoutMs: 12_000 });
   }
 
-  async stopScan(): Promise<void> {
-    if (this.simulation()) {
-      this.status.update((status) => ({ ...status, state: 'idle' }));
-      return;
-    }
-    await HBand.stopScan();
-  }
-
-  /**
-   * A autenticação usa a password predefinida do SDK apenas quando o utilizador
-   * não fornece outra; nenhum comando funcional é enviado antes da confirmação.
-   */
   async connect(deviceId: string, password = '0000'): Promise<void> {
     if (this.simulation()) {
       this.simulateConnection(deviceId);
@@ -145,15 +89,15 @@ export class HBandService {
   }
 
   /**
-   * Serializa todas as operações porque o SDK H Band não aceita interações
-   * demoradas em paralelo com o mesmo periférico.
+   * Serializa os comandos porque o protocolo não permite operações BLE longas
+   * concorrentes sobre a mesma pulseira.
    */
   execute(operation: string, params: Record<string, unknown> = {}): Promise<void> {
     const task = async () => {
       this.busyOperation.set(operation);
       try {
         if (this.simulation()) {
-          this.simulateOperation(operation);
+          this.simulateOperation(operation, params);
         } else {
           await HBand.execute({ operation, params });
         }
@@ -168,58 +112,20 @@ export class HBandService {
     return this.queue.then(() => undefined);
   }
 
-  capability(name?: string): 'supported' | 'unsupported' | 'unknown' {
-    if (!name) {
-      return 'unknown';
-    }
+  capability(name: string): 'supported' | 'unsupported' | 'unknown' {
     return this.status().capabilities[name] ?? 'unknown';
   }
 
-  /**
-   * Distingue o catálogo integral do SDK dos comandos já ligados ao bridge de
-   * cada plataforma, evitando apresentar uma operação inerte como executável.
-   */
   operationAvailable(operation: string): boolean {
-    if (this.simulation() || operation === 'session.scan') {
-      return true;
-    }
-    const platform = this.status().platform ?? Capacitor.getPlatform();
-    return platform === 'android'
-      ? ANDROID_OPERATIONS.has(operation)
-      : platform === 'ios' && IOS_OPERATIONS.has(operation);
+    return this.simulation() || METRIC_OPERATIONS.has(operation);
   }
 
-  latestFor(featureId: string): HBandDataEvent | undefined {
-    const aliases: Record<string, string[]> = {
-      'device-status': ['battery', 'rssi'],
-      'heart-rate': ['heartRate'],
-      'blood-pressure': ['bloodPressure'],
-      oxygen: ['oxygen'],
-      breathing: ['breathing'],
-      temperature: ['temperature'],
-      hrv: ['hrv'],
-      ecg: ['ecg'],
-      'blood-glucose': ['bloodGlucose'],
-      'fatigue-stress': ['fatigue', 'stress'],
-      'body-composition': ['bodyComposition'],
-      'blood-composition': ['bloodComposition'],
-      'gsr-mini': ['gsr', 'miniCheckup'],
-      'daily-activity': ['activity'],
-      sleep: ['sleep'],
-      'health-history': ['allHealth', 'origin'],
-      'sport-history': ['sport'],
-      'clinical-history': ['manual', 'rr'],
-    };
-    return aliases[featureId]?.map((type) => this.data()[type]).find(Boolean);
+  latestFor(metric: MetricId): HBandDataEvent | undefined {
+    return this.data()[metric];
   }
 
-  setSimulation(enabled: boolean): void {
-    if (this.isNative) {
-      this.simulation.set(enabled);
-    }
-    if (enabled) {
-      this.seedSimulation();
-    }
+  historyFor(metric: MetricId): HBandDataEvent | undefined {
+    return this.history()[metric];
   }
 
   private upsertDevice(device: HBandDevice): void {
@@ -229,12 +135,32 @@ export class HBandService {
     });
   }
 
+  /**
+   * Separa histórico e tempo real, impedindo que uma leitura de outro dia
+   * substitua o valor atual apresentado no cartão da métrica.
+   */
   private storeData(event: HBandDataEvent): void {
-    this.data.update((data) => ({ ...data, [event.type]: event }));
+    const metric = event.metric ?? this.metricForType(event.type);
+    if (!metric) {
+      return;
+    }
+    if (event.type === 'history') {
+      this.history.update((history) => ({ ...history, [metric]: event }));
+    } else {
+      this.data.update((data) => ({ ...data, [metric]: event }));
+    }
+  }
+
+  private metricForType(type: string): MetricId | undefined {
+    const metrics: MetricId[] = [
+      'heartRate', 'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose',
+      'hrv', 'ecg', 'bodyComposition', 'met', 'stress',
+    ];
+    return metrics.find((metric) => metric === type);
   }
 
   private appendLog(entry: HBandLogEntry): void {
-    this.logs.update((logs) => [entry, ...logs].slice(0, 120));
+    this.logs.update((logs) => [entry, ...logs].slice(0, 80));
   }
 
   private fail(operation: string, error: unknown): void {
@@ -249,9 +175,9 @@ export class HBandService {
   }
 
   private seedSimulation(): void {
-    const capabilities: HBandStatus['capabilities'] = Object.fromEntries([
-      'heartRate', 'bloodPressure', 'bloodOxygen', 'sleep', 'sport', 'display',
-      'findDevice', 'camera', 'weather', 'alarms', 'autoMeasure', 'lowPower',
+    const capabilities = Object.fromEntries([
+      'heartRate', 'bloodPressure', 'bloodOxygen', 'temperature', 'bloodGlucose',
+      'hrv', 'ecg', 'bodyComposition', 'met', 'stress',
     ].map((capability) => [capability, 'supported' as const]));
     this.status.set({
       available: true,
@@ -261,24 +187,6 @@ export class HBandService {
       platform: 'web',
       sdkVersion: 'simulation',
     });
-    this.storeData({
-      type: 'heartRate',
-      timestamp: new Date().toISOString(),
-      values: { bpm: 72 },
-      samples: [68, 70, 69, 73, 76, 74, 72, 71, 72],
-    });
-    this.storeData({
-      type: 'activity',
-      timestamp: new Date().toISOString(),
-      values: { steps: 6842, distanceKm: 4.7, caloriesKcal: 328 },
-      samples: [220, 480, 760, 1120, 680, 930, 1290, 842, 520],
-    });
-    this.storeData({
-      type: 'sleep',
-      timestamp: new Date().toISOString(),
-      values: { totalMinutes: 438, deepMinutes: 112, lightMinutes: 286, awakeMinutes: 40 },
-      samples: [0, 1, 1, 2, 2, 1, 2, 1, 0, 1, 2, 2, 1, 0],
-    });
   }
 
   private simulateScan(): void {
@@ -287,54 +195,74 @@ export class HBandService {
     window.setTimeout(() => {
       this.upsertDevice({ id: 'MF91-DEMO', name: 'MF91', rssi: -48, model: 'MF91' });
       this.status.update((status) => ({ ...status, state: 'idle' }));
-    }, 450);
+    }, 300);
   }
 
   private simulateConnection(deviceId: string): void {
     const device = this.devices().find((item) => item.id === deviceId)
       ?? { id: deviceId, name: 'MF91', model: 'MF91', rssi: -48 };
-    this.status.update((status) => ({ ...status, state: 'connecting' }));
-    window.setTimeout(() => {
-      this.status.update((status) => ({
-        ...status,
-        state: 'connected',
-        device: { ...device, firmware: 'demo-1.0.0', hardware: 'MF91' },
-      }));
-      this.appendLog({
-        id: `${Date.now()}-connected`,
-        timestamp: new Date().toISOString(),
-        level: 'success',
-        message: 'MF91 simulation connected',
-      });
-    }, 650);
+    this.status.update((status) => ({
+      ...status,
+      state: 'connected',
+      device: { ...device, firmware: 'simulation' },
+    }));
   }
 
-  private simulateOperation(operation: string): void {
+  private simulateOperation(operation: string, params: Record<string, unknown>): void {
     const now = new Date().toISOString();
-    const simulated: Record<string, HBandDataEvent> = {
-      'device.battery': { type: 'battery', timestamp: now, values: { percent: 78, charging: false } },
-      'device.rssi': { type: 'rssi', timestamp: now, values: { dbm: -51 } },
-      'measure.heartRate.start': { type: 'heartRate', timestamp: now, values: { bpm: 74 }, samples: [69, 71, 73, 72, 75, 77, 74] },
-      'measure.bloodPressure.start': { type: 'bloodPressure', timestamp: now, values: { systolic: 121, diastolic: 78, progress: 100 } },
-      'measure.oxygen.start': { type: 'oxygen', timestamp: now, values: { percent: 97, pulseBpm: 73 }, samples: [96, 97, 97, 98, 97] },
-      'measure.breathing.start': { type: 'breathing', timestamp: now, values: { breathsPerMinute: 16 }, samples: [15, 16, 16, 17, 16] },
-      'measure.temperature.start': { type: 'temperature', timestamp: now, values: { celsius: 36.4 }, samples: [36.1, 36.2, 36.3, 36.4] },
-      'measure.hrv.start': { type: 'hrv', timestamp: now, values: { milliseconds: 54 }, samples: [48, 52, 51, 57, 54] },
-      'measure.fatigue.start': { type: 'fatigue', timestamp: now, values: { score: 32, progress: 100 } },
-      'measure.stress.start': { type: 'stress', timestamp: now, values: { score: 38 }, samples: [32, 36, 44, 40, 38] },
-      'measure.bloodGlucose.start': { type: 'bloodGlucose', timestamp: now, values: { mmolL: 5.2 }, samples: [4.9, 5.1, 5.2] },
-      'history.activity.current': { type: 'activity', timestamp: now, values: { steps: 6842, distanceKm: 4.7, caloriesKcal: 328 }, samples: [220, 480, 760, 1120, 680, 930, 1290, 842, 520] },
+    const live: Record<string, HBandDataEvent> = {
+      'measure.heartRate.start': { type: 'heartRate', metric: 'heartRate', timestamp: now, values: { bpm: 74 }, samples: [69, 71, 73, 72, 75, 77, 74] },
+      'measure.bloodPressure.start': { type: 'bloodPressure', metric: 'bloodPressure', timestamp: now, values: { systolic: 121, diastolic: 78, pulseBpm: 73 } },
+      'measure.oxygen.start': { type: 'oxygen', metric: 'oxygen', timestamp: now, values: { percent: 97 }, samples: [96, 97, 97, 98, 97] },
+      'measure.temperature.start': { type: 'temperature', metric: 'temperature', timestamp: now, values: { celsius: 36.4 }, samples: [36.1, 36.2, 36.3, 36.4] },
+      'measure.bloodGlucose.start': { type: 'bloodGlucose', metric: 'bloodGlucose', timestamp: now, values: { mmolL: 5.2 }, samples: [4.9, 5.1, 5.2] },
+      'measure.hrv.start': { type: 'hrv', metric: 'hrv', timestamp: now, values: { milliseconds: 54 }, samples: [48, 52, 51, 57, 54] },
+      'measure.ecg.start': { type: 'ecg', metric: 'ecg', timestamp: now, values: { bpm: 72 }, samples: [0, 12, 45, -18, -8, 2, 4, 42, -20, -7, 1, 3] },
+      'measure.bodyComposition.start': { type: 'bodyComposition', metric: 'bodyComposition', timestamp: now, values: { bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6, boneMassKg: 2.8, basalMetabolismKcal: 1540 } },
+      'measure.stress.start': { type: 'stress', metric: 'stress', timestamp: now, values: { score: 38 }, samples: [32, 36, 44, 40, 38] },
     };
-    const event = simulated[operation];
+    if (operation === 'history.metric') {
+      const metric = params['metric'] as MetricId;
+      const date = String(params['date']);
+      const records = this.simulatedHistory(metric, date);
+      this.storeData({
+        type: 'history',
+        metric,
+        date,
+        timestamp: now,
+        values: { records: records.length },
+        records,
+        samples: records.flatMap((record) => record.samples ?? this.numericValues(record.values)),
+      });
+      return;
+    }
+    const event = live[operation];
     if (event) {
       this.storeData(event);
     }
-    this.appendLog({
-      id: `${Date.now()}-${operation}`,
-      timestamp: now,
-      level: event ? 'success' : 'info',
-      message: event ? 'Simulated data received' : 'Simulated operation accepted',
-      operation,
-    });
+  }
+
+  private simulatedHistory(metric: MetricId, date: string): HBandHistoryRecord[] {
+    const valueSets: Record<MetricId, Array<Record<string, number>>> = {
+      heartRate: [{ bpm: 68 }, { bpm: 73 }, { bpm: 76 }, { bpm: 71 }],
+      bloodPressure: [{ systolic: 118, diastolic: 76 }, { systolic: 121, diastolic: 79 }],
+      oxygen: [{ percent: 97 }, { percent: 98 }, { percent: 96 }],
+      temperature: [{ celsius: 36.2 }, { celsius: 36.4 }, { celsius: 36.3 }],
+      bloodGlucose: [{ mmolL: 4.9 }, { mmolL: 5.5 }, { mmolL: 5.1 }],
+      hrv: [{ milliseconds: 49 }, { milliseconds: 55 }, { milliseconds: 52 }],
+      ecg: [{ bpm: 71 }, { bpm: 73 }],
+      bodyComposition: [{ bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6 }],
+      met: [{ met: 1.0 }, { met: 2.2 }, { met: 4.4 }, { met: 6.6 }],
+      stress: [{ score: 31 }, { score: 44 }, { score: 38 }],
+    };
+    return valueSets[metric].map((values, index) => ({
+      timestamp: `${date}T${String(8 + index * 3).padStart(2, '0')}:00:00`,
+      values,
+      samples: metric === 'ecg' ? [0, 10, 42, -20, -7, 2, 4, 38, -18, -5] : undefined,
+    }));
+  }
+
+  private numericValues(values: Record<string, string | number | boolean | null>): number[] {
+    return Object.values(values).filter((value): value is number => typeof value === 'number');
   }
 }

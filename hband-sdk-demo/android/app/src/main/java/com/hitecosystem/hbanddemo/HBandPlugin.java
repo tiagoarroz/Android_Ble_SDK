@@ -17,6 +17,7 @@ import com.getcapacitor.annotation.PermissionCallback;
 import com.inuker.bluetooth.library.Code;
 import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.response.BleReadRssiResponse;
+import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
@@ -28,9 +29,14 @@ import com.veepoo.protocol.listener.base.IConnectResponse;
 import com.veepoo.protocol.listener.base.INotifyResponse;
 import com.veepoo.protocol.listener.data.IBPDetectDataListener;
 import com.veepoo.protocol.listener.data.IBatteryDataListener;
+import com.veepoo.protocol.listener.data.IBodyComponentDetectListener;
+import com.veepoo.protocol.listener.data.IBodyComponentReadDataListener;
 import com.veepoo.protocol.listener.data.IBloodGlucoseChangeListener;
 import com.veepoo.protocol.listener.data.IBreathDataListener;
 import com.veepoo.protocol.listener.data.IDeviceFuctionDataListener;
+import com.veepoo.protocol.listener.data.AbsDeviceManualDetectDataListener;
+import com.veepoo.protocol.listener.data.IECGDetectListener;
+import com.veepoo.protocol.listener.data.IECGReadDataListener;
 import com.veepoo.protocol.listener.data.IFatigueDataListener;
 import com.veepoo.protocol.listener.data.IGsrDetectListener;
 import com.veepoo.protocol.listener.data.IHRVOriginDataListener;
@@ -48,6 +54,11 @@ import com.veepoo.protocol.listener.data.ISportDataListener;
 import com.veepoo.protocol.listener.data.ITemptureDataListener;
 import com.veepoo.protocol.listener.data.ITemptureDetectDataListener;
 import com.veepoo.protocol.model.datas.BatteryData;
+import com.veepoo.protocol.model.datas.BloodGlucoseManualData;
+import com.veepoo.protocol.model.datas.BloodOxygenManualData;
+import com.veepoo.protocol.model.datas.BloodPressureManualData;
+import com.veepoo.protocol.model.datas.BodyComponent;
+import com.veepoo.protocol.model.datas.BodyTemperatureManualData;
 import com.veepoo.protocol.model.datas.BpData;
 import com.veepoo.protocol.model.datas.BreathData;
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage1;
@@ -56,25 +67,37 @@ import com.veepoo.protocol.model.datas.DeviceFunctionPackage3;
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage4;
 import com.veepoo.protocol.model.datas.DeviceFunctionPackage5;
 import com.veepoo.protocol.model.datas.FatigueData;
+import com.veepoo.protocol.model.datas.EcgDetectInfo;
+import com.veepoo.protocol.model.datas.EcgDetectResult;
+import com.veepoo.protocol.model.datas.EcgDetectState;
+import com.veepoo.protocol.model.datas.EcgDiagnosis;
 import com.veepoo.protocol.model.datas.FunctionDeviceSupportData;
 import com.veepoo.protocol.model.datas.FunctionSocailMsgData;
 import com.veepoo.protocol.model.datas.GsrDetectResult;
 import com.veepoo.protocol.model.datas.HRVOriginData;
+import com.veepoo.protocol.model.datas.HeartRateManualData;
+import com.veepoo.protocol.model.datas.HrvManualData;
+import com.veepoo.protocol.model.datas.MetoManualData;
 import com.veepoo.protocol.model.datas.HeartData;
 import com.veepoo.protocol.model.datas.OriginData;
 import com.veepoo.protocol.model.datas.OriginHalfHourData;
 import com.veepoo.protocol.model.datas.PersonInfoData;
 import com.veepoo.protocol.model.datas.PwdData;
+import com.veepoo.protocol.model.datas.PressureManualData;
 import com.veepoo.protocol.model.datas.SleepData;
 import com.veepoo.protocol.model.datas.Spo2hData;
 import com.veepoo.protocol.model.datas.Spo2hOriginData;
 import com.veepoo.protocol.model.datas.SportData;
 import com.veepoo.protocol.model.datas.TemptureData;
 import com.veepoo.protocol.model.datas.TemptureDetectData;
+import com.veepoo.protocol.model.datas.TimeData;
+import com.veepoo.protocol.model.enums.DetectState;
+import com.veepoo.protocol.model.enums.DeviceManualDataType;
 import com.veepoo.protocol.model.enums.EBPDetectModel;
 import com.veepoo.protocol.model.enums.EBloodGlucoseRiskLevel;
 import com.veepoo.protocol.model.enums.EBloodGlucoseStatus;
 import com.veepoo.protocol.model.enums.EFunctionStatus;
+import com.veepoo.protocol.model.enums.EEcgDataType;
 import com.veepoo.protocol.model.enums.EPwdStatus;
 import com.veepoo.protocol.model.enums.ESex;
 import com.veepoo.protocol.model.enums.ETimeMode;
@@ -85,7 +108,12 @@ import com.veepoo.protocol.model.settings.DeviceTimeSetting;
 import com.veepoo.protocol.model.settings.ReadOriginSetting;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +139,11 @@ public class HBandPlugin extends Plugin {
     private final Map<String, SearchResult> discoveredDevices = new LinkedHashMap<>();
     private final JSObject capabilities = new JSObject();
     private final IBleWriteResponse writeResponse = code -> emitLog(
+        code == Code.REQUEST_SUCCESS ? "success" : "warning",
+        "BLE write response: " + code,
+        null
+    );
+    private final BleWriteResponse directWriteResponse = code -> emitLog(
         code == Code.REQUEST_SUCCESS ? "success" : "warning",
         "BLE write response: " + code,
         null
@@ -366,6 +399,25 @@ public class HBandPlugin extends Plugin {
                 manager.stopBloodGlucoseDetect(writeResponse, bloodGlucoseListener);
                 accept(call, operation);
                 return;
+            case "measure.ecg.start":
+                manager.startDetectECG(directWriteResponse, false, ecgListener);
+                accept(call, operation);
+                return;
+            case "measure.ecg.stop":
+                manager.stopDetectECG(directWriteResponse, false, ecgListener);
+                accept(call, operation);
+                return;
+            case "measure.bodyComposition.start":
+                manager.startDetectBodyComponent(directWriteResponse, bodyComponentListener);
+                accept(call, operation);
+                return;
+            case "measure.bodyComposition.stop":
+                manager.stopDetectBodyComponent(directWriteResponse);
+                accept(call, operation);
+                return;
+            case "history.metric":
+                readMetricHistory(call);
+                return;
             case "history.activity.current":
                 readCurrentActivity(call);
                 return;
@@ -438,7 +490,8 @@ public class HBandPlugin extends Plugin {
         putCapability("hrv", data.getHrvFunction());
         putCapability("ecg", data.getEcg());
         putCapability("bloodGlucose", data.getBloodGlucose());
-        putCapability("fatigue", data.getFatigue());
+        putCapability("stress", data.getStress());
+        putCapability("met", data.getMet());
         putCapability("bodyComposition", data.getBodyComponent());
         putCapability("bloodComposition", data.getBloodComponent());
         putCapability("gsr", data.getGSR());
@@ -718,6 +771,299 @@ public class HBandPlugin extends Plugin {
     private void startBloodGlucose(PluginCall call) {
         manager.startBloodGlucoseDetect(writeResponse, bloodGlucoseListener);
         accept(call, "measure.bloodGlucose.start");
+    }
+
+    private final IECGDetectListener ecgListener = new IECGDetectListener() {
+        @Override public void onEcgDetectInfoChange(EcgDetectInfo info) {
+            emitData("ecg", new JSObject().put("state", info.toString()), null, info.toString());
+        }
+
+        @Override public void onEcgDetectStateChange(EcgDetectState state) {
+            emitData("ecg", new JSObject().put("state", state.toString()), null, state.toString());
+        }
+
+        @Override public void onEcgDetectResultChange(EcgDetectResult result) {
+            emitData("ecg", ecgValues(result), intArray(result.getFilterSignals()), result.toString());
+        }
+
+        @Override public void onEcgDetectDiagnosisChange(EcgDiagnosis diagnosis) {
+            emitData("ecg", new JSObject().put("diagnosis", diagnosis.toString()), null, diagnosis.toString());
+        }
+
+        @Override public void onEcgADCChange(int[] original, int[] filtered) {
+            emitData("ecg", new JSObject().put("samples", filtered == null ? 0 : filtered.length), intArray(filtered), null);
+        }
+    };
+
+    private final IBodyComponentDetectListener bodyComponentListener = new IBodyComponentDetectListener() {
+        @Override public void onDetecting(int progress, int impedance) {
+            emitData(
+                "bodyComposition",
+                new JSObject().put("progress", progress).put("impedance", impedance),
+                null,
+                null
+            );
+        }
+
+        @Override public void onDetectSuccess(BodyComponent component) {
+            emitData("bodyComposition", bodyComponentValues(component), null, component.toString());
+        }
+
+        @Override public void onDetectFailed(DetectState state) {
+            emitLog("error", "Body composition failed: " + state, "measure.bodyComposition.start");
+        }
+
+        @Override public void onDetectStop() {
+            emitLog("info", "Body composition stopped", "measure.bodyComposition.stop");
+        }
+    };
+
+    /**
+     * Lê um único dia civil. Os registos manuais podem incluir dados posteriores
+     * ao instante pedido, pelo que o intervalo é novamente filtrado na bridge.
+     */
+    private void readMetricHistory(PluginCall call) {
+        JSObject params = call.getObject("params");
+        String metric = params == null ? null : params.getString("metric");
+        String dateText = params == null ? null : params.getString("date");
+        if (metric == null || dateText == null) {
+            call.reject("HISTORY_METRIC_AND_DATE_REQUIRED");
+            return;
+        }
+
+        final LocalDate date;
+        try {
+            date = LocalDate.parse(dateText);
+        } catch (RuntimeException error) {
+            call.reject("HISTORY_DATE_INVALID");
+            return;
+        }
+
+        if ("ecg".equals(metric)) {
+            readEcgHistory(metric, date);
+        } else if ("bodyComposition".equals(metric)) {
+            readBodyComponentHistory(metric, date);
+        } else {
+            DeviceManualDataType dataType = manualType(metric);
+            if (dataType == null) {
+                call.reject("HISTORY_METRIC_UNSUPPORTED: " + metric);
+                return;
+            }
+            readManualMetricHistory(metric, date, dataType);
+        }
+        accept(call, "history.metric");
+    }
+
+    private DeviceManualDataType manualType(String metric) {
+        switch (metric) {
+            case "heartRate": return DeviceManualDataType.HEART_RATE;
+            case "bloodPressure": return DeviceManualDataType.BLOOD_PRESSURE;
+            case "oxygen": return DeviceManualDataType.BLOOD_OXYGEN;
+            case "temperature": return DeviceManualDataType.BODY_TEMPERATURE;
+            case "bloodGlucose": return DeviceManualDataType.BLOOD_GLUCOSE;
+            case "hrv": return DeviceManualDataType.HRV;
+            case "met": return DeviceManualDataType.MET;
+            case "stress": return DeviceManualDataType.STRESS;
+            default: return null;
+        }
+    }
+
+    private void readManualMetricHistory(String metric, LocalDate date, DeviceManualDataType dataType) {
+        long start = date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        long end = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        JSArray records = new JSArray();
+        List<DeviceManualDataType> requested = Collections.singletonList(dataType);
+        manager.readDeviceManualData(
+            writeResponse,
+            start,
+            requested,
+            requested,
+            new AbsDeviceManualDetectDataListener() {
+                @Override public void onHeartRateDataChange(List<HeartRateManualData> data) {
+                    for (HeartRateManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            int[] rates = item.getRate();
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("bpm", rates != null && rates.length > 0 ? rates[rates.length - 1] : 0), intArray(rates)));
+                        }
+                    }
+                }
+
+                @Override public void onBloodPressureDataChange(List<BloodPressureManualData> data) {
+                    for (BloodPressureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("systolic", item.getSystolic())
+                                .put("diastolic", item.getDiastolic())
+                                .put("pulseBpm", item.getHeartRate()), null));
+                        }
+                    }
+                }
+
+                @Override public void onBloodOxygenDataChange(List<BloodOxygenManualData> data) {
+                    for (BloodOxygenManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            int[] values = item.getOxygen();
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("percent", values != null && values.length > 0 ? values[values.length - 1] : 0), intArray(values)));
+                        }
+                    }
+                }
+
+                @Override public void onBodyTemperatureDataChange(List<BodyTemperatureManualData> data) {
+                    for (BodyTemperatureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("celsius", item.getTemperature())
+                                .put("baselineCelsius", item.getBaseTemperature()), null));
+                        }
+                    }
+                }
+
+                @Override public void onBloodGlucoseDataChange(List<BloodGlucoseManualData> data) {
+                    for (BloodGlucoseManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("mmolL", item.getBloodGlucoseValue())
+                                .put("riskLevel", String.valueOf(item.getRisk())), null));
+                        }
+                    }
+                }
+
+                @Override public void onHrvManualDataChange(List<HrvManualData> data) {
+                    for (HrvManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            int[] values = item.getHrv();
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
+                                .put("milliseconds", values != null && values.length > 0 ? values[values.length - 1] : 0), intArray(values)));
+                        }
+                    }
+                }
+
+                @Override public void onMetoManualDataChange(List<MetoManualData> data) {
+                    for (MetoManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject().put("met", item.getMeto()), null));
+                        }
+                    }
+                }
+
+                @Override public void onPressureManualDataChange(List<PressureManualData> data) {
+                    for (PressureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            records.put(historyRecord(item.getTimeStamp(), new JSObject().put("score", item.getPressure()), null));
+                        }
+                    }
+                }
+
+                @Override public void onReadComplete() {
+                    emitHistory(metric, date.toString(), records);
+                }
+
+                @Override public void onReadFail() {
+                    emitLog("error", "Manual history read failed", "history.metric");
+                    emitHistory(metric, date.toString(), records);
+                }
+            }
+        );
+    }
+
+    private void readEcgHistory(String metric, LocalDate date) {
+        TimeData day = new TimeData(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        manager.readECGData(directWriteResponse, day, EEcgDataType.ALL, new IECGReadDataListener() {
+            @Override public void readDataFinish(List<EcgDetectResult> data) {
+                JSArray records = new JSArray();
+                for (EcgDetectResult item : data) {
+                    records.put(historyRecord(item.getTimeBean(), ecgValues(item), intArray(item.getFilterSignals())));
+                }
+                emitHistory(metric, date.toString(), records);
+            }
+
+            @Override public void readDiagnosisDataFinish(List<EcgDiagnosis> data) {}
+        });
+    }
+
+    private void readBodyComponentHistory(String metric, LocalDate date) {
+        manager.readBodyComponentData(directWriteResponse, data -> {
+            JSArray records = new JSArray();
+            for (BodyComponent item : data) {
+                if (sameDate(item.getTimeBean(), date)) {
+                    records.put(historyRecord(item.getTimeBean(), bodyComponentValues(item), null));
+                }
+            }
+            emitHistory(metric, date.toString(), records);
+        });
+    }
+
+    private JSObject ecgValues(EcgDetectResult result) {
+        return new JSObject()
+            .put("bpm", result.getAveHeart())
+            .put("hrvMilliseconds", result.getAveHrv())
+            .put("qtMilliseconds", result.getAveQT())
+            .put("durationSeconds", result.getDuration());
+    }
+
+    private JSObject bodyComponentValues(BodyComponent item) {
+        return new JSObject()
+            .put("bmi", item.getBMI())
+            .put("bodyFatPercent", item.getBodyFatRate())
+            .put("waterPercent", item.getBodyWater())
+            .put("muscleMassKg", item.getMuscleMass())
+            .put("boneMassKg", item.getBoneMass())
+            .put("basalMetabolismKcal", item.getBasalMetabolicRate());
+    }
+
+    private JSObject historyRecord(long timestamp, JSObject values, JSArray samples) {
+        JSObject record = new JSObject()
+            .put("timestamp", Instant.ofEpochSecond(timestamp).toString())
+            .put("values", values);
+        if (samples != null) {
+            record.put("samples", samples);
+        }
+        return record;
+    }
+
+    private JSObject historyRecord(TimeData time, JSObject values, JSArray samples) {
+        JSObject record = new JSObject()
+            .put("timestamp", time == null ? Instant.now().toString() : time.toFullDateTimeString())
+            .put("values", values);
+        if (samples != null) {
+            record.put("samples", samples);
+        }
+        return record;
+    }
+
+    private boolean inDay(long timestamp, long start, long end) {
+        return timestamp >= start && timestamp < end;
+    }
+
+    private boolean sameDate(TimeData time, LocalDate date) {
+        return time != null
+            && time.getYear() == date.getYear()
+            && time.getMonth() == date.getMonthValue()
+            && time.getDay() == date.getDayOfMonth();
+    }
+
+    private JSArray intArray(int[] values) {
+        if (values == null) {
+            return null;
+        }
+        JSArray result = new JSArray();
+        for (int value : values) {
+            result.put(value);
+        }
+        return result;
+    }
+
+    private void emitHistory(String metric, String date, JSArray records) {
+        JSObject event = new JSObject();
+        event.put("type", "history");
+        event.put("metric", metric);
+        event.put("date", date);
+        event.put("timestamp", Instant.now().toString());
+        event.put("values", new JSObject().put("records", records.length()));
+        event.put("records", records);
+        notifyListeners("data", event, true);
     }
 
     private void readCurrentActivity(PluginCall call) {

@@ -18,6 +18,18 @@
         </svg>
       </div>
     }
+    @case ('ecg') {
+      <div class="line-visual line-visual--ecg">
+        @if (primaryEntry(); as primary) {
+          <span class="line-visual__value">{{ formatValue(primary[1]) }}</span>
+          <small>{{ fieldLabel(primary[0]) }}</small>
+        }
+        <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.ecgChart')">
+          <polyline class="line-visual__shadow" [attr.points]="chartPoints()"></polyline>
+          <polyline class="line-visual__stroke" [attr.points]="chartPoints()"></polyline>
+        </svg>
+      </div>
+    }
     @case ('gauge') {
       <div class="gauge-visual">
         <svg viewBox="0 0 100 100" role="img" [attr.aria-label]="i18n.translate('data.gauge')">
@@ -31,28 +43,56 @@
       </div>
     }
     @case ('bars') {
-      <div class="bar-visual">
+      @if (isMetVisual()) {
+        <div class="met-visual">
+          <div
+            class="met-visual__chart"
+            role="img"
+            [attr.aria-label]="i18n.translate('data.met.chart')"
+          >
+            @for (point of metPoints(); track point.timestamp) {
+              <div class="met-visual__point" [attr.data-intensity]="point.intensity">
+                <span class="met-visual__track">
+                  <i [style.height.%]="metBarHeight(point.value)"></i>
+                </span>
+                <strong>{{ formatMet(point.value) }}</strong>
+                <time>{{ point.timestamp | date:'shortTime' }}</time>
+              </div>
+            }
+          </div>
+          <div class="met-visual__legend">
+            <span data-intensity="rest">{{ i18n.translate('data.met.ranges.rest') }}</span>
+            <span data-intensity="light">{{ i18n.translate('data.met.ranges.light') }}</span>
+            <span data-intensity="moderate">{{ i18n.translate('data.met.ranges.moderate') }}</span>
+            <span data-intensity="vigorous">{{ i18n.translate('data.met.ranges.vigorous') }}</span>
+          </div>
+          @if (!compact) {
+            <div class="met-visual__reference">
+              <strong>{{ i18n.translate('data.met.definition') }}</strong>
+              <span>{{ i18n.translate('data.met.oxygenReference') }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="bar-visual">
+          @for (entry of entries(); track entry[0]) {
+            <div>
+              <span class="bar-visual__track"><i [style.height.%]="barHeight(entry[1])"></i></span>
+              <strong>{{ formatValue(entry[1]) }}</strong>
+              <small>{{ fieldLabel(entry[0]) }}</small>
+            </div>
+          }
+        </div>
+      }
+    }
+    @case ('composition') {
+      <div class="metric-visual composition-visual">
         @for (entry of entries(); track entry[0]) {
           <div>
-            <span class="bar-visual__track"><i [style.height.%]="barHeight(entry[1])"></i></span>
             <strong>{{ formatValue(entry[1]) }}</strong>
-            <small>{{ fieldLabel(entry[0]) }}</small>
+            <span>{{ fieldLabel(entry[0]) }}</span>
           </div>
         }
-      </div>
-    }
-    @case ('sleep') {
-      <div class="sleep-visual">
-        <div class="sleep-visual__timeline">
-          @for (sample of event.samples || []; track $index) {
-            <span [attr.data-stage]="sample"></span>
-          }
-        </div>
-        <div class="sleep-visual__legend">
-          @for (entry of entries(); track entry[0]) {
-            <span><i></i><strong>{{ formatValue(entry[1]) }}</strong> {{ fieldLabel(entry[0]) }}</span>
-          }
-        </div>
       </div>
     }
     @default {
@@ -65,6 +105,20 @@
         }
       </div>
     }
+  }
+  @if (!compact && historyRecords().length && !isMetVisual()) {
+    <div class="history-record-list">
+      @for (record of historyRecords(); track record.timestamp) {
+        <div>
+          <time>{{ record.timestamp | date:'shortTime' }}</time>
+          <span>
+            @for (entry of record.values | keyvalue; track entry.key) {
+              <b>{{ fieldLabel(entry.key) }}:</b> {{ formatValue(entry.value) }}
+            }
+          </span>
+        </div>
+      }
+    </div>
   }
   @if (!compact) {
     <time class="data-timestamp">{{ event.timestamp | date:'medium' }}</time>

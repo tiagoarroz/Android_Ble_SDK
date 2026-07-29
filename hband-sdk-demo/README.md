@@ -1,28 +1,51 @@
 # H Band SDK Demo — MF91
 
-Aplicação de demonstração Ionic 8, Angular 20 e Capacitor 8 para explorar os
-SDKs H Band/Veepoo com a pulseira MF91 em Android e iOS.
+Aplicação Ionic 8, Angular 20 e Capacitor 8 focada nas métricas de saúde da
+pulseira MF91:
 
-## O que inclui
+- frequência cardíaca;
+- pressão arterial;
+- oxigénio no sangue;
+- temperatura corporal;
+- glicemia;
+- HRV;
+- ECG;
+- composição corporal;
+- MET;
+- stress.
 
-- catálogo visual de 43 módulos funcionais, agrupados em ligação, medições,
-  histórico, automação, interação e funções avançadas;
-- visualizações próprias para séries, medidores, barras, sono, tabelas,
-  cronologias e eventos técnicos;
-- pesquisa, filtro por grupo, capacidades reportadas pelo firmware e bloqueio
-  de funções declaradas como não suportadas;
-- simulação web para avaliar a interface sem uma pulseira;
-- bridge Capacitor Android sobre `VPOperateManager`;
-- bridge Capacitor iOS sobre `VPBleCentralManage` e
-  `VPPeripheralBaseManage`;
-- português de Portugal, português do Brasil, inglês, espanhol e francês;
-- fila única de comandos BLE, porque o SDK não suporta operações demoradas em
-  paralelo.
+A aplicação apresenta medição atual e histórico de um dia escolhido. Cada
+métrica usa uma representação adequada: séries, medidores, barras, grelha de
+composição corporal ou traçado ECG. As restantes superfícies funcionais do SDK
+não fazem parte deste demonstrador.
 
-O catálogo integral e a cobertura nativa são conceitos distintos. Os módulos
-sem contrato confirmado continuam visíveis para documentar a superfície do
-SDK, mas os respetivos botões ficam desativados numa aplicação nativa. Consulte
-[`docs/SDK_COVERAGE.md`](docs/SDK_COVERAGE.md).
+## Histórico diário
+
+O botão **Ler histórico** envia `history.metric` com:
+
+```json
+{
+  "metric": "heartRate",
+  "date": "2026-07-29"
+}
+```
+
+No Android, os registos manuais são pedidos a partir do início do dia e
+filtrados até ao início do dia seguinte. ECG e composição corporal usam os
+leitores próprios do SDK. No iOS, os dados são primeiro sincronizados de forma
+serializada e depois consultados na base local do SDK pela data `yyyy-MM-dd`,
+tal como no exemplo oficial.
+
+MET (equivalente metabólico) representa a proporção entre o gasto energético
+durante a atividade e em repouso. A referência de 1 MET corresponde a
+3,5 ml de oxigénio por kg de peso corporal por minuto. A visualização classifica
+os valores como repouso (cerca de 1,0 MET), atividade leve (1,6–2,9), moderada
+(3,0–5,9) ou vigorosa (6,0+).
+
+O SDK não disponibiliza um comando de medição MET em tempo real; a bridge
+apresenta diretamente os valores automáticos/históricos recebidos, sem os
+recalcular. As capacidades reportadas pelo firmware bloqueiam ações declaradas
+como não suportadas.
 
 ## Executar
 
@@ -31,17 +54,11 @@ Requisitos:
 - Node.js 20 ou superior;
 - Android Studio/JDK 21 para Android;
 - Xcode 16 ou superior para iOS;
-- um dispositivo físico iOS. Os frameworks fornecidos são binários ARM para
-  dispositivo e não contêm slices de simulador.
+- dispositivo físico iOS, porque os frameworks fornecidos não têm slices de
+  simulador.
 
 ```bash
 npm install
-npm start
-```
-
-Build web e sincronização:
-
-```bash
 npm run build
 npm run cap:sync
 ```
@@ -49,42 +66,24 @@ npm run cap:sync
 Build Android:
 
 ```bash
-npm run android:build
+cd android
+./gradlew assembleDebug
 ```
 
 Build iOS sem assinatura:
 
 ```bash
-npm run ios:build
+cd ios/App
+xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+  -sdk iphoneos CODE_SIGNING_ALLOWED=NO build
 ```
 
-Para instalar num telefone, abra `android/` no Android Studio ou
-`ios/App/App.xcodeproj` no Xcode, escolha a equipa de assinatura e selecione um
-dispositivo físico.
+## Limites de validação
 
-## Fluxo de ligação
-
-1. Conceder permissão Bluetooth.
-2. Procurar a MF91.
-3. Selecionar o periférico e confirmar a password do dispositivo. O valor
-   predefinido pelo SDK é `0000`.
-4. Aguardar a confirmação de notify e da password.
-5. Consultar as capacidades do firmware.
-6. Executar uma medição de cada vez e pará-la explicitamente quando aplicável.
-
-A sincronização do perfil só é enviada quando altura, peso, ano de nascimento,
-idade, objetivo de passos e sexo foram todos preenchidos. Não existem valores
-pessoais implícitos.
-
-## Segurança
-
-- os resultados apresentados são dados do dispositivo e não constituem
-  diagnóstico médico;
-- atualização de firmware, limpeza de dados, reset e transferências de conteúdo
-  não são executáveis neste bridge sem um contrato e ficheiro validados;
-- a simulação web serve apenas para validar interface e navegação;
-- um build bem-sucedido não confirma ligação, precisão clínica nem suporte
-  efetivo do firmware MF91.
-
-O ensaio em hardware está descrito em
-[`docs/MF91_PHYSICAL_TEST_PLAN.md`](docs/MF91_PHYSICAL_TEST_PLAN.md).
+- A simulação web valida interface e visualizações, não o dispositivo.
+- Um build bem-sucedido não confirma que um firmware MF91 concreto suporta
+  todas as métricas.
+- Os valores apresentados vêm do SDK/dispositivo e não constituem diagnóstico
+  médico.
+- A validação física está descrita em
+  [`docs/MF91_PHYSICAL_TEST_PLAN.md`](docs/MF91_PHYSICAL_TEST_PLAN.md).

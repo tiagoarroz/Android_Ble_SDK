@@ -1,32 +1,14 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
 export type ConnectionState =
-  | 'unavailable'
-  | 'idle'
-  | 'scanning'
-  | 'connecting'
-  | 'authenticating'
-  | 'connected'
-  | 'disconnected'
-  | 'error';
-
+  | 'unavailable' | 'idle' | 'scanning' | 'connecting' | 'authenticating'
+  | 'connected' | 'disconnected' | 'error';
 export type CapabilityState = 'supported' | 'unsupported' | 'unknown';
-export type FeatureCategory =
-  | 'connection'
-  | 'measurements'
-  | 'history'
-  | 'automation'
-  | 'interaction'
-  | 'advanced';
-export type VisualizationType =
-  | 'metric'
-  | 'gauge'
-  | 'line'
-  | 'bars'
-  | 'sleep'
-  | 'timeline'
-  | 'table'
-  | 'log';
+export type MetricId =
+  | 'heartRate' | 'bloodPressure' | 'oxygen' | 'temperature' | 'bloodGlucose'
+  | 'hrv' | 'ecg' | 'bodyComposition' | 'met' | 'stress';
+export type VisualizationType = 'gauge' | 'line' | 'bars' | 'ecg' | 'composition';
+export type DataValue = string | number | boolean | null;
 
 export interface HBandDevice {
   id: string;
@@ -47,11 +29,20 @@ export interface HBandStatus {
   platform?: string;
 }
 
+export interface HBandHistoryRecord {
+  timestamp: string;
+  values: Record<string, DataValue>;
+  samples?: number[];
+}
+
 export interface HBandDataEvent {
   type: string;
   timestamp: string;
-  values: Record<string, string | number | boolean | null>;
+  date?: string;
+  metric?: MetricId;
+  values: Record<string, DataValue>;
   samples?: number[];
+  records?: HBandHistoryRecord[];
   raw?: string;
 }
 
@@ -82,22 +73,10 @@ export interface HBandPlugin {
   connect(options: { deviceId: string; password?: string }): Promise<void>;
   disconnect(): Promise<void>;
   execute(options: HBandOperationOptions): Promise<HBandOperationResult>;
-  addListener(
-    eventName: 'deviceFound',
-    listener: (device: HBandDevice) => void,
-  ): Promise<PluginListenerHandle>;
-  addListener(
-    eventName: 'statusChanged',
-    listener: (status: HBandStatus) => void,
-  ): Promise<PluginListenerHandle>;
-  addListener(
-    eventName: 'data',
-    listener: (event: HBandDataEvent) => void,
-  ): Promise<PluginListenerHandle>;
-  addListener(
-    eventName: 'log',
-    listener: (entry: HBandLogEntry) => void,
-  ): Promise<PluginListenerHandle>;
+  addListener(eventName: 'deviceFound', listener: (device: HBandDevice) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'statusChanged', listener: (status: HBandStatus) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'data', listener: (event: HBandDataEvent) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'log', listener: (entry: HBandLogEntry) => void): Promise<PluginListenerHandle>;
   removeAllListeners(): Promise<void>;
 }
 
@@ -106,16 +85,16 @@ export interface FeatureAction {
   operation: string;
   labelKey: string;
   tone?: 'primary' | 'secondary' | 'danger';
+  metric?: MetricId;
 }
 
 export interface FeatureDefinition {
   id: string;
-  category: FeatureCategory;
+  metric: MetricId;
   titleKey: string;
   descriptionKey: string;
   icon: string;
-  capability?: string;
+  capability: string;
   visualization: VisualizationType;
   actions: FeatureAction[];
-  advanced?: boolean;
 }
