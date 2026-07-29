@@ -7,10 +7,9 @@
 | Oxigénio no sangue | Medidor SpO₂ | Iniciar/parar | Iniciar/parar | Sim |
 | Temperatura corporal | Série em °C | Iniciar/parar | Iniciar/parar | Sim |
 | Glicemia | Série em mmol/L | Iniciar/parar | Iniciar/parar | Sim |
-| HRV | Série em ms | Iniciar/parar | Iniciar/parar | Sim |
 | ECG | Traçado | Iniciar/parar | Iniciar/parar | Sim |
 | Composição corporal | Grelha de componentes | Iniciar/parar | Iniciar/parar | Sim |
-| MET | Barras | Sem medição live no SDK | Sem medição live no SDK | Sim |
+| Passos | Barras de atividade | Leitura atual | Leitura atual | Sim |
 | Stress | Medidor 0–100 | Iniciar/parar | Iniciar/parar | Sim |
 
 ## Origem do histórico
@@ -19,8 +18,8 @@
   `readBodyComponentData`.
 - iOS: sincronização serializada do tipo de dados e consultas de
   `VPDataBaseOperation` pela data exata.
-- MET e stress no iOS são extraídos dos dados originais diários, onde o próprio
-  SDK documenta os campos `met` e `stress`.
+- Stress no iOS é extraído dos dados originais diários, onde o próprio SDK
+  documenta o campo `stress`.
 
 O estado `supported`, `unsupported` ou `unknown` é calculado depois da
 autenticação a partir das capacidades do dispositivo. A compilação das bridges

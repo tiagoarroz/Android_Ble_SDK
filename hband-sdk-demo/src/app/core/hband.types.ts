@@ -6,7 +6,7 @@ export type ConnectionState =
 export type CapabilityState = 'supported' | 'unsupported' | 'unknown';
 export type MetricId =
   | 'heartRate' | 'bloodPressure' | 'oxygen' | 'temperature' | 'bloodGlucose'
-  | 'hrv' | 'ecg' | 'bodyComposition' | 'met' | 'stress' | 'steps';
+  | 'ecg' | 'bodyComposition' | 'stress' | 'steps';
 export type VisualizationType = 'gauge' | 'line' | 'bars' | 'ecg' | 'composition' | 'activity';
 export type DataValue = string | number | boolean | null;
 

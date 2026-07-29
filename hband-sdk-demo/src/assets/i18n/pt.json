@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Onze métricas, um dia de cada vez.",
+    "title": "Nove métricas, um dia de cada vez.",
     "description": "Ligue a MF91, confirme as capacidades reportadas pelo firmware e consulte medições atuais ou o histórico de uma data específica."
   },
   "common": {
@@ -97,18 +97,6 @@
       "today": "Atividade acumulada",
       "chart": "Distribuição de passos ao longo do dia"
     },
-    "met": {
-      "chart": "Evolução do equivalente metabólico ao longo do dia",
-      "value": "{{value}} MET",
-      "definition": "MET compara o gasto energético da atividade com o gasto em repouso.",
-      "oxygenReference": "1 MET corresponde à referência de 3,5 ml de oxigénio por kg de peso corporal por minuto.",
-      "ranges": {
-        "rest": "Repouso · cerca de 1,0 MET",
-        "light": "Atividade leve · 1,6–2,9 MET",
-        "moderate": "Atividade moderada · 3,0–5,9 MET",
-        "vigorous": "Atividade vigorosa · 6,0+ MET"
-      }
-    },
     "fields": {
       "bpm": "Frequência cardíaca (bpm)",
       "state": "Estado",
@@ -148,7 +136,6 @@
       "charging": "Em carga",
       "dbm": "Sinal (dBm)",
       "score": "Pontuação",
-      "met": "MET",
       "bmi": "IMC",
       "bodyFatPercent": "Gordura corporal (%)",
       "waterPercent": "Água corporal (%)",
@@ -279,10 +266,6 @@
       "title": "Temperatura",
       "description": "Temperatura corporal e basal, medição em direto e histórico automático."
     },
-    "hrv": {
-      "title": "HRV",
-      "description": "Variabilidade da frequência cardíaca, amostras e análise temporal."
-    },
     "ecg": {
       "title": "ECG",
       "description": "Traçado em tempo real e resultados ECG guardados no dispositivo."
@@ -302,11 +285,6 @@
     "steps": {
       "title": "Passos",
       "description": "Passos, distância e calorias acumulados no dia atual ou numa data do histórico."
-    },
-    "met": {
-      "title": "MET",
-      "description": "Equivalente metabólico: relação entre a energia gasta durante a atividade e em repouso.",
-      "historyOnly": "O SDK não expõe uma medição MET em tempo real; esta métrica é lida dos registos históricos."
     },
     "stress": {
       "title": "Stress",
@@ -338,7 +316,7 @@
     },
     "clinicalHistory": {
       "title": "Históricos clínicos",
-      "description": "SpO₂, HRV, temperatura, medições manuais e intervalos RR."
+      "description": "SpO₂, temperatura, medições manuais e intervalos RR."
     },
     "automaticMonitoring": {
       "title": "Medição automática",

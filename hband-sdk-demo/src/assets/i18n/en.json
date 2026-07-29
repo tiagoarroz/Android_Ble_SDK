@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Eleven metrics, one day at a time.",
+    "title": "Nine metrics, one day at a time.",
     "description": "Connect the MF91, confirm its firmware capabilities, and view live measurements or history for a specific date."
   },
   "common": {
@@ -97,18 +97,6 @@
       "today": "Accumulated activity",
       "chart": "Step distribution throughout the day"
     },
-    "met": {
-      "chart": "Metabolic equivalent progression throughout the day",
-      "value": "{{value}} MET",
-      "definition": "MET compares energy expenditure during activity with energy expenditure at rest.",
-      "oxygenReference": "1 MET corresponds to the reference of 3.5 ml of oxygen per kilogram of body weight per minute.",
-      "ranges": {
-        "rest": "Rest · about 1.0 MET",
-        "light": "Light activity · 1.6–2.9 MET",
-        "moderate": "Moderate activity · 3.0–5.9 MET",
-        "vigorous": "Vigorous activity · 6.0+ MET"
-      }
-    },
     "fields": {
       "bpm": "Heart rate (bpm)",
       "state": "State",
@@ -148,7 +136,6 @@
       "charging": "Charging",
       "dbm": "Signal (dBm)",
       "score": "Score",
-      "met": "MET",
       "bmi": "BMI",
       "bodyFatPercent": "Body fat (%)",
       "waterPercent": "Body water (%)",
@@ -279,10 +266,6 @@
       "title": "Temperature",
       "description": "Body and baseline temperature, live measurement, and automatic history."
     },
-    "hrv": {
-      "title": "HRV",
-      "description": "Heart rate variability, samples, and time-based analysis."
-    },
     "ecg": {
       "title": "ECG",
       "description": "Real-time trace and ECG results stored by the device."
@@ -302,11 +285,6 @@
     "steps": {
       "title": "Steps",
       "description": "Steps, distance and calories accumulated today or on a selected historical date."
-    },
-    "met": {
-      "title": "MET",
-      "description": "Metabolic equivalent: the ratio between energy spent during activity and at rest.",
-      "historyOnly": "The SDK does not expose a live MET measurement; this metric is read from historical records."
     },
     "stress": {
       "title": "Stress",
@@ -338,7 +316,7 @@
     },
     "clinicalHistory": {
       "title": "Clinical histories",
-      "description": "SpO₂, HRV, temperature, manual measurements, and RR intervals."
+      "description": "SpO₂, temperature, manual measurements, and RR intervals."
     },
     "automaticMonitoring": {
       "title": "Automatic measurement",

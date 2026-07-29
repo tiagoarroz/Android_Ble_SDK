@@ -160,10 +160,6 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             testFatigue(true, call: call, operation: operation)
         case "measure.fatigue.stop":
             testFatigue(false, call: call, operation: operation)
-        case "measure.hrv.start":
-            testHRV(true, call: call, operation: operation)
-        case "measure.hrv.stop":
-            testHRV(false, call: call, operation: operation)
         case "measure.stress.start":
             testStress(true, call: call, operation: operation)
         case "measure.stress.stop":
@@ -391,16 +387,6 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         accept(call, operation: operation)
     }
 
-    private func testHRV(_ start: Bool, call: CAPPluginCall, operation: String) {
-        manager.peripheralManage.veepooSDK_HRVTest(start) { [weak self] progress, state, value in
-            self?.emitData(
-                type: "hrv",
-                values: ["state": state.rawValue, "progress": progress, "milliseconds": value]
-            )
-        }
-        accept(call, operation: operation)
-    }
-
     private func testStress(_ start: Bool, call: CAPPluginCall, operation: String) {
         manager.peripheralManage.veepooSDK_stressTestStart(start) {
             [weak self] state, progress, value in
@@ -543,12 +529,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         switch metric {
         case "oxygen":
             manager.peripheralManage.veepooSdkStartReadDeviceOxygenData(completion)
-        case "hrv":
-            manager.peripheralManage.veepooSdkStartReadDeviceHrvData(completion)
         case "temperature" where manager.peripheralModel?.temperatureType != 5:
             manager.peripheralManage.veepooSdkStartReadDeviceTemperatureData(completion)
         case "heartRate", "bloodPressure", "temperature", "bloodGlucose",
-             "ecg", "bodyComposition", "met", "stress":
+             "ecg", "bodyComposition", "stress":
             manager.peripheralManage.veepooSdkStartReadDeviceAllData(readStateChange: completion)
         default:
             call.reject("HISTORY_METRIC_UNSUPPORTED:\(metric)")
@@ -609,16 +593,16 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
 
         let records: [[String: Any]]
         switch metric {
-        case "heartRate", "met", "stress":
+        case "heartRate", "stress":
             let original = VPDataBaseOperation.veepooSDKGetOriginalData(
                 withDate: date,
                 andTableID: tableID
             ) as? [String: [String: Any]] ?? [:]
             records = original.keys.sorted().compactMap { time in
                 guard let source = original[time] else { return nil }
-                let key = metric == "heartRate" ? "heartValue" : metric
+                let key = metric == "heartRate" ? "heartValue" : "stress"
                 guard let value = number(source[key]), value > 0 else { return nil }
-                let field = metric == "heartRate" ? "bpm" : metric == "stress" ? "score" : "met"
+                let field = metric == "heartRate" ? "bpm" : "score"
                 let samples = metric == "heartRate"
                     ? numericArray(source["ecgs"] ?? source["ppgs"])
                     : []
@@ -657,19 +641,6 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                         "percent": number($0["OxygenValue"]) ?? 0,
                         "pulseBpm": number($0["HeartValue"]) ?? 0
                     ]
-                )
-            }
-        case "hrv":
-            let source = VPDataBaseOperation.veepooSDKGetDeviceHrvData(
-                withDate: date,
-                andTableID: tableID
-            ) as? [[String: Any]] ?? []
-            records = source.map {
-                historyRecord(
-                    date: date,
-                    time: string($0["time"]),
-                    values: ["milliseconds": number($0["hrvValue"]) ?? 0],
-                    samples: numericArray($0["hearts"]).map { $0 * 10 }
                 )
             }
         case "temperature":
@@ -852,12 +823,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             "bloodOxygen": support(model.bloodOxygenType > 0 || model.oxygenType > 0),
             "breathing": support(model.resRateType > 0),
             "temperature": support(model.temperatureType > 0),
-            "hrv": support(model.hrvType > 0 || model.isSupportHRVTest),
             "ecg": support(model.ecgType > 0),
             "bloodGlucose": support(model.bloodGlucoseType > 0),
             "fatigue": "unknown",
             "stress": support(model.stressType > 1),
-            "met": support(model.metType > 0),
             "bodyComposition": support(model.bodyCompositionType > 0),
             "bloodComposition": support(model.bloodAnalysisType > 0),
             "gsr": support(model.gsrType > 0),

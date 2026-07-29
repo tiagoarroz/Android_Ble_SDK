@@ -52,37 +52,7 @@
       </div>
     }
     @case ('bars') {
-      @if (isMetVisual()) {
-        <div class="met-visual">
-          <div
-            class="met-visual__chart"
-            role="img"
-            [attr.aria-label]="i18n.translate('data.met.chart')"
-          >
-            @for (point of metPoints(); track point.timestamp) {
-              <div class="met-visual__point" [attr.data-intensity]="point.intensity">
-                <span class="met-visual__track">
-                  <i [style.height.%]="metBarHeight(point.value)"></i>
-                </span>
-                <strong>{{ formatMet(point.value) }}</strong>
-                <time>{{ point.timestamp | date:'shortTime' }}</time>
-              </div>
-            }
-          </div>
-          <div class="met-visual__legend">
-            <span data-intensity="rest">{{ i18n.translate('data.met.ranges.rest') }}</span>
-            <span data-intensity="light">{{ i18n.translate('data.met.ranges.light') }}</span>
-            <span data-intensity="moderate">{{ i18n.translate('data.met.ranges.moderate') }}</span>
-            <span data-intensity="vigorous">{{ i18n.translate('data.met.ranges.vigorous') }}</span>
-          </div>
-          @if (!compact) {
-            <div class="met-visual__reference">
-              <strong>{{ i18n.translate('data.met.definition') }}</strong>
-              <span>{{ i18n.translate('data.met.oxygenReference') }}</span>
-            </div>
-          }
-        </div>
-      } @else if (isBloodPressureVisual()) {
+      @if (isBloodPressureVisual()) {
         <div class="blood-pressure-visual">
           <div class="blood-pressure-visual__values">
             @for (entry of resultEntries(); track entry[0]) {
@@ -197,7 +167,7 @@
       </div>
     }
   }
-  @if (!compact && historyRecords().length && !isMetVisual()) {
+  @if (!compact && historyRecords().length) {
     <div class="history-record-list">
       @for (record of historyRecords(); track record.timestamp) {
         <div>

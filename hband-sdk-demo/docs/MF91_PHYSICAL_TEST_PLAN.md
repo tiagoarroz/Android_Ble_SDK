@@ -28,7 +28,7 @@ Para cada capacidade que a MF91 declarar como suportada:
 6. confirmar que um módulo não suportado permanece bloqueado.
 
 Validar separadamente ritmo cardíaco, pressão arterial, SpO₂, respiração,
-temperatura, HRV, fadiga, stress, glicose e GSR. ECG, composição corporal,
+temperatura, fadiga, stress, glicose e GSR. ECG, composição corporal,
 composição sanguínea e microexame só devem ser ensaiados se o firmware os
 declarar e se a MF91 tiver os contactos/sensores necessários.
 

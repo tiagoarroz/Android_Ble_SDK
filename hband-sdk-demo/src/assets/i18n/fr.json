@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Onze mesures, un jour à la fois.",
+    "title": "Neuf mesures, un jour à la fois.",
     "description": "Connectez le MF91, confirmez les capacités du micrologiciel et consultez les mesures actuelles ou l'historique d'une date précise."
   },
   "common": {
@@ -97,18 +97,6 @@
       "today": "Activité cumulée",
       "chart": "Répartition des pas au cours de la journée"
     },
-    "met": {
-      "chart": "Évolution de l'équivalent métabolique au fil de la journée",
-      "value": "{{value}} MET",
-      "definition": "Le MET compare la dépense énergétique pendant l'activité à celle au repos.",
-      "oxygenReference": "1 MET correspond à la référence de 3,5 ml d'oxygène par kilogramme de poids corporel par minute.",
-      "ranges": {
-        "rest": "Repos · environ 1,0 MET",
-        "light": "Activité légère · 1,6–2,9 MET",
-        "moderate": "Activité modérée · 3,0–5,9 MET",
-        "vigorous": "Activité vigoureuse · 6,0+ MET"
-      }
-    },
     "fields": {
       "bpm": "Fréquence cardiaque (bpm)",
       "state": "État",
@@ -148,7 +136,6 @@
       "charging": "En charge",
       "dbm": "Signal (dBm)",
       "score": "Score",
-      "met": "MET",
       "bmi": "IMC",
       "bodyFatPercent": "Graisse corporelle (%)",
       "waterPercent": "Eau corporelle (%)",
@@ -279,10 +266,6 @@
       "title": "Température",
       "description": "Température corporelle et de base, mesure en direct et historique automatique."
     },
-    "hrv": {
-      "title": "VFC",
-      "description": "Variabilité de la fréquence cardiaque, échantillons et analyse temporelle."
-    },
     "ecg": {
       "title": "ECG",
       "description": "Tracé en temps réel et résultats ECG enregistrés par l'appareil."
@@ -302,11 +285,6 @@
     "steps": {
       "title": "Pas",
       "description": "Pas, distance et calories cumulés aujourd'hui ou à une date historique sélectionnée."
-    },
-    "met": {
-      "title": "MET",
-      "description": "Équivalent métabolique : rapport entre l'énergie dépensée pendant l'activité et au repos.",
-      "historyOnly": "Le SDK n'expose pas de mesure MET en direct ; cette mesure est lue dans l'historique."
     },
     "stress": {
       "title": "Stress",
@@ -338,7 +316,7 @@
     },
     "clinicalHistory": {
       "title": "Historiques cliniques",
-      "description": "SpO₂, VFC, température, mesures manuelles et intervalles RR."
+      "description": "SpO₂, température, mesures manuelles et intervalles RR."
     },
     "automaticMonitoring": {
       "title": "Mesure automatique",

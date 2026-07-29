@@ -14,8 +14,6 @@ const liveAndHistory = (metric: FeatureDefinition['metric'], prefix: string) => 
 /**
  * Mantém o demonstrador limitado às métricas clínicas, fisiológicas e de
  * atividade pedidas.
- * A ausência de uma ação em tempo real é intencional quando o SDK só confirma
- * dados automáticos/históricos, como acontece com MET.
  */
 export const FEATURE_CATALOG: FeatureDefinition[] = [
   {
@@ -49,12 +47,6 @@ export const FEATURE_CATALOG: FeatureDefinition[] = [
     actions: liveAndHistory('bloodGlucose', 'measure.bloodGlucose'),
   },
   {
-    id: 'hrv', metric: 'hrv', titleKey: 'features.hrv.title',
-    descriptionKey: 'features.hrv.description', icon: 'analytics-outline',
-    capability: 'hrv', visualization: 'line',
-    actions: liveAndHistory('hrv', 'measure.hrv'),
-  },
-  {
     id: 'ecg', metric: 'ecg', titleKey: 'features.ecg.title',
     descriptionKey: 'features.ecg.description', icon: 'fitness-outline',
     capability: 'ecg', visualization: 'ecg',
@@ -84,14 +76,6 @@ export const FEATURE_CATALOG: FeatureDefinition[] = [
         tone: 'secondary',
         metric: 'steps',
       },
-    ],
-  },
-  {
-    id: 'met', metric: 'met', titleKey: 'features.met.title',
-    descriptionKey: 'features.met.description', icon: 'flash-outline',
-    capability: 'met', visualization: 'bars',
-    actions: [
-      { id: 'history', operation: 'history.metric', labelKey: 'actions.history', metric: 'met' },
     ],
   },
   {

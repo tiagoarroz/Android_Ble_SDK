@@ -39,9 +39,7 @@ import com.veepoo.protocol.listener.data.IECGDetectListener;
 import com.veepoo.protocol.listener.data.IECGReadDataListener;
 import com.veepoo.protocol.listener.data.IFatigueDataListener;
 import com.veepoo.protocol.listener.data.IGsrDetectListener;
-import com.veepoo.protocol.listener.data.IHRVOriginDataListener;
 import com.veepoo.protocol.listener.data.IHeartDataListener;
-import com.veepoo.protocol.listener.data.IHrvDetectListener;
 import com.veepoo.protocol.listener.data.IOriginDataListener;
 import com.veepoo.protocol.listener.data.IOriginData3Listener;
 import com.veepoo.protocol.listener.data.IPressureDetectListener;
@@ -104,7 +102,6 @@ import com.veepoo.protocol.model.enums.EPwdStatus;
 import com.veepoo.protocol.model.enums.ESex;
 import com.veepoo.protocol.model.enums.ETimeMode;
 import com.veepoo.protocol.model.enums.GsrDetectAck;
-import com.veepoo.protocol.model.enums.HrvDetectState;
 import com.veepoo.protocol.model.enums.PressureDetectState;
 import com.veepoo.protocol.model.settings.DeviceTimeSetting;
 import com.veepoo.protocol.model.settings.ReadOriginSetting;
@@ -377,13 +374,6 @@ public class HBandPlugin extends Plugin {
                 manager.stopDetectFatigue(writeResponse, fatigueListener);
                 accept(call, operation);
                 return;
-            case "measure.hrv.start":
-                startHrv(call);
-                return;
-            case "measure.hrv.stop":
-                manager.stopDetectHrv(directWriteResponse, hrvListener);
-                accept(call, operation);
-                return;
             case "measure.stress.start":
                 startStress(call);
                 return;
@@ -439,9 +429,6 @@ public class HBandPlugin extends Plugin {
                 return;
             case "history.oxygen":
                 readOxygenHistory(call);
-                return;
-            case "history.hrv":
-                readHrvHistory(call);
                 return;
             case "history.temperature":
                 readTemperatureHistory(call);
@@ -522,11 +509,9 @@ public class HBandPlugin extends Plugin {
         putCapability("bloodOxygen", data.getSpo2H());
         putCapability("breathing", data.getBeathFunction());
         putCapability("temperature", data.getTemperatureFunction());
-        putCapability("hrv", data.getHrvFunction());
         putCapability("ecg", data.getEcg());
         putCapability("bloodGlucose", data.getBloodGlucose());
         putCapability("stress", data.getStress());
-        putCapability("met", data.getMet());
         putCapability("bodyComposition", data.getBodyComponent());
         putCapability("bloodComposition", data.getBloodComponent());
         putCapability("gsr", data.getGSR());
@@ -706,28 +691,6 @@ public class HBandPlugin extends Plugin {
     private void startFatigue(PluginCall call) {
         manager.startDetectFatigue(writeResponse, fatigueListener);
         accept(call, "measure.fatigue.start");
-    }
-
-    private final IHrvDetectListener hrvListener = new IHrvDetectListener() {
-        @Override
-        public void onHrvDetect(int value) {
-            emitMetric("hrv", "milliseconds", value, null);
-        }
-
-        @Override
-        public void onDetectFailed(HrvDetectState state) {
-            emitLog("error", "HRV failed: " + state, "measure.hrv.start");
-        }
-
-        @Override
-        public void onDetectStop() {
-            emitLog("info", "HRV stopped", "measure.hrv.stop");
-        }
-    };
-
-    private void startHrv(PluginCall call) {
-        manager.startDetectHrv(directWriteResponse, hrvListener);
-        accept(call, "measure.hrv.start");
     }
 
     private final IPressureDetectListener pressureListener = new IPressureDetectListener() {
@@ -992,8 +955,6 @@ public class HBandPlugin extends Plugin {
             case "oxygen": return DeviceManualDataType.BLOOD_OXYGEN;
             case "temperature": return DeviceManualDataType.BODY_TEMPERATURE;
             case "bloodGlucose": return DeviceManualDataType.BLOOD_GLUCOSE;
-            case "hrv": return DeviceManualDataType.HRV;
-            case "met": return DeviceManualDataType.MET;
             case "stress": return DeviceManualDataType.STRESS;
             default: return null;
         }
@@ -1061,23 +1022,9 @@ public class HBandPlugin extends Plugin {
                     }
                 }
 
-                @Override public void onHrvManualDataChange(List<HrvManualData> data) {
-                    for (HrvManualData item : data) {
-                        if (inDay(item.getTimeStamp(), start, end)) {
-                            int[] values = item.getHrv();
-                            records.put(historyRecord(item.getTimeStamp(), new JSObject()
-                                .put("milliseconds", values != null && values.length > 0 ? values[values.length - 1] : 0), intArray(values)));
-                        }
-                    }
-                }
+                @Override public void onHrvManualDataChange(List<HrvManualData> data) {}
 
-                @Override public void onMetoManualDataChange(List<MetoManualData> data) {
-                    for (MetoManualData item : data) {
-                        if (inDay(item.getTimeStamp(), start, end)) {
-                            records.put(historyRecord(item.getTimeStamp(), new JSObject().put("met", item.getMeto()), null));
-                        }
-                    }
-                }
+                @Override public void onMetoManualDataChange(List<MetoManualData> data) {}
 
                 @Override public void onPressureManualDataChange(List<PressureManualData> data) {
                     for (PressureManualData item : data) {
@@ -1263,19 +1210,6 @@ public class HBandPlugin extends Plugin {
             @Override public void onReadOriginComplete() { emitLog("success", "Oxygen history complete", "history.oxygen"); }
         }, 0);
         accept(call, "history.oxygen");
-    }
-
-    private void readHrvHistory(PluginCall call) {
-        manager.readHRVOrigin(writeResponse, new IHRVOriginDataListener() {
-            @Override public void onReadOriginProgress(float progress) { emitMetric("hrvHistory", "progress", progress, null); }
-            @Override public void onReadOriginProgressDetail(int day, String date, int allPackage, int currentPackage) {}
-            @Override public void onHRVOriginListener(HRVOriginData data) {
-                emitData("hrvHistory", new JSObject().put("summary", data.toString()), null, data.toString());
-            }
-            @Override public void onDayHrvScore(int day, String date, int score) { emitMetric("hrvHistory", "score", score, date); }
-            @Override public void onReadOriginComplete() { emitLog("success", "HRV history complete", "history.hrv"); }
-        }, 0);
-        accept(call, "history.hrv");
     }
 
     private void readTemperatureHistory(PluginCall call) {

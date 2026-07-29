@@ -21,7 +21,6 @@ const METRIC_OPERATIONS = new Set([
   'measure.oxygen.start', 'measure.oxygen.stop',
   'measure.temperature.start', 'measure.temperature.stop',
   'measure.bloodGlucose.start', 'measure.bloodGlucose.stop',
-  'measure.hrv.start', 'measure.hrv.stop',
   'measure.ecg.start', 'measure.ecg.stop',
   'measure.bodyComposition.start', 'measure.bodyComposition.stop',
   'measure.stress.start', 'measure.stress.stop',
@@ -300,9 +299,7 @@ export class HBandService {
     if (finishesAtFullProgress.includes(metric)) {
       return this.progress(event) >= 100;
     }
-    return metric === 'hrv'
-      && typeof event.values['milliseconds'] === 'number'
-      && event.values['milliseconds'] > 0;
+    return false;
   }
 
   /**
@@ -326,7 +323,7 @@ export class HBandService {
   private metricForType(type: string): MetricId | undefined {
     const metrics: MetricId[] = [
       'heartRate', 'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose',
-      'hrv', 'ecg', 'bodyComposition', 'met', 'stress', 'steps',
+      'ecg', 'bodyComposition', 'stress', 'steps',
     ];
     return metrics.find((metric) => metric === type);
   }
@@ -378,7 +375,7 @@ export class HBandService {
   private seedSimulation(): void {
     const capabilities = Object.fromEntries([
       'heartRate', 'bloodPressure', 'bloodOxygen', 'temperature', 'bloodGlucose',
-      'hrv', 'ecg', 'bodyComposition', 'met', 'stress', 'steps',
+      'ecg', 'bodyComposition', 'stress', 'steps',
     ].map((capability) => [capability, 'supported' as const]));
     this.status.set({
       available: true,
@@ -418,7 +415,6 @@ export class HBandService {
       'measure.oxygen.start': { type: 'oxygen', metric: 'oxygen', timestamp: now, values: { percent: 97 }, samples: [96, 97, 97, 98, 97] },
       'measure.temperature.start': { type: 'temperature', metric: 'temperature', timestamp: now, values: { celsius: 36.4 }, samples: [36.1, 36.2, 36.3, 36.4] },
       'measure.bloodGlucose.start': { type: 'bloodGlucose', metric: 'bloodGlucose', timestamp: now, values: { mmolL: 5.2 }, samples: [4.9, 5.1, 5.2] },
-      'measure.hrv.start': { type: 'hrv', metric: 'hrv', timestamp: now, values: { milliseconds: 54 }, samples: [48, 52, 51, 57, 54] },
       'measure.ecg.start': { type: 'ecg', metric: 'ecg', timestamp: now, values: { bpm: 72 }, samples: [0, 12, 45, -18, -8, 2, 4, 42, -20, -7, 1, 3] },
       'measure.bodyComposition.start': { type: 'bodyComposition', metric: 'bodyComposition', timestamp: now, values: { bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6, boneMassKg: 2.8, basalMetabolismKcal: 1540 } },
       'measure.stress.start': { type: 'stress', metric: 'stress', timestamp: now, values: { score: 38 }, samples: [32, 36, 44, 40, 38] },
@@ -460,10 +456,8 @@ export class HBandService {
       oxygen: [{ percent: 97 }, { percent: 98 }, { percent: 96 }],
       temperature: [{ celsius: 36.2 }, { celsius: 36.4 }, { celsius: 36.3 }],
       bloodGlucose: [{ mmolL: 4.9 }, { mmolL: 5.5 }, { mmolL: 5.1 }],
-      hrv: [{ milliseconds: 49 }, { milliseconds: 55 }, { milliseconds: 52 }],
       ecg: [{ bpm: 71 }, { bpm: 73 }],
       bodyComposition: [{ bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6 }],
-      met: [{ met: 1.0 }, { met: 2.2 }, { met: 4.4 }, { met: 6.6 }],
       stress: [{ score: 31 }, { score: 44 }, { score: 38 }],
       steps: [
         { steps: 740, distanceKm: 0.5, caloriesKcal: 31 },

@@ -4,14 +4,6 @@ import { Component, Input, inject } from '@angular/core';
 import type { HBandDataEvent, VisualizationType } from '../../core/hband.types';
 import { I18nService } from '../../core/i18n.service';
 
-type MetIntensity = 'rest' | 'light' | 'moderate' | 'vigorous';
-
-interface MetPoint {
-  timestamp: string;
-  value: number;
-  intensity: MetIntensity;
-}
-
 interface ActivityPoint {
   timestamp: string;
   steps: number;
@@ -74,10 +66,6 @@ export class DataVisualizerComponent {
     return Math.max(8, (numeric / max) * 100);
   }
 
-  isMetVisual(): boolean {
-    return this.event.metric === 'met' || this.event.type === 'met';
-  }
-
   isBloodPressureVisual(): boolean {
     return this.event.metric === 'bloodPressure' || this.event.type === 'bloodPressure';
   }
@@ -120,64 +108,6 @@ export class DataVisualizerComponent {
     return typeof value === 'number' && Number.isFinite(value)
       ? Math.min(100, Math.max(0, value))
       : null;
-  }
-
-  /**
-   * Normaliza os registos MET num único formato para desenhar a evolução
-   * temporal sem alterar os valores recebidos do SDK.
-   */
-  metPoints(): MetPoint[] {
-    const records = this.historyRecords()
-      .map((record) => ({ timestamp: record.timestamp, value: record.values['met'] }))
-      .filter((record): record is { timestamp: string; value: number } =>
-        typeof record.value === 'number' && record.value > 0);
-
-    if (records.length) {
-      return records.map((record) => ({
-        ...record,
-        intensity: this.metIntensity(record.value),
-      }));
-    }
-
-    const value = this.event.values['met'];
-    return typeof value === 'number' && value > 0
-      ? [{ timestamp: this.event.timestamp, value, intensity: this.metIntensity(value) }]
-      : [];
-  }
-
-  /**
-   * Mantém uma escala comparável entre dias: nunca usa menos de 6 MET como
-   * máximo visual, porque esse é o início da atividade vigorosa.
-   */
-  metBarHeight(value: number): number {
-    const scaleMaximum = Math.max(6, ...this.metPoints().map((point) => point.value));
-    return Math.max(6, Math.min(100, (value / scaleMaximum) * 100));
-  }
-
-  /**
-   * Classifica a intensidade segundo os intervalos MET apresentados na
-   * legenda. Valores inferiores a 1,6 ficam no patamar de repouso.
-   */
-  metIntensity(value: number): MetIntensity {
-    if (value < 1.6) {
-      return 'rest';
-    }
-    if (value < 3) {
-      return 'light';
-    }
-    if (value < 6) {
-      return 'moderate';
-    }
-    return 'vigorous';
-  }
-
-  formatMet(value: number): string {
-    const locale = this.i18n.language() === 'br' ? 'pt-BR' : this.i18n.language();
-    const formatted = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    }).format(value);
-    return this.i18n.translate('data.met.value', { value: formatted });
   }
 
   gaugeValue(): number {

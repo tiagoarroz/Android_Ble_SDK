@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Once métricas, un día cada vez.",
+    "title": "Nueve métricas, un día cada vez.",
     "description": "Conecta la MF91, confirma las capacidades del firmware y consulta mediciones actuales o el historial de una fecha concreta."
   },
   "common": {
@@ -97,18 +97,6 @@
       "today": "Actividad acumulada",
       "chart": "Distribución de pasos a lo largo del día"
     },
-    "met": {
-      "chart": "Evolución del equivalente metabólico a lo largo del día",
-      "value": "{{value}} MET",
-      "definition": "MET compara el gasto energético durante la actividad con el gasto en reposo.",
-      "oxygenReference": "1 MET corresponde a la referencia de 3,5 ml de oxígeno por kilogramo de peso corporal por minuto.",
-      "ranges": {
-        "rest": "Reposo · cerca de 1,0 MET",
-        "light": "Actividad ligera · 1,6–2,9 MET",
-        "moderate": "Actividad moderada · 3,0–5,9 MET",
-        "vigorous": "Actividad vigorosa · 6,0+ MET"
-      }
-    },
     "fields": {
       "bpm": "Frecuencia cardíaca (bpm)",
       "state": "Estado",
@@ -148,7 +136,6 @@
       "charging": "Cargando",
       "dbm": "Señal (dBm)",
       "score": "Puntuación",
-      "met": "MET",
       "bmi": "IMC",
       "bodyFatPercent": "Grasa corporal (%)",
       "waterPercent": "Agua corporal (%)",
@@ -279,10 +266,6 @@
       "title": "Temperatura",
       "description": "Temperatura corporal y basal, medición en directo e historial automático."
     },
-    "hrv": {
-      "title": "HRV",
-      "description": "Variabilidad de la frecuencia cardíaca, muestras y análisis temporal."
-    },
     "ecg": {
       "title": "ECG",
       "description": "Trazado en tiempo real y resultados de ECG guardados en el dispositivo."
@@ -302,11 +285,6 @@
     "steps": {
       "title": "Pasos",
       "description": "Pasos, distancia y calorías acumulados hoy o en una fecha histórica seleccionada."
-    },
-    "met": {
-      "title": "MET",
-      "description": "Equivalente metabólico: relación entre la energía gastada durante la actividad y en reposo.",
-      "historyOnly": "El SDK no expone una medición MET en tiempo real; esta métrica se lee de los registros históricos."
     },
     "stress": {
       "title": "Estrés",
@@ -338,7 +316,7 @@
     },
     "clinicalHistory": {
       "title": "Historiales clínicos",
-      "description": "SpO₂, HRV, temperatura, mediciones manuales e intervalos RR."
+      "description": "SpO₂, temperatura, mediciones manuales e intervalos RR."
     },
     "automaticMonitoring": {
       "title": "Medición automática",

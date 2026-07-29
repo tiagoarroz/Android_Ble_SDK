@@ -8,16 +8,16 @@ pulseira MF91:
 - oxigénio no sangue;
 - temperatura corporal;
 - glicemia;
-- HRV;
 - ECG;
 - composição corporal;
-- MET;
+- passos;
 - stress.
 
 A aplicação apresenta medição atual e histórico de um dia escolhido. Cada
 métrica usa uma representação adequada: séries, medidores, barras, grelha de
-composição corporal ou traçado ECG. As restantes superfícies funcionais do SDK
-não fazem parte deste demonstrador.
+composição corporal, atividade ou traçado ECG. A bateria da pulseira é
+apresentada na área de ligação. As restantes superfícies funcionais do SDK não
+fazem parte deste demonstrador.
 
 ## Medição e logs
 
@@ -45,18 +45,11 @@ No Android, os registos manuais são pedidos a partir do início do dia e
 filtrados até ao início do dia seguinte. ECG e composição corporal usam os
 leitores próprios do SDK. No iOS, os dados são primeiro sincronizados de forma
 serializada e depois consultados na base local do SDK pela data `yyyy-MM-dd`,
-tal como no exemplo oficial.
+tal como no exemplo oficial. Os passos usam o leitor de atividade do SDK e
+incluem também distância e calorias.
 
-MET (equivalente metabólico) representa a proporção entre o gasto energético
-durante a atividade e em repouso. A referência de 1 MET corresponde a
-3,5 ml de oxigénio por kg de peso corporal por minuto. A visualização classifica
-os valores como repouso (cerca de 1,0 MET), atividade leve (1,6–2,9), moderada
-(3,0–5,9) ou vigorosa (6,0+).
-
-O SDK não disponibiliza um comando de medição MET em tempo real; a bridge
-apresenta diretamente os valores automáticos/históricos recebidos, sem os
-recalcular. As capacidades reportadas pelo firmware bloqueiam ações declaradas
-como não suportadas.
+As capacidades reportadas pelo firmware bloqueiam ações declaradas como não
+suportadas.
 
 ## Executar
 
