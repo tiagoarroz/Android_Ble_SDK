@@ -3,7 +3,7 @@
     @case ('line') {
       <div class="line-visual">
         @if (primaryEntry(); as primary) {
-          <span class="line-visual__value">{{ formatValue(primary[1]) }}</span>
+          <span class="line-visual__value">{{ formatValue(primary[1], primary[0]) }}</span>
           <small>{{ fieldLabel(primary[0]) }}</small>
         }
         <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.chart')">
@@ -19,15 +19,24 @@
       </div>
     }
     @case ('ecg') {
-      <div class="line-visual line-visual--ecg">
-        @if (primaryEntry(); as primary) {
-          <span class="line-visual__value">{{ formatValue(primary[1]) }}</span>
-          <small>{{ fieldLabel(primary[0]) }}</small>
+      <div class="ecg-visual">
+        <div class="line-visual line-visual--ecg">
+          <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.ecgChart')">
+            <line class="ecg-visual__axis" x1="0" y1="24" x2="100" y2="24"></line>
+            <polyline class="line-visual__shadow" [attr.points]="chartPoints()"></polyline>
+            <polyline class="line-visual__stroke" [attr.points]="chartPoints()"></polyline>
+          </svg>
+        </div>
+        @if (resultEntries().length) {
+          <div class="ecg-visual__values">
+            @for (entry of resultEntries(); track entry[0]) {
+              <span>
+                <strong>{{ formatValue(entry[1], entry[0]) }}</strong>
+                <small>{{ fieldLabel(entry[0]) }}</small>
+              </span>
+            }
+          </div>
         }
-        <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.ecgChart')">
-          <polyline class="line-visual__shadow" [attr.points]="chartPoints()"></polyline>
-          <polyline class="line-visual__stroke" [attr.points]="chartPoints()"></polyline>
-        </svg>
       </div>
     }
     @case ('gauge') {
@@ -37,7 +46,7 @@
           <circle class="gauge-visual__value" cx="50" cy="50" r="40" [attr.stroke-dasharray]="gaugeDash()"></circle>
         </svg>
         <span>
-          <strong>{{ formatValue(primaryEntry()?.[1] ?? null) }}</strong>
+          <strong>{{ formatValue(primaryEntry()?.[1] ?? null, primaryEntry()?.[0]) }}</strong>
           <small>{{ fieldLabel(primaryEntry()?.[0] || '') }}</small>
         </span>
       </div>
@@ -73,12 +82,41 @@
             </div>
           }
         </div>
+      } @else if (isBloodPressureVisual()) {
+        <div class="blood-pressure-visual">
+          <div class="blood-pressure-visual__values">
+            @for (entry of resultEntries(); track entry[0]) {
+              <div>
+                <strong>{{ formatValue(entry[1], entry[0]) }}</strong>
+                <span>{{ fieldLabel(entry[0]) }}</span>
+              </div>
+            }
+          </div>
+          @if (progressValue() !== null) {
+            <div class="horizontal-progress">
+              <div class="horizontal-progress__heading">
+                <span>{{ i18n.translate('data.measurementProgress') }}</span>
+                <strong>{{ progressValue() }}%</strong>
+              </div>
+              <span
+                class="horizontal-progress__track"
+                role="progressbar"
+                [attr.aria-label]="i18n.translate('data.measurementProgress')"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="progressValue()"
+              >
+                <i [style.width.%]="progressValue()"></i>
+              </span>
+            </div>
+          }
+        </div>
       } @else {
         <div class="bar-visual">
           @for (entry of entries(); track entry[0]) {
             <div>
               <span class="bar-visual__track"><i [style.height.%]="barHeight(entry[1])"></i></span>
-              <strong>{{ formatValue(entry[1]) }}</strong>
+              <strong>{{ formatValue(entry[1], entry[0]) }}</strong>
               <small>{{ fieldLabel(entry[0]) }}</small>
             </div>
           }
@@ -86,11 +124,31 @@
       }
     }
     @case ('composition') {
-      <div class="metric-visual composition-visual">
-        @for (entry of entries(); track entry[0]) {
+      <div class="composition-layout">
+        <div class="metric-visual composition-visual">
+        @for (entry of resultEntries(); track entry[0]) {
           <div>
-            <strong>{{ formatValue(entry[1]) }}</strong>
+            <strong>{{ formatValue(entry[1], entry[0]) }}</strong>
             <span>{{ fieldLabel(entry[0]) }}</span>
+          </div>
+        }
+        </div>
+        @if (isBodyCompositionVisual() && progressValue() !== null) {
+          <div class="horizontal-progress">
+            <div class="horizontal-progress__heading">
+              <span>{{ i18n.translate('data.measurementProgress') }}</span>
+              <strong>{{ progressValue() }}%</strong>
+            </div>
+            <span
+              class="horizontal-progress__track"
+              role="progressbar"
+              [attr.aria-label]="i18n.translate('data.measurementProgress')"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="progressValue()"
+            >
+              <i [style.width.%]="progressValue()"></i>
+            </span>
           </div>
         }
       </div>
@@ -99,7 +157,7 @@
       <div class="metric-visual">
         @for (entry of entries(); track entry[0]) {
           <div>
-            <strong>{{ formatValue(entry[1]) }}</strong>
+            <strong>{{ formatValue(entry[1], entry[0]) }}</strong>
             <span>{{ fieldLabel(entry[0]) }}</span>
           </div>
         }
@@ -113,7 +171,7 @@
           <time>{{ record.timestamp | date:'shortTime' }}</time>
           <span>
             @for (entry of record.values | keyvalue; track entry.key) {
-              <b>{{ fieldLabel(entry.key) }}:</b> {{ formatValue(entry.value) }}
+              <b>{{ fieldLabel(entry.key) }}:</b> {{ formatValue(entry.value, entry.key) }}
             }
           </span>
         </div>

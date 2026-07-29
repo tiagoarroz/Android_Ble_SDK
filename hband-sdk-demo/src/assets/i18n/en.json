@@ -83,6 +83,13 @@
     "chart": "Sample chart",
     "ecgChart": "Electrocardiogram trace",
     "gauge": "Value gauge",
+    "measurementProgress": "Measurement progress",
+    "glucoseTotal": {
+      "title": "Complete measurement",
+      "completed": "Final result",
+      "inProgress": "Measurement in progress",
+      "waiting": "Start the measurement to track its progress and obtain the final result."
+    },
     "met": {
       "chart": "Metabolic equivalent progression throughout the day",
       "value": "{{value}} MET",

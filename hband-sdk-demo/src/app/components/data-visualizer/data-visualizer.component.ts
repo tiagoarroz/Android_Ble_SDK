@@ -28,8 +28,15 @@ export class DataVisualizerComponent {
     return Object.entries(latest?.values ?? this.event.values).filter(([field]) => field !== 'records');
   }
 
+  /**
+   * Separa os valores clínicos dos campos de controlo do protocolo.
+   */
+  resultEntries(): Array<[string, string | number | boolean | null]> {
+    return this.entries().filter(([field]) => !['progress', 'state', 'samples'].includes(field));
+  }
+
   primaryEntry(): [string, string | number | boolean | null] | undefined {
-    return this.entries()[0];
+    return this.resultEntries()[0] ?? this.entries()[0];
   }
 
   chartPoints(): string {
@@ -56,6 +63,21 @@ export class DataVisualizerComponent {
 
   isMetVisual(): boolean {
     return this.event.metric === 'met' || this.event.type === 'met';
+  }
+
+  isBloodPressureVisual(): boolean {
+    return this.event.metric === 'bloodPressure' || this.event.type === 'bloodPressure';
+  }
+
+  isBodyCompositionVisual(): boolean {
+    return this.event.metric === 'bodyComposition' || this.event.type === 'bodyComposition';
+  }
+
+  progressValue(): number | null {
+    const value = this.event.values['progress'];
+    return typeof value === 'number' && Number.isFinite(value)
+      ? Math.min(100, Math.max(0, value))
+      : null;
   }
 
   /**
@@ -127,9 +149,18 @@ export class DataVisualizerComponent {
     return `${(this.gaugeValue() / 100) * circumference} ${circumference}`;
   }
 
-  formatValue(value: string | number | boolean | null): string {
+  formatValue(value: string | number | boolean | null, field?: string): string {
     if (typeof value === 'boolean') {
       return this.i18n.translate(value ? 'common.yes' : 'common.no');
+    }
+    if (
+      typeof value === 'number'
+      && ['celsius', 'surfaceCelsius', 'baselineCelsius'].includes(field ?? '')
+    ) {
+      return new Intl.NumberFormat(this.locale(), {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }).format(value);
     }
     return value === null ? '—' : String(value);
   }
@@ -160,5 +191,9 @@ export class DataVisualizerComponent {
     const key = `data.fields.${field}`;
     const translated = this.i18n.translate(key);
     return translated === key ? field : translated;
+  }
+
+  private locale(): string {
+    return this.i18n.language() === 'br' ? 'pt-BR' : this.i18n.language();
   }
 }

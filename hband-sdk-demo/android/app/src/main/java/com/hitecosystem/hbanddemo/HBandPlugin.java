@@ -225,13 +225,13 @@ public class HBandPlugin extends Plugin {
 
             @Override
             public void onSearchStopped() {
-                setConnectionState("idle");
+                finishScanState();
                 emitLog("success", "BLE scan completed", "session.scan");
             }
 
             @Override
             public void onSearchCanceled() {
-                setConnectionState("idle");
+                finishScanState();
                 emitLog("warning", "BLE scan cancelled", "session.scan");
             }
         });
@@ -309,7 +309,8 @@ public class HBandPlugin extends Plugin {
             return;
         }
 
-        switch (operation) {
+        try {
+            switch (operation) {
             case "session.authenticate":
                 pendingConnectCall = call;
                 authenticateCurrentDevice();
@@ -375,21 +376,21 @@ public class HBandPlugin extends Plugin {
                 startHrv(call);
                 return;
             case "measure.hrv.stop":
-                manager.stopDetectHrv(null, hrvListener);
+                manager.stopDetectHrv(directWriteResponse, hrvListener);
                 accept(call, operation);
                 return;
             case "measure.stress.start":
                 startStress(call);
                 return;
             case "measure.stress.stop":
-                manager.stopDetectPressure(null);
+                manager.stopDetectPressure(directWriteResponse);
                 accept(call, operation);
                 return;
             case "measure.gsr.start":
                 startGsr(call);
                 return;
             case "measure.gsr.stop":
-                manager.stopDetectGsr(null);
+                manager.stopDetectGsr(directWriteResponse);
                 accept(call, operation);
                 return;
             case "measure.bloodGlucose.start":
@@ -438,6 +439,15 @@ public class HBandPlugin extends Plugin {
                 return;
             default:
                 call.reject("UNIMPLEMENTED_OPERATION: " + operation);
+            }
+        } catch (RuntimeException error) {
+            /*
+             * Alguns métodos do SDK propagam exceções internas por reflexão.
+             * Rejeitar a chamada evita terminar o processo Capacitor e mantém
+             * o erro disponível nos logs da medição.
+             */
+            emitLog("error", "SDK operation failed: " + error, operation);
+            call.reject("SDK_OPERATION_FAILED: " + operation, error);
         }
     }
 
@@ -460,6 +470,19 @@ public class HBandPlugin extends Plugin {
 
             @Override
             public void onConnectionConfirmTimeout() {
+                /*
+                 * O SDK pode publicar este timeout depois de já ter entregue
+                 * uma confirmação válida. Nesse caso a sessão BLE continua
+                 * operacional e não deve regressar visualmente a erro.
+                 */
+                if ("connected".equals(connectionState) && manager.isCurrentDeviceConnected()) {
+                    emitLog(
+                        "warning",
+                        "Late connection confirmation timeout ignored after authentication",
+                        "session.authenticate"
+                    );
+                    return;
+                }
                 rejectPendingConnect("CONNECTION_CONFIRM_TIMEOUT");
                 setConnectionState("error");
             }
@@ -684,7 +707,7 @@ public class HBandPlugin extends Plugin {
     };
 
     private void startHrv(PluginCall call) {
-        manager.startDetectHrv(null, hrvListener);
+        manager.startDetectHrv(directWriteResponse, hrvListener);
         accept(call, "measure.hrv.start");
     }
 
@@ -711,7 +734,7 @@ public class HBandPlugin extends Plugin {
     };
 
     private void startStress(PluginCall call) {
-        manager.startDetectPressure(null, pressureListener);
+        manager.startDetectPressure(directWriteResponse, pressureListener);
         accept(call, "measure.stress.start");
     }
 
@@ -738,7 +761,7 @@ public class HBandPlugin extends Plugin {
     };
 
     private void startGsr(PluginCall call) {
-        manager.startDetectGsr(null, gsrListener);
+        manager.startDetectGsr(directWriteResponse, gsrListener);
         accept(call, "measure.gsr.start");
     }
 
@@ -1146,7 +1169,9 @@ public class HBandPlugin extends Plugin {
         @Override
         public void onConnectStatusChanged(String mac, int status) {
             if (status == Constants.STATUS_CONNECTED) {
-                setConnectionState("connecting");
+                if (!"connected".equals(connectionState) && !"authenticating".equals(connectionState)) {
+                    setConnectionState("connecting");
+                }
             } else if (status == Constants.STATUS_DISCONNECTED) {
                 setConnectionState("disconnected");
             }
@@ -1187,6 +1212,16 @@ public class HBandPlugin extends Plugin {
     private void setConnectionState(String state) {
         connectionState = state;
         emitStatus();
+    }
+
+    /**
+     * Um cancelamento de scan pode chegar depois de a ligação já ter começado.
+     * Só o scan que ainda está ativo tem autorização para repor o estado idle.
+     */
+    private void finishScanState() {
+        if ("scanning".equals(connectionState)) {
+            setConnectionState("idle");
+        }
     }
 
     private void emitStatus() {

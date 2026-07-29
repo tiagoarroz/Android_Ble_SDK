@@ -18,7 +18,9 @@ import {
 import { DataVisualizerComponent } from '../components/data-visualizer/data-visualizer.component';
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
-import type { FeatureAction, FeatureDefinition, HBandLogEntry } from '../core/hband.types';
+import type {
+  FeatureAction, FeatureDefinition, HBandDataEvent, HBandLogEntry,
+} from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
 @Component({
@@ -128,6 +130,25 @@ export class HomePage implements OnInit {
 
   setDate(value: string | number | null | undefined): void {
     this.selectedDate.set(String(value ?? this.today).slice(0, 10));
+  }
+
+  measurementProgress(event: HBandDataEvent | undefined): number {
+    const value = event?.values['progress'];
+    return typeof value === 'number' && Number.isFinite(value)
+      ? Math.min(100, Math.max(0, value))
+      : 0;
+  }
+
+  formatGlucose(event: HBandDataEvent): string {
+    const value = event.values['mmolL'];
+    if (typeof value !== 'number') {
+      return '—';
+    }
+    const locale = this.i18n.language() === 'br' ? 'pt-BR' : this.i18n.language();
+    return new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 2,
+    }).format(value);
   }
 
   capability(feature: FeatureDefinition): 'supported' | 'unsupported' | 'unknown' {

@@ -223,6 +223,49 @@
             }
           </section>
 
+          @if (feature.metric === 'bloodGlucose') {
+            <section class="metric-data-section glucose-total-section">
+              <h3>{{ i18n.translate('data.glucoseTotal.title') }}</h3>
+              @if (hband.latestFor(feature.metric); as glucoseEvent) {
+                <div class="glucose-total-card">
+                  @if (hband.finalFor(feature.metric); as finalEvent) {
+                    <div class="glucose-total-card__result">
+                      <span>{{ i18n.translate('data.glucoseTotal.completed') }}</span>
+                      <strong>{{ formatGlucose(finalEvent) }}</strong>
+                      <small>{{ i18n.translate('data.fields.mmolL') }}</small>
+                    </div>
+                  } @else {
+                    <div class="glucose-total-card__pending">
+                      <ion-spinner name="crescent"></ion-spinner>
+                      <span>{{ i18n.translate('data.glucoseTotal.inProgress') }}</span>
+                    </div>
+                  }
+                  <div class="horizontal-progress">
+                    <div class="horizontal-progress__heading">
+                      <span>{{ i18n.translate('data.measurementProgress') }}</span>
+                      <strong>{{ measurementProgress(glucoseEvent) }}%</strong>
+                    </div>
+                    <span
+                      class="horizontal-progress__track"
+                      role="progressbar"
+                      [attr.aria-label]="i18n.translate('data.measurementProgress')"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      [attr.aria-valuenow]="measurementProgress(glucoseEvent)"
+                    >
+                      <i [style.width.%]="measurementProgress(glucoseEvent)"></i>
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <div class="detail-empty detail-empty--small">
+                  <ion-icon name="medical-outline"></ion-icon>
+                  <span>{{ i18n.translate('data.glucoseTotal.waiting') }}</span>
+                </div>
+              }
+            </section>
+          }
+
           <section class="metric-data-section">
             <div class="metric-data-section__heading">
               <h3>{{ i18n.translate('data.history') }}</h3>

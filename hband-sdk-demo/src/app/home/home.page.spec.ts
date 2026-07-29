@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import type { HBandDataEvent } from '../core/hband.types';
 import { HomePage } from './home.page';
 
 describe('HomePage', () => {
@@ -46,4 +47,49 @@ describe('HomePage', () => {
     expect(dataEntry?.data?.values['bpm']).toBe(74);
     expect(component.formatLogPayload(dataEntry!)).toContain('"bpm": 74');
   });
+
+  it('should keep heart rate active when STATE_HEART_NORMAL carries a bpm', async () => {
+    const feature = component.features.find((item) => item.metric === 'heartRate')!;
+    const measurement = feature.actions.find((action) => action.stopOperation)!;
+
+    await component.run(measurement, feature);
+    feedDeviceData({
+      type: 'heartRate',
+      metric: 'heartRate',
+      timestamp: new Date().toISOString(),
+      values: { bpm: 72, state: 'STATE_HEART_NORMAL' },
+    });
+
+    expect(component.hband.measurementActive('heartRate')).toBeTrue();
+    expect(component.actionOperation(measurement, feature)).toBe('measure.heartRate.stop');
+  });
+
+  it('should finish finite measurements only when full progress is received', async () => {
+    const feature = component.features.find((item) => item.metric === 'stress')!;
+    const measurement = feature.actions.find((action) => action.stopOperation)!;
+
+    await component.run(measurement, feature);
+    expect(component.hband.measurementActive('stress')).toBeTrue();
+
+    feedDeviceData({
+      type: 'stress',
+      metric: 'stress',
+      timestamp: new Date().toISOString(),
+      values: { progress: 100, score: 32 },
+    });
+
+    expect(component.hband.measurementActive('stress')).toBeFalse();
+    expect(component.actionOperation(measurement, feature)).toBe('measure.stress.start');
+  });
+
+  /**
+   * Injeta callbacks equivalentes aos eventos nativos sem expor a operação
+   * interna do serviço no contrato de produção.
+   */
+  function feedDeviceData(event: HBandDataEvent): void {
+    const testableService = component.hband as unknown as {
+      storeData(data: HBandDataEvent): void;
+    };
+    testableService.storeData(event);
+  }
 });

@@ -1543,8 +1543,162 @@ ion-content {
   }
 }
 
+.ecg-visual {
+  display: grid;
+  gap: 14px;
+}
+
+.ecg-visual__axis {
+  stroke: rgba(217, 83, 95, 0.24);
+  stroke-dasharray: 2 2;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.ecg-visual__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  span {
+    background: #fff5f5;
+    border: 1px solid rgba(217, 83, 95, 0.14);
+    border-radius: 12px;
+    display: grid;
+    min-width: 104px;
+    padding: 10px 12px;
+  }
+
+  strong {
+    color: var(--app-ink);
+    font-size: 17px;
+  }
+
+  small {
+    color: var(--app-ink-soft);
+    font-size: 9px;
+    font-weight: 750;
+    text-transform: uppercase;
+  }
+}
+
+.blood-pressure-visual,
+.composition-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.blood-pressure-visual__values {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  div {
+    background: linear-gradient(145deg, #f7fbfa, #eef6f3);
+    border: 1px solid var(--app-border);
+    border-radius: 16px;
+    display: grid;
+    min-height: 104px;
+    padding: 18px;
+    place-content: center;
+    text-align: center;
+  }
+
+  strong {
+    color: var(--app-ink);
+    font-size: 32px;
+    letter-spacing: -0.05em;
+  }
+
+  span {
+    color: var(--app-ink-soft);
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+  }
+}
+
+.horizontal-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.horizontal-progress__heading {
+  align-items: center;
+  color: var(--app-ink-soft);
+  display: flex;
+  font-size: 11px;
+  font-weight: 700;
+  justify-content: space-between;
+
+  strong {
+    color: var(--app-ink);
+  }
+}
+
+.horizontal-progress__track {
+  background: #e5eeea;
+  border-radius: 999px;
+  display: block;
+  height: 10px;
+  overflow: hidden;
+
+  i {
+    background: linear-gradient(90deg, #0b987f, var(--app-mint));
+    border-radius: inherit;
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    transition: width 180ms ease;
+  }
+}
+
 .composition-visual {
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.glucose-total-card {
+  background: linear-gradient(145deg, #f6fbf9, #edf6f2);
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  display: grid;
+  gap: 20px;
+  padding: 18px;
+}
+
+.glucose-total-card__result {
+  display: grid;
+  text-align: center;
+
+  > span,
+  small {
+    color: var(--app-ink-soft);
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: var(--app-ink);
+    font-size: 38px;
+    letter-spacing: -0.05em;
+  }
+}
+
+.glucose-total-card__pending {
+  align-items: center;
+  color: var(--app-ink-soft);
+  display: flex;
+  font-size: 13px;
+  gap: 10px;
+  justify-content: center;
+  min-height: 58px;
+
+  ion-spinner {
+    color: var(--ion-color-primary);
+    height: 20px;
+    width: 20px;
+  }
 }
 
 .history-record-list {

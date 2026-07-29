@@ -33,6 +33,7 @@ export class HBandService {
   readonly status = signal<HBandStatus>(INITIAL_STATUS);
   readonly devices = signal<HBandDevice[]>([]);
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
+  readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly logs = signal<HBandLogEntry[]>([]);
   readonly busyOperation = signal<string | null>(null);
@@ -155,6 +156,10 @@ export class HBandService {
     return this.history()[metric];
   }
 
+  finalFor(metric: MetricId): HBandDataEvent | undefined {
+    return this.finalMeasurements()[metric];
+  }
+
   measurementActive(metric: MetricId): boolean {
     return this.activeMeasurements()[metric] === true;
   }
@@ -170,6 +175,9 @@ export class HBandService {
   async toggleMeasurement(metric: MetricId, startOperation: string, stopOperation: string): Promise<void> {
     const active = this.measurementActive(metric);
     await this.execute(active ? stopOperation : startOperation);
+    if (!active && metric === 'bloodGlucose') {
+      this.finalMeasurements.update((measurements) => ({ ...measurements, bloodGlucose: undefined }));
+    }
     this.activeMeasurements.update((measurements) => ({
       ...measurements,
       [metric]: !active,
@@ -178,7 +186,7 @@ export class HBandService {
 
   private storeStatus(status: HBandStatus): void {
     this.status.set(status);
-    if (status.state === 'disconnected' || status.state === 'idle' || status.state === 'error') {
+    if (status.state === 'disconnected' || status.state === 'unavailable') {
       this.activeMeasurements.set({});
     }
   }
@@ -211,8 +219,58 @@ export class HBandService {
     if (event.type === 'history') {
       this.history.update((history) => ({ ...history, [metric]: event }));
     } else {
-      this.data.update((data) => ({ ...data, [metric]: event }));
+      /*
+       * ECG, composição corporal, Stress e outras medições distribuem amostras,
+       * progresso e resultado por callbacks distintos. A composição conserva
+       * a leitura completa sem apagar amostras quando chega apenas um estado.
+       */
+      this.data.update((data) => {
+        const previous = data[metric];
+        const merged: HBandDataEvent = {
+          ...previous,
+          ...event,
+          metric,
+          values: { ...(previous?.values ?? {}), ...event.values },
+          samples: event.samples?.length ? event.samples : previous?.samples,
+        };
+        return { ...data, [metric]: merged };
+      });
+      if (metric === 'bloodGlucose' && this.progress(event) >= 100) {
+        const complete = this.data()[metric];
+        if (complete) {
+          this.finalMeasurements.update((measurements) => ({ ...measurements, [metric]: complete }));
+        }
+      }
+      const current = this.data()[metric];
+      if (current && this.measurementFinished(metric, current)) {
+        this.activeMeasurements.update((measurements) => ({ ...measurements, [metric]: false }));
+      }
     }
+  }
+
+  /**
+   * Converte apenas percentagens numéricas confirmadas pelo payload do SDK.
+   */
+  private progress(event: HBandDataEvent): number {
+    const value = event.values['progress'];
+    return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  }
+
+  /**
+   * Termina visualmente apenas medições que o SDK identifica como finitas.
+   * A frequência cardíaca não usa estados de dados como sinal de fim, pois
+   * `STATE_HEART_NORMAL` representa precisamente uma leitura ainda ativa.
+   */
+  private measurementFinished(metric: MetricId, event: HBandDataEvent): boolean {
+    const finishesAtFullProgress: MetricId[] = [
+      'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose', 'bodyComposition', 'stress',
+    ];
+    if (finishesAtFullProgress.includes(metric)) {
+      return this.progress(event) >= 100;
+    }
+    return metric === 'hrv'
+      && typeof event.values['milliseconds'] === 'number'
+      && event.values['milliseconds'] > 0;
   }
 
   private metricForType(type: string): MetricId | undefined {
