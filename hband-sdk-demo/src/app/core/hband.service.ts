@@ -4,7 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { HBand } from './hband.plugin';
 import type {
   HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
-  HBandStatus, MetricId,
+  HBandStatus, HBandSyncStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -14,6 +14,13 @@ const INITIAL_STATUS: HBandStatus = {
   capabilities: {},
   platform: Capacitor.getPlatform(),
 };
+
+const DEVICE_SESSION_KEY = 'hband-device-session';
+
+interface RememberedDeviceSession {
+  deviceId: string;
+  password: string;
+}
 
 const METRIC_OPERATIONS = new Set([
   'measure.heartRate.start', 'measure.heartRate.stop',
@@ -26,6 +33,7 @@ const METRIC_OPERATIONS = new Set([
   'measure.stress.start', 'measure.stress.stop',
   'history.activity.current',
   'history.metric',
+  'history.daily',
   'device.battery',
 ]);
 
@@ -38,6 +46,9 @@ export class HBandService {
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
+  readonly syncStatus = signal<HBandSyncStatus>({
+    state: 'idle', completed: 0, total: 0, failed: 0,
+  });
   readonly logs = signal<HBandLogEntry[]>([]);
   readonly busyOperation = signal<string | null>(null);
   readonly activeMeasurements = signal<Partial<Record<MetricId, boolean>>>({});
@@ -46,6 +57,7 @@ export class HBandService {
   private queue: Promise<unknown> = Promise.resolve();
   private logSequence = 0;
   private readonly operationMetrics = new Map<string, MetricId>();
+  private syncPromise: Promise<void> | null = null;
 
   /**
    * Liga os eventos uma única vez e recupera o estado da bridge nativa.
@@ -60,7 +72,16 @@ export class HBandService {
     await HBand.addListener('data', (event) => this.storeData(event));
     await HBand.addListener('log', (entry) => this.appendLog(entry));
     try {
-      this.status.set(await HBand.getStatus());
+      const status = await HBand.getStatus();
+      this.storeStatus(status);
+      if (
+        status.available
+        && status.bluetoothEnabled
+        && status.platform === 'android'
+        && ['idle', 'disconnected', 'error'].includes(status.state)
+      ) {
+        await this.restoreDeviceSession();
+      }
     } catch (error) {
       this.fail('session.initialize', error);
     }
@@ -85,7 +106,7 @@ export class HBandService {
       return;
     }
     await HBand.connect({ deviceId, password });
-    await this.refreshBattery();
+    this.rememberDeviceSession({ deviceId, password });
   }
 
   async disconnect(): Promise<void> {
@@ -95,6 +116,7 @@ export class HBandService {
       this.battery.set(null);
       return;
     }
+    localStorage.removeItem(DEVICE_SESSION_KEY);
     await HBand.disconnect();
     this.activeMeasurements.set({});
     this.battery.set(null);
@@ -102,6 +124,77 @@ export class HBandService {
 
   async refreshBattery(): Promise<void> {
     await this.execute('device.battery');
+  }
+
+  /**
+   * Replica a sequência observada na aplicação de referência: bateria, hora,
+   * atividade atual e dados do dia. No Android, uma única leitura de origem
+   * distribui as métricas; todas as operações usam a mesma fila.
+   */
+  synchroniseDate(date: string): Promise<void> {
+    if (this.syncPromise) {
+      return this.syncPromise;
+    }
+    const catalogMetrics: MetricId[] = [
+      'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
+      'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
+    ];
+    const metrics = catalogMetrics.filter((metric) => this.metricSupported(metric));
+    const android = this.status().platform === 'android';
+    const operations: Array<{ operation: string; params?: Record<string, unknown> }> = [
+      { operation: 'device.battery' },
+      { operation: 'device.time' },
+      { operation: 'history.activity.current' },
+      ...(android
+        ? [{ operation: 'history.daily', params: { date } }]
+        : metrics
+        .map((metric) => ({
+          operation: 'history.metric',
+          params: { metric, date },
+        }))),
+    ];
+
+    this.syncPromise = (async () => {
+      let completed = 0;
+      let failed = 0;
+      this.syncStatus.set({
+        state: 'syncing', date, completed, total: operations.length, failed,
+      });
+      for (const item of operations) {
+        this.syncStatus.update((status) => ({ ...status, current: item.operation }));
+        try {
+          await this.execute(item.operation, item.params ?? {});
+        } catch {
+          failed += 1;
+        }
+        completed += 1;
+        this.syncStatus.update((status) => ({ ...status, completed, failed }));
+      }
+      this.syncStatus.update((status) => ({
+        ...status,
+        state: failed > 0 ? 'partial' : 'complete',
+        current: undefined,
+      }));
+    })().finally(() => {
+      this.syncPromise = null;
+    });
+    return this.syncPromise;
+  }
+
+  /**
+   * No Android, as métricas automáticas partilham o mesmo bloco de origem e
+   * são lidas de uma vez. ECG e composição corporal conservam as operações
+   * dedicadas porque usam áreas de armazenamento diferentes no dispositivo.
+   */
+  readHistory(metric: MetricId, date: string): Promise<void> {
+    const originMetrics: MetricId[] = [
+      'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
+      'bloodGlucose', 'stress',
+    ];
+    if (this.status().platform === 'android' && originMetrics.includes(metric)) {
+      return this.execute('history.daily', { date });
+    }
+    return this.execute('history.metric', { metric, date });
   }
 
   /**
@@ -203,11 +296,25 @@ export class HBandService {
   }
 
   private storeStatus(status: HBandStatus): void {
+    const wasConnected = this.status().state === 'connected';
     this.status.set(status);
+    if (!wasConnected && status.state === 'connected') {
+      void this.synchroniseDate(this.localDate(new Date()));
+    }
     if (status.state === 'disconnected' || status.state === 'unavailable') {
       this.activeMeasurements.set({});
       this.battery.set(null);
     }
+  }
+
+  private metricSupported(metric: MetricId): boolean {
+    const capability = metric === 'oxygen' ? 'bloodOxygen' : metric;
+    return this.capability(capability) !== 'unsupported';
+  }
+
+  private localDate(date: Date): string {
+    const offset = date.getTimezoneOffset() * 60_000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 10);
   }
 
   private upsertDevice(device: HBandDevice): void {
@@ -247,7 +354,23 @@ export class HBandService {
       data: event,
     });
     if (event.type === 'history') {
-      this.history.update((history) => ({ ...history, [metric]: event }));
+      this.history.update((history) => {
+        const previous = history[metric];
+        if (!previous || previous.date !== event.date) {
+          return { ...history, [metric]: event };
+        }
+        const records = this.mergeHistoryRecords(previous.records ?? [], event.records ?? []);
+        return {
+          ...history,
+          [metric]: {
+            ...previous,
+            ...event,
+            values: { ...previous.values, ...event.values, records: records.length },
+            records,
+            samples: [...(previous.samples ?? []), ...(event.samples ?? [])],
+          },
+        };
+      });
     } else {
       /*
        * ECG, composição corporal, Stress e outras medições distribuem amostras,
@@ -475,5 +598,56 @@ export class HBandService {
 
   private numericValues(values: Record<string, string | number | boolean | null>): number[] {
     return Object.values(values).filter((value): value is number => typeof value === 'number');
+  }
+
+  /**
+   * Conserva apenas os dados necessários para retomar a mesma sessão BLE
+   * depois de a aplicação ser reaberta.
+   */
+  private rememberDeviceSession(session: RememberedDeviceSession): void {
+    localStorage.setItem(DEVICE_SESSION_KEY, JSON.stringify(session));
+  }
+
+  /**
+   * Tenta ligar diretamente ao último endereço autenticado. A bridge nativa
+   * continua responsável pelas novas tentativas se a pulseira estiver
+   * temporariamente fora de alcance.
+   */
+  private async restoreDeviceSession(): Promise<void> {
+    const serialized = localStorage.getItem(DEVICE_SESSION_KEY);
+    if (!serialized) {
+      return;
+    }
+    try {
+      const session = JSON.parse(serialized) as Partial<RememberedDeviceSession>;
+      if (typeof session.deviceId !== 'string' || typeof session.password !== 'string') {
+        localStorage.removeItem(DEVICE_SESSION_KEY);
+        return;
+      }
+      await HBand.connect({
+        deviceId: session.deviceId,
+        password: session.password,
+      });
+    } catch (error) {
+      this.fail('session.restore', error);
+    }
+  }
+
+  /**
+   * Junta dados automáticos de cinco minutos e medições manuais sem duplicar
+   * o mesmo instante/payload quando o SDK repete um bloco durante a leitura.
+   */
+  private mergeHistoryRecords(
+    previous: HBandHistoryRecord[],
+    incoming: HBandHistoryRecord[],
+  ): HBandHistoryRecord[] {
+    const records = new Map<string, HBandHistoryRecord>();
+    for (const record of [...previous, ...incoming]) {
+      const key = `${record.timestamp}|${JSON.stringify(record.values)}`;
+      records.set(key, record);
+    }
+    return [...records.values()].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
   }
 }

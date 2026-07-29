@@ -87,6 +87,31 @@
     "ecgChart": "Traçado de eletrocardiograma",
     "gauge": "Indicador de valor",
     "measurementProgress": "Progresso da medição",
+    "daily": {
+      "intervalAverage": "Média do intervalo",
+      "dayAverage": "Média do dia inteiro",
+      "minimum": "Mínimo",
+      "maximum": "Máximo",
+      "chart": "Evolução ao longo de 24 horas"
+    },
+    "temperatureTabs": {
+      "label": "Tipo de temperatura",
+      "body": "Corporal",
+      "skin": "Pele"
+    },
+    "classifications": {
+      "normal": "Normal",
+      "relaxed": "Relaxado",
+      "moderate": "Moderado",
+      "elevated": "Elevado",
+      "high": "Alto",
+      "belowReference": "Abaixo da referência",
+      "aboveReference": "Acima da referência",
+      "outsideReference": "Fora da referência",
+      "lowRisk": "Risco baixo",
+      "mediumRisk": "Risco médio",
+      "highRisk": "Risco alto"
+    },
     "glucoseTotal": {
       "title": "Medição total",
       "completed": "Resultado final",
@@ -95,7 +120,8 @@
     },
     "activity": {
       "today": "Atividade acumulada",
-      "chart": "Distribuição de passos ao longo do dia"
+      "chart": "Distribuição de passos ao longo do dia",
+      "latestInterval": "Último intervalo"
     },
     "fields": {
       "bpm": "Frequência cardíaca (bpm)",
@@ -109,6 +135,7 @@
       "enabled": "Disponível",
       "celsius": "Temperatura (°C)",
       "surfaceCelsius": "Temperatura da pele (°C)",
+      "baselineCelsius": "Temperatura da pele (°C)",
       "level": "Nível",
       "milliseconds": "Milissegundos",
       "hrvMilliseconds": "HRV (ms)",
@@ -161,6 +188,11 @@
     "description": "Escolha o dia usado pelo botão de histórico de cada métrica.",
     "date": "Data",
     "noData": "Leia o histórico desta data."
+  },
+  "sync": {
+    "action": "Sincronizar dia",
+    "inProgress": "Sincronizando",
+    "progress": "{{completed}} de {{total}} leituras"
   },
   "profile": {
     "title": "Dados pessoais para sincronização",

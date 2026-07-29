@@ -35,6 +35,15 @@ export interface HBandBatteryStatus {
   updatedAt: string;
 }
 
+export interface HBandSyncStatus {
+  state: 'idle' | 'syncing' | 'complete' | 'partial';
+  date?: string;
+  current?: string;
+  completed: number;
+  total: number;
+  failed: number;
+}
+
 export interface HBandHistoryRecord {
   timestamp: string;
   values: Record<string, DataValue>;

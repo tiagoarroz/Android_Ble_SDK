@@ -1,9 +1,13 @@
 package com.hitecosystem.hbanddemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -157,6 +161,23 @@ public class HBandPlugin extends Plugin {
     private String firmwareVersion;
     private String hardwareVersion;
     private PluginCall pendingConnectCall;
+    private final Handler reconnectHandler = new Handler(Looper.getMainLooper());
+    private boolean intentionalDisconnect;
+    private int reconnectAttempts;
+    private final Runnable reconnectRunnable = () -> {
+        if (intentionalDisconnect
+            || currentAddress == null
+            || manager.isCurrentDeviceConnected()) {
+            return;
+        }
+        reconnectAttempts += 1;
+        emitLog(
+            "info",
+            "Automatic reconnect attempt " + reconnectAttempts,
+            "session.reconnect"
+        );
+        scanForReconnect();
+    };
 
     @Override
     public void load() {
@@ -165,6 +186,35 @@ public class HBandPlugin extends Plugin {
         manager.registerBluetoothStateListener(new IABluetoothStateListener() {
             @Override
             public void onBluetoothStateChanged(boolean isOpen) {
+                /*
+                 * O SDK pode conservar o estado interno "connected" quando o
+                 * adaptador fecha. Corrigir o estado aqui garante que o canal
+                 * GATT é recriado quando o Bluetooth voltar a abrir.
+                 */
+                if (!isOpen) {
+                    reconnectHandler.removeCallbacks(reconnectRunnable);
+                    if (currentAddress != null && !intentionalDisconnect) {
+                        setConnectionState("disconnected");
+                    } else {
+                        emitStatus();
+                    }
+                    return;
+                }
+                if (
+                    currentAddress != null
+                    && !intentionalDisconnect
+                    && !manager.isCurrentDeviceConnected()
+                ) {
+                    /*
+                     * Reiniciar o adaptador invalida o registo GATT interno da
+                     * biblioteca. Uma nova inicialização recompõe esse cliente
+                     * antes de voltar a usar o endereço conhecido.
+                     */
+                    manager.init(getContext().getApplicationContext());
+                    setConnectionState("disconnected");
+                    scheduleReconnect();
+                    return;
+                }
                 emitStatus();
             }
         });
@@ -264,15 +314,31 @@ public class HBandPlugin extends Plugin {
             : deviceId;
         currentPassword = call.getString("password", "0000");
         pendingConnectCall = call;
+        intentionalDisconnect = false;
+        reconnectAttempts = 0;
+        reconnectHandler.removeCallbacks(reconnectRunnable);
+        connectCurrentDevice();
+    }
+
+    /**
+     * Reutiliza exatamente o mesmo handshake na ligação inicial e nas
+     * religações automáticas após uma perda inesperada do sinal.
+     */
+    private void connectCurrentDevice() {
         manager.stopScanDevice();
         setConnectionState("connecting");
-        manager.registerConnectStatusListener(deviceId, connectStatusListener);
-        manager.connectDevice(deviceId, currentName, new IConnectResponse() {
+        manager.registerConnectStatusListener(currentAddress, connectStatusListener);
+        manager.connectDevice(currentAddress, currentName, new IConnectResponse() {
             @Override
             public void connectState(int code, BleGattProfile profile, boolean isOadModel) {
                 if (code != Code.REQUEST_SUCCESS) {
-                    rejectPendingConnect("BLE_CONNECT_FAILED_" + code);
-                    setConnectionState("error");
+                    if (pendingConnectCall != null) {
+                        rejectPendingConnect("BLE_CONNECT_FAILED_" + code);
+                        setConnectionState("error");
+                    } else {
+                        setConnectionState("disconnected");
+                    }
+                    scheduleReconnect();
                 }
             }
         }, new INotifyResponse() {
@@ -281,6 +347,7 @@ public class HBandPlugin extends Plugin {
                 if (state != Code.REQUEST_SUCCESS) {
                     rejectPendingConnect("BLE_NOTIFY_FAILED_" + state);
                     setConnectionState("error");
+                    scheduleReconnect();
                     return;
                 }
                 authenticateCurrentDevice();
@@ -288,10 +355,83 @@ public class HBandPlugin extends Plugin {
         });
     }
 
+    /**
+     * Depois de o adaptador reiniciar, volta a descobrir apenas o MAC
+     * recordado antes de ligar. Isto recompõe o dispositivo interno usado pelo
+     * SDK e nunca seleciona uma das outras MF91 próximas.
+     */
+    private void scanForReconnect() {
+        if (intentionalDisconnect || currentAddress == null) {
+            return;
+        }
+        final boolean[] targetFound = { false };
+        final Runnable[] scanTimeout = new Runnable[1];
+        scanTimeout[0] = () -> {
+            if (targetFound[0] || intentionalDisconnect) {
+                return;
+            }
+            targetFound[0] = true;
+            manager.stopScanDevice();
+            setConnectionState("disconnected");
+            emitLog("warning", "Reconnect scan timed out", "session.reconnect");
+            scheduleReconnect();
+        };
+        manager.startScanDevice(8_000, new SearchResponse() {
+            @Override
+            public void onSearchStarted() {
+                emitLog("info", "Reconnect scan started", "session.reconnect");
+            }
+
+            @Override
+            public void onDeviceFounded(SearchResult result) {
+                if (
+                    result == null
+                    || result.getAddress() == null
+                    || !currentAddress.equalsIgnoreCase(result.getAddress())
+                    || targetFound[0]
+                ) {
+                    return;
+                }
+                targetFound[0] = true;
+                reconnectHandler.removeCallbacks(scanTimeout[0]);
+                discoveredDevices.put(result.getAddress(), result);
+                if (result.getName() != null && !result.getName().trim().isEmpty()) {
+                    currentName = result.getName();
+                }
+                manager.stopScanDevice();
+                connectCurrentDevice();
+            }
+
+            @Override
+            public void onSearchStopped() {
+                if (!targetFound[0] && !intentionalDisconnect) {
+                    targetFound[0] = true;
+                    reconnectHandler.removeCallbacks(scanTimeout[0]);
+                    setConnectionState("disconnected");
+                    scheduleReconnect();
+                }
+            }
+
+            @Override
+            public void onSearchCanceled() {
+                if (!targetFound[0] && !intentionalDisconnect) {
+                    targetFound[0] = true;
+                    reconnectHandler.removeCallbacks(scanTimeout[0]);
+                    setConnectionState("disconnected");
+                    scheduleReconnect();
+                }
+            }
+        });
+        reconnectHandler.postDelayed(scanTimeout[0], 10_000L);
+    }
+
     @PluginMethod
     public void disconnect(PluginCall call) {
+        intentionalDisconnect = true;
+        reconnectHandler.removeCallbacks(reconnectRunnable);
         manager.disconnectWatch(code -> {
             setConnectionState("disconnected");
+            stopConnectionService();
             call.resolve();
         });
     }
@@ -418,6 +558,9 @@ public class HBandPlugin extends Plugin {
             case "history.metric":
                 readMetricHistory(call);
                 return;
+            case "history.daily":
+                readDailyHistory(call);
+                return;
             case "history.activity.current":
                 readCurrentActivity(call);
                 return;
@@ -460,8 +603,12 @@ public class HBandPlugin extends Plugin {
                 }
                 firmwareVersion = pwdData.getDeviceVersion();
                 hardwareVersion = String.valueOf(pwdData.getDeviceNumber());
+                reconnectAttempts = 0;
+                reconnectHandler.removeCallbacks(reconnectRunnable);
                 setConnectionState("connected");
+                startConnectionService();
                 resolvePendingConnect();
+                emitLog("success", "Device session ready", "session.connect");
             }
 
             @Override
@@ -481,6 +628,7 @@ public class HBandPlugin extends Plugin {
                 }
                 rejectPendingConnect("CONNECTION_CONFIRM_TIMEOUT");
                 setConnectionState("error");
+                scheduleReconnect();
             }
         }, new IDeviceFuctionDataListener() {
             @Override
@@ -553,8 +701,8 @@ public class HBandPlugin extends Plugin {
             values.put("lowBattery", data.isLowBattery());
             values.put("state", data.getState());
             emitData("battery", values, null, data.toString());
+            accept(call, "device.battery");
         });
-        accept(call, "device.battery");
     }
 
     private void readRssi(PluginCall call) {
@@ -584,8 +732,10 @@ public class HBandPlugin extends Plugin {
             now.get(Calendar.SECOND),
             ETimeMode.MODE_24
         );
-        manager.settingTime(writeResponse, state -> emitLog("success", "Time sync state: " + state, "device.time"), setting);
-        accept(call, "device.time");
+        manager.settingTime(writeResponse, state -> {
+            emitLog("success", "Time sync state: " + state, "device.time");
+            accept(call, "device.time");
+        }, setting);
     }
 
     private void syncProfile(PluginCall call) {
@@ -862,18 +1012,17 @@ public class HBandPlugin extends Plugin {
                 return;
             }
         } else if ("ecg".equals(metric)) {
-            readEcgHistory(metric, date);
+            readEcgHistory(call, metric, date);
         } else if ("bodyComposition".equals(metric)) {
-            readBodyComponentHistory(metric, date);
+            readBodyComponentHistory(call, metric, date);
         } else {
             DeviceManualDataType dataType = manualType(metric);
             if (dataType == null) {
                 call.reject("HISTORY_METRIC_UNSUPPORTED: " + metric);
                 return;
             }
-            readManualMetricHistory(metric, date, dataType);
+            readManualMetricHistory(call, metric, date, dataType);
         }
-        accept(call, "history.metric");
     }
 
     /**
@@ -905,6 +1054,7 @@ public class HBandPlugin extends Plugin {
                     @Override public void onReadOriginProgress(float progress) {}
                     @Override public void onReadOriginComplete() {
                         emitHistory(metric, date.toString(), records);
+                        accept(call, "history.metric");
                     }
                 },
                 dayOffset,
@@ -923,6 +1073,7 @@ public class HBandPlugin extends Plugin {
                     @Override public void onReadOriginProgress(float progress) {}
                     @Override public void onReadOriginComplete() {
                         emitHistory(metric, date.toString(), records);
+                        accept(call, "history.metric");
                     }
                 },
                 dayOffset,
@@ -948,6 +1099,236 @@ public class HBandPlugin extends Plugin {
         ));
     }
 
+    /**
+     * Lê uma única vez os blocos automáticos de cinco minutos e distribui-os
+     * pelas métricas que a MF91 inclui no protocolo de origem. É a sequência
+     * usada para preencher os gráficos diários sem repetir o mesmo download.
+     */
+    private void readDailyHistory(PluginCall call) {
+        JSObject params = call.getObject("params");
+        String dateText = params == null ? null : params.getString("date");
+        if (dateText == null) {
+            call.reject("HISTORY_DATE_REQUIRED");
+            return;
+        }
+        final LocalDate date;
+        try {
+            date = LocalDate.parse(dateText);
+        } catch (RuntimeException error) {
+            call.reject("HISTORY_DATE_INVALID");
+            return;
+        }
+        long difference = ChronoUnit.DAYS.between(date, LocalDate.now());
+        if (difference < 0 || difference > watchDataDays) {
+            call.reject("HISTORY_DATE_OUTSIDE_DEVICE_RETENTION");
+            return;
+        }
+
+        JSArray steps = new JSArray();
+        JSArray heartRate = new JSArray();
+        JSArray bloodPressure = new JSArray();
+        JSArray oxygen = new JSArray();
+        JSArray temperature = new JSArray();
+        JSArray bloodGlucose = new JSArray();
+        JSArray stress = new JSArray();
+        int dayOffset = (int) difference;
+
+        if (originProtocolVersion >= 3) {
+            manager.readOriginDataSingleDay(
+                writeResponse,
+                new IOriginData3Listener() {
+                    @Override public void onOriginFiveMinuteListDataChange(List<OriginData3> data) {
+                        for (OriginData3 item : data) {
+                            appendOriginRecords(
+                                item, date, steps, heartRate, bloodPressure,
+                                oxygen, temperature, bloodGlucose, stress
+                            );
+                        }
+                    }
+                    @Override public void onOriginHalfHourDataChange(OriginHalfHourData data) {}
+                    @Override public void onOriginHRVOriginListDataChange(List<HRVOriginData> data) {}
+                    @Override public void onOriginSpo2OriginListDataChange(List<Spo2hOriginData> data) {}
+                    @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
+                    @Override public void onReadOriginProgress(float progress) {
+                        emitMetric("sync", "progress", progress, null);
+                    }
+                    @Override public void onReadOriginComplete() {
+                        emitDailyHistories(
+                            date, steps, heartRate, bloodPressure, oxygen,
+                            temperature, bloodGlucose, stress
+                        );
+                        accept(call, "history.daily");
+                    }
+                },
+                dayOffset,
+                1,
+                watchDataDays
+            );
+            return;
+        }
+
+        manager.readOriginDataSingleDay(
+            writeResponse,
+            new IOriginDataListener() {
+                @Override public void onOringinFiveMinuteDataChange(OriginData item) {
+                    appendLegacyOriginRecords(
+                        item, date, steps, heartRate, bloodPressure, temperature
+                    );
+                }
+                @Override public void onOringinHalfHourDataChange(OriginHalfHourData data) {}
+                @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
+                @Override public void onReadOriginProgress(float progress) {
+                    emitMetric("sync", "progress", progress, null);
+                }
+                @Override public void onReadOriginComplete() {
+                    emitDailyHistories(
+                        date, steps, heartRate, bloodPressure, oxygen,
+                        temperature, bloodGlucose, stress
+                    );
+                    accept(call, "history.daily");
+                }
+            },
+            dayOffset,
+            1,
+            watchDataDays
+        );
+    }
+
+    private void appendOriginRecords(
+        OriginData3 item,
+        LocalDate date,
+        JSArray steps,
+        JSArray heartRate,
+        JSArray bloodPressure,
+        JSArray oxygen,
+        JSArray temperature,
+        JSArray bloodGlucose,
+        JSArray stress
+    ) {
+        if (!sameDate(item.getmTime(), date)) {
+            return;
+        }
+        appendStepHistoryRecord(steps, item, date);
+        Double bpm = averagePositive(item.getPpgs());
+        if (bpm != null) {
+            heartRate.put(historyRecord(
+                item.getmTime(),
+                new JSObject().put("bpm", bpm),
+                intArray(item.getPpgs())
+            ));
+        }
+        appendBloodPressureOrigin(bloodPressure, item);
+        Double percent = averagePositive(item.getOxygens());
+        if (percent != null) {
+            oxygen.put(historyRecord(
+                item.getmTime(),
+                new JSObject().put("percent", percent),
+                intArray(item.getOxygens())
+            ));
+        }
+        appendTemperatureOrigin(temperature, item);
+        if (item.getBloodGlucose() > 0) {
+            bloodGlucose.put(historyRecord(
+                item.getmTime(),
+                new JSObject()
+                    .put("mmolL", item.getBloodGlucose())
+                    .put("riskLevel", String.valueOf(item.getBloodGlucoseRiskLevel())),
+                null
+            ));
+        }
+        if (item.getPressure() > 0) {
+            stress.put(historyRecord(
+                item.getmTime(),
+                new JSObject().put("score", item.getPressure()),
+                null
+            ));
+        }
+    }
+
+    private void appendLegacyOriginRecords(
+        OriginData item,
+        LocalDate date,
+        JSArray steps,
+        JSArray heartRate,
+        JSArray bloodPressure,
+        JSArray temperature
+    ) {
+        if (!sameDate(item.getmTime(), date)) {
+            return;
+        }
+        appendStepHistoryRecord(steps, item, date);
+        if (item.getRateValue() > 0) {
+            heartRate.put(historyRecord(
+                item.getmTime(),
+                new JSObject().put("bpm", item.getRateValue()),
+                null
+            ));
+        }
+        appendBloodPressureOrigin(bloodPressure, item);
+        appendTemperatureOrigin(temperature, item);
+    }
+
+    private void appendBloodPressureOrigin(JSArray records, OriginData item) {
+        if (item.getHighValue() < 60 || item.getLowValue() <= 0) {
+            return;
+        }
+        records.put(historyRecord(
+            item.getmTime(),
+            new JSObject()
+                .put("systolic", item.getHighValue())
+                .put("diastolic", item.getLowValue()),
+            null
+        ));
+    }
+
+    private void appendTemperatureOrigin(JSArray records, OriginData item) {
+        if (item.getTemperature() <= 0) {
+            return;
+        }
+        records.put(historyRecord(
+            item.getmTime(),
+            new JSObject()
+                .put("celsius", item.getTemperature())
+                .put("baselineCelsius", item.getBaseTemperature()),
+            null
+        ));
+    }
+
+    private Double averagePositive(int[] values) {
+        if (values == null || values.length == 0) {
+            return null;
+        }
+        int total = 0;
+        int count = 0;
+        for (int value : values) {
+            if (value > 0) {
+                total += value;
+                count += 1;
+            }
+        }
+        return count == 0 ? null : (double) total / count;
+    }
+
+    private void emitDailyHistories(
+        LocalDate date,
+        JSArray steps,
+        JSArray heartRate,
+        JSArray bloodPressure,
+        JSArray oxygen,
+        JSArray temperature,
+        JSArray bloodGlucose,
+        JSArray stress
+    ) {
+        String day = date.toString();
+        emitHistory("steps", day, steps);
+        emitHistory("heartRate", day, heartRate);
+        emitHistory("bloodPressure", day, bloodPressure);
+        emitHistory("oxygen", day, oxygen);
+        emitHistory("temperature", day, temperature);
+        emitHistory("bloodGlucose", day, bloodGlucose);
+        emitHistory("stress", day, stress);
+    }
+
     private DeviceManualDataType manualType(String metric) {
         switch (metric) {
             case "heartRate": return DeviceManualDataType.HEART_RATE;
@@ -960,7 +1341,12 @@ public class HBandPlugin extends Plugin {
         }
     }
 
-    private void readManualMetricHistory(String metric, LocalDate date, DeviceManualDataType dataType) {
+    private void readManualMetricHistory(
+        PluginCall call,
+        String metric,
+        LocalDate date,
+        DeviceManualDataType dataType
+    ) {
         long start = date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         long end = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
         JSArray records = new JSArray();
@@ -1036,17 +1422,19 @@ public class HBandPlugin extends Plugin {
 
                 @Override public void onReadComplete() {
                     emitHistory(metric, date.toString(), records);
+                    accept(call, "history.metric");
                 }
 
                 @Override public void onReadFail() {
                     emitLog("error", "Manual history read failed", "history.metric");
                     emitHistory(metric, date.toString(), records);
+                    accept(call, "history.metric");
                 }
             }
         );
     }
 
-    private void readEcgHistory(String metric, LocalDate date) {
+    private void readEcgHistory(PluginCall call, String metric, LocalDate date) {
         TimeData day = new TimeData(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
         manager.readECGData(directWriteResponse, day, EEcgDataType.ALL, new IECGReadDataListener() {
             @Override public void readDataFinish(List<EcgDetectResult> data) {
@@ -1055,13 +1443,14 @@ public class HBandPlugin extends Plugin {
                     records.put(historyRecord(item.getTimeBean(), ecgValues(item), intArray(item.getFilterSignals())));
                 }
                 emitHistory(metric, date.toString(), records);
+                accept(call, "history.metric");
             }
 
             @Override public void readDiagnosisDataFinish(List<EcgDiagnosis> data) {}
         });
     }
 
-    private void readBodyComponentHistory(String metric, LocalDate date) {
+    private void readBodyComponentHistory(PluginCall call, String metric, LocalDate date) {
         manager.readBodyComponentData(directWriteResponse, data -> {
             JSArray records = new JSArray();
             for (BodyComponent item : data) {
@@ -1070,6 +1459,7 @@ public class HBandPlugin extends Plugin {
                 }
             }
             emitHistory(metric, date.toString(), records);
+            accept(call, "history.metric");
         });
     }
 
@@ -1168,8 +1558,8 @@ public class HBandPlugin extends Plugin {
             values.put("distanceKm", data.getDis());
             values.put("caloriesKcal", data.getKcal());
             emitData("steps", values, null, data.toString());
+            accept(call, "history.activity.current");
         });
-        accept(call, "history.activity.current");
     }
 
     private void readSleep(PluginCall call) {
@@ -1233,9 +1623,36 @@ public class HBandPlugin extends Plugin {
                 }
             } else if (status == Constants.STATUS_DISCONNECTED) {
                 setConnectionState("disconnected");
+                if (!intentionalDisconnect) {
+                    scheduleReconnect();
+                }
             }
         }
     };
+
+    /**
+     * Aplica espera exponencial limitada para evitar ciclos agressivos de
+     * ligação quando a pulseira fica temporariamente fora de alcance.
+     */
+    private void scheduleReconnect() {
+        if (intentionalDisconnect || currentAddress == null) {
+            return;
+        }
+        long delayMs = Math.min(30_000L, 3_000L * (1L << Math.min(reconnectAttempts, 3)));
+        reconnectHandler.removeCallbacks(reconnectRunnable);
+        reconnectHandler.postDelayed(reconnectRunnable, delayMs);
+        emitLog("warning", "Reconnect scheduled in " + delayMs + " ms", "session.reconnect");
+    }
+
+    private void startConnectionService() {
+        Intent intent = new Intent(getContext(), HBandConnectionService.class);
+        intent.putExtra(HBandConnectionService.EXTRA_DEVICE_NAME, currentName);
+        ContextCompat.startForegroundService(getContext(), intent);
+    }
+
+    private void stopConnectionService() {
+        getContext().stopService(new Intent(getContext(), HBandConnectionService.class));
+    }
 
     private JSObject buildStatus() {
         JSObject status = new JSObject();

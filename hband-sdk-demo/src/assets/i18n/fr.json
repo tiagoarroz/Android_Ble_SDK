@@ -87,6 +87,31 @@
     "ecgChart": "Tracé d'électrocardiogramme",
     "gauge": "Jauge de valeur",
     "measurementProgress": "Progression de la mesure",
+    "daily": {
+      "intervalAverage": "Moyenne de l'intervalle",
+      "dayAverage": "Moyenne de la journée",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "chart": "Évolution sur 24 heures"
+    },
+    "temperatureTabs": {
+      "label": "Type de température",
+      "body": "Corporelle",
+      "skin": "Peau"
+    },
+    "classifications": {
+      "normal": "Normal",
+      "relaxed": "Détendu",
+      "moderate": "Modéré",
+      "elevated": "Élevé",
+      "high": "Haut",
+      "belowReference": "Sous la référence",
+      "aboveReference": "Au-dessus de la référence",
+      "outsideReference": "Hors référence",
+      "lowRisk": "Risque faible",
+      "mediumRisk": "Risque moyen",
+      "highRisk": "Risque élevé"
+    },
     "glucoseTotal": {
       "title": "Mesure complète",
       "completed": "Résultat final",
@@ -95,7 +120,8 @@
     },
     "activity": {
       "today": "Activité cumulée",
-      "chart": "Répartition des pas au cours de la journée"
+      "chart": "Répartition des pas au cours de la journée",
+      "latestInterval": "Dernier intervalle"
     },
     "fields": {
       "bpm": "Fréquence cardiaque (bpm)",
@@ -109,6 +135,7 @@
       "enabled": "Disponible",
       "celsius": "Température (°C)",
       "surfaceCelsius": "Température cutanée (°C)",
+      "baselineCelsius": "Température cutanée (°C)",
       "level": "Niveau",
       "milliseconds": "Millisecondes",
       "hrvMilliseconds": "VFC (ms)",
@@ -161,6 +188,11 @@
     "description": "Choisissez le jour utilisé par le bouton d'historique de chaque mesure.",
     "date": "Date",
     "noData": "Lisez l'historique pour cette date."
+  },
+  "sync": {
+    "action": "Synchroniser le jour",
+    "inProgress": "Synchronisation",
+    "progress": "{{completed}} sur {{total}} lectures"
   },
   "profile": {
     "title": "Données personnelles à synchroniser",

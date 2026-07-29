@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hband_connection_channel">Band connection</string>
+    <string name="hband_connection_channel_description">Keeps the Bluetooth session active during synchronisation.</string>
+    <string name="hband_connection_title">Band connected</string>
+    <string name="hband_connection_device">Using %1$s</string>
+    <string name="hband_connected_device_default">H Band device</string>
+</resources>

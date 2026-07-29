@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hband_connection_channel">Conexión de la pulsera</string>
+    <string name="hband_connection_channel_description">Mantiene activa la sesión Bluetooth durante la sincronización.</string>
+    <string name="hband_connection_title">Pulsera conectada</string>
+    <string name="hband_connection_device">Usando %1$s</string>
+    <string name="hband_connected_device_default">dispositivo H Band</string>
+</resources>

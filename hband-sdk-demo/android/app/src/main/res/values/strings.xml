@@ -4,4 +4,9 @@
     <string name="title_activity_main">H Band SDK Demo</string>
     <string name="package_name">com.hitecosystem.hbanddemo</string>
     <string name="custom_url_scheme">com.hitecosystem.hbanddemo</string>
+    <string name="hband_connection_channel">Ligação à pulseira</string>
+    <string name="hband_connection_channel_description">Mantém a sessão Bluetooth ativa durante a sincronização.</string>
+    <string name="hband_connection_title">Pulseira ligada</string>
+    <string name="hband_connection_device">A utilizar %1$s</string>
+    <string name="hband_connected_device_default">dispositivo H Band</string>
 </resources>

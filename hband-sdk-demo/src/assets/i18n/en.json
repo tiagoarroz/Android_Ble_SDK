@@ -87,6 +87,31 @@
     "ecgChart": "Electrocardiogram trace",
     "gauge": "Value gauge",
     "measurementProgress": "Measurement progress",
+    "daily": {
+      "intervalAverage": "Interval average",
+      "dayAverage": "Whole-day average",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "chart": "24-hour evolution"
+    },
+    "temperatureTabs": {
+      "label": "Temperature type",
+      "body": "Body",
+      "skin": "Skin"
+    },
+    "classifications": {
+      "normal": "Normal",
+      "relaxed": "Relaxed",
+      "moderate": "Moderate",
+      "elevated": "Elevated",
+      "high": "High",
+      "belowReference": "Below reference",
+      "aboveReference": "Above reference",
+      "outsideReference": "Outside reference",
+      "lowRisk": "Low risk",
+      "mediumRisk": "Medium risk",
+      "highRisk": "High risk"
+    },
     "glucoseTotal": {
       "title": "Complete measurement",
       "completed": "Final result",
@@ -95,7 +120,8 @@
     },
     "activity": {
       "today": "Accumulated activity",
-      "chart": "Step distribution throughout the day"
+      "chart": "Step distribution throughout the day",
+      "latestInterval": "Latest interval"
     },
     "fields": {
       "bpm": "Heart rate (bpm)",
@@ -109,6 +135,7 @@
       "enabled": "Available",
       "celsius": "Temperature (°C)",
       "surfaceCelsius": "Skin temperature (°C)",
+      "baselineCelsius": "Skin temperature (°C)",
       "level": "Level",
       "milliseconds": "Milliseconds",
       "hrvMilliseconds": "HRV (ms)",
@@ -161,6 +188,11 @@
     "description": "Choose the day used by each metric's history button.",
     "date": "Date",
     "noData": "Read history for this date."
+  },
+  "sync": {
+    "action": "Sync day",
+    "inProgress": "Synchronising",
+    "progress": "{{completed}} of {{total}} readings"
   },
   "profile": {
     "title": "Personal data synchronization",

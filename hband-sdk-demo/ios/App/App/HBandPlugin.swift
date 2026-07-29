@@ -513,10 +513,9 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
         if metric == "steps" {
-            guard readStepHistory(call, metric: metric, date: date) else {
+            guard readStepHistory(call, metric: metric, date: date, operation: operation) else {
                 return
             }
-            accept(call, operation: operation)
             return
         }
 
@@ -524,6 +523,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             [weak self] state, _, _, _ in
             guard state == .complete else { return }
             self?.queryHistory(metric: metric, date: date)
+            self?.accept(call, operation: operation)
         }
 
         switch metric {
@@ -538,14 +538,18 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("HISTORY_METRIC_UNSUPPORTED:\(metric)")
             return
         }
-        accept(call, operation: operation)
     }
 
     /**
      * Converte a data civil num deslocamento suportado pelo SDK e devolve o
      * total diário de passos, distância e calorias num único registo.
      */
-    private func readStepHistory(_ call: CAPPluginCall, metric: String, date: String) -> Bool {
+    private func readStepHistory(
+        _ call: CAPPluginCall,
+        metric: String,
+        date: String,
+        operation: String
+    ) -> Bool {
         guard
             let target = dateValue(date),
             let today = dateValue(dateString(Date())),
@@ -569,6 +573,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                     "values": values
                 ]]
             )
+            self.accept(call, operation: operation)
         }
         return true
     }

@@ -124,6 +124,33 @@
         [value]="selectedDate()"
         (ionInput)="setDate($event.detail.value)"
       ></ion-input>
+      <div class="history-sync-control">
+        <ion-button
+          fill="outline"
+          [disabled]="!hband.connected() || hband.syncStatus().state === 'syncing'"
+          (click)="synchroniseSelectedDate()"
+        >
+          @if (hband.syncStatus().state === 'syncing') {
+            <ion-spinner slot="start" name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon slot="start" name="sync-outline"></ion-icon>
+          }
+          {{ i18n.translate(
+            hband.syncStatus().state === 'syncing'
+              ? 'sync.inProgress'
+              : 'sync.action'
+          ) }}
+        </ion-button>
+        @if (hband.syncStatus().state !== 'idle') {
+          <span>
+            {{ i18n.translate('sync.progress', {
+              completed: hband.syncStatus().completed,
+              total: hband.syncStatus().total
+            }) }}
+          </span>
+          <ion-progress-bar [value]="syncPercent() / 100"></ion-progress-bar>
+        }
+      </div>
     </section>
 
     <div class="section-heading">

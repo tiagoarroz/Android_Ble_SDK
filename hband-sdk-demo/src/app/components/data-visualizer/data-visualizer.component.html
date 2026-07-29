@@ -1,4 +1,113 @@
 <div class="data-visualizer" [class.data-visualizer--compact]="compact">
+  @if (usesDailyOverview()) {
+    <div class="daily-overview">
+      @if (usesTemperatureTabs()) {
+        <div class="daily-overview__tabs" role="tablist" [attr.aria-label]="i18n.translate('data.temperatureTabs.label')">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="temperatureHistoryField === 'celsius'"
+            [class.is-active]="temperatureHistoryField === 'celsius'"
+            (click)="setTemperatureHistoryField('celsius')"
+          >
+            {{ i18n.translate('data.temperatureTabs.body') }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="temperatureHistoryField === 'baselineCelsius'"
+            [class.is-active]="temperatureHistoryField === 'baselineCelsius'"
+            (click)="setTemperatureHistoryField('baselineCelsius')"
+          >
+            {{ i18n.translate('data.temperatureTabs.skin') }}
+          </button>
+        </div>
+      }
+      <header class="daily-overview__current">
+        <span>{{ i18n.translate('data.daily.intervalAverage') }}</span>
+        <div>
+          <strong>
+            {{ formatValue(intervalAverage(), historyPrimaryField()) }}
+            @if (historySecondaryField(); as secondary) {
+              / {{ formatValue(intervalAverage(secondary), secondary) }}
+            }
+          </strong>
+          <small>{{ fieldLabel(historyPrimaryField()) }}</small>
+        </div>
+        <time>{{ intervalLabel() }}</time>
+        @if (classification(); as status) {
+          <em [attr.data-tone]="classificationTone()">{{ status }}</em>
+        }
+      </header>
+
+      <div class="daily-chart">
+        <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.daily.chart')">
+          <line x1="0" y1="42" x2="100" y2="42"></line>
+          <line x1="0" y1="26" x2="100" y2="26"></line>
+          <line x1="0" y1="10" x2="100" y2="10"></line>
+          @if (usesStressBarChart()) {
+            @for (point of historyBarPoints(); track $index) {
+              <rect
+                class="daily-chart__bar"
+                [attr.data-tone]="point.tone"
+                [attr.x]="point.x"
+                [attr.y]="point.y"
+                [attr.width]="point.width"
+                [attr.height]="point.height"
+                rx=".7"
+              ></rect>
+            }
+          } @else {
+            <polyline class="daily-chart__primary" [attr.points]="historyChartPoints(historyPrimaryField())"></polyline>
+            @if (historySecondaryField(); as secondary) {
+              <polyline class="daily-chart__secondary" [attr.points]="historyChartPoints(secondary)"></polyline>
+            }
+          }
+        </svg>
+        <div class="daily-chart__axis">
+          <span>0</span><span>6</span><span>12</span><span>18</span><span>24</span>
+        </div>
+      </div>
+
+      @if (referenceItems().length) {
+        <div class="daily-reference">
+          @for (item of referenceItems(); track item.label) {
+            <span [attr.data-tone]="item.tone"><i></i>{{ item.label }}</span>
+          }
+        </div>
+      }
+
+      <div class="daily-overview__stats">
+        <span>
+          <small>{{ i18n.translate('data.daily.dayAverage') }}</small>
+          <strong>
+            {{ formatValue(dailyAverage(), historyPrimaryField()) }}
+            @if (historySecondaryField(); as secondary) {
+              / {{ formatValue(dailyAverage(secondary), secondary) }}
+            }
+          </strong>
+        </span>
+        <span>
+          <small>{{ i18n.translate('data.daily.minimum') }}</small>
+          <strong>
+            {{ formatValue(dailyMinimum(), historyPrimaryField()) }}
+            @if (historySecondaryField(); as secondary) {
+              / {{ formatValue(dailyMinimum(secondary), secondary) }}
+            }
+          </strong>
+        </span>
+        <span>
+          <small>{{ i18n.translate('data.daily.maximum') }}</small>
+          <strong>
+            {{ formatValue(dailyMaximum(), historyPrimaryField()) }}
+            @if (historySecondaryField(); as secondary) {
+              / {{ formatValue(dailyMaximum(secondary), secondary) }}
+            }
+          </strong>
+        </span>
+      </div>
+    </div>
+  } @else {
   @switch (type) {
     @case ('line') {
       <div class="line-visual">
@@ -125,6 +234,13 @@
     }
     @case ('activity') {
       <div class="activity-visual">
+        @if (isHistory() && latestActivityPoint(); as point) {
+          <div class="activity-visual__interval">
+            <span>{{ i18n.translate('data.activity.latestInterval') }}</span>
+            <strong>{{ formatValue(point.steps, 'steps') }}</strong>
+            <time>{{ point.timestamp | date:'shortTime' }}</time>
+          </div>
+        }
         <div class="activity-visual__summary">
           <span>{{ i18n.translate('data.activity.today') }}</span>
           <strong>{{ formatValue(activityValue('steps'), 'steps') }}</strong>
@@ -147,11 +263,13 @@
             [attr.aria-label]="i18n.translate('data.activity.chart')"
           >
             @for (point of activityPoints(); track point.timestamp) {
-              <span>
+              <span [style.left.%]="activityPointLeft(point.timestamp)">
                 <i [style.height.%]="activityBarHeight(point.steps)"></i>
-                <time>{{ point.timestamp | date:'shortTime' }}</time>
               </span>
             }
+            <div class="activity-visual__axis">
+              <b>0</b><b>6</b><b>12</b><b>18</b><b>24</b>
+            </div>
           </div>
         }
       </div>
@@ -166,6 +284,28 @@
         }
       </div>
     }
+  }
+  }
+  @if (!compact && !isHistory() && classification(); as status) {
+    <div class="measurement-classification" [attr.data-tone]="classificationTone()">
+      <i></i>
+      <span>{{ status }}</span>
+    </div>
+  }
+  @if (showsSeparateProgress()) {
+    <div class="measurement-progress-summary">
+      <span
+        class="measurement-progress-ring"
+        [style.--measurement-progress]="progressValue() + '%'"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="progressValue()"
+      >
+        <strong>{{ progressValue() }}%</strong>
+      </span>
+      <span>{{ i18n.translate('data.measurementProgress') }}</span>
+    </div>
   }
   @if (!compact && historyRecords().length) {
     <div class="history-record-list">

@@ -87,6 +87,31 @@
     "ecgChart": "Trazado de electrocardiograma",
     "gauge": "Indicador de valor",
     "measurementProgress": "Progreso de la medición",
+    "daily": {
+      "intervalAverage": "Media del intervalo",
+      "dayAverage": "Media del día completo",
+      "minimum": "Mínimo",
+      "maximum": "Máximo",
+      "chart": "Evolución durante 24 horas"
+    },
+    "temperatureTabs": {
+      "label": "Tipo de temperatura",
+      "body": "Corporal",
+      "skin": "Piel"
+    },
+    "classifications": {
+      "normal": "Normal",
+      "relaxed": "Relajado",
+      "moderate": "Moderado",
+      "elevated": "Elevado",
+      "high": "Alto",
+      "belowReference": "Por debajo de la referencia",
+      "aboveReference": "Por encima de la referencia",
+      "outsideReference": "Fuera de la referencia",
+      "lowRisk": "Riesgo bajo",
+      "mediumRisk": "Riesgo medio",
+      "highRisk": "Riesgo alto"
+    },
     "glucoseTotal": {
       "title": "Medición completa",
       "completed": "Resultado final",
@@ -95,7 +120,8 @@
     },
     "activity": {
       "today": "Actividad acumulada",
-      "chart": "Distribución de pasos a lo largo del día"
+      "chart": "Distribución de pasos a lo largo del día",
+      "latestInterval": "Último intervalo"
     },
     "fields": {
       "bpm": "Frecuencia cardíaca (bpm)",
@@ -109,6 +135,7 @@
       "enabled": "Disponible",
       "celsius": "Temperatura (°C)",
       "surfaceCelsius": "Temperatura cutánea (°C)",
+      "baselineCelsius": "Temperatura cutánea (°C)",
       "level": "Nivel",
       "milliseconds": "Milisegundos",
       "hrvMilliseconds": "HRV (ms)",
@@ -161,6 +188,11 @@
     "description": "Elige el día utilizado por el botón de historial de cada métrica.",
     "date": "Fecha",
     "noData": "Lee el historial de esta fecha."
+  },
+  "sync": {
+    "action": "Sincronizar día",
+    "inProgress": "Sincronizando",
+    "progress": "{{completed}} de {{total}} lecturas"
   },
   "profile": {
     "title": "Datos personales para sincronizar",

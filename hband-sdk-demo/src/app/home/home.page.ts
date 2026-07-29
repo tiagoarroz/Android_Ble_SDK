@@ -12,7 +12,7 @@ import {
   chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
-  waterOutline,
+  waterOutline, syncOutline,
 } from 'ionicons/icons';
 
 import { DataVisualizerComponent } from '../components/data-visualizer/data-visualizer.component';
@@ -49,7 +49,7 @@ export class HomePage implements OnInit {
       chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
-      waterOutline,
+      waterOutline, syncOutline,
     });
   }
 
@@ -67,6 +67,15 @@ export class HomePage implements OnInit {
     this.scanOpen.set(false);
   }
 
+  async synchroniseSelectedDate(): Promise<void> {
+    await this.hband.synchroniseDate(this.selectedDate());
+  }
+
+  syncPercent(): number {
+    const sync = this.hband.syncStatus();
+    return sync.total > 0 ? Math.round((sync.completed / sync.total) * 100) : 0;
+  }
+
   /**
    * Alterna as medições com um único controlo e acrescenta a data apenas à
    * operação histórica, sem alterar os contratos confirmados da bridge.
@@ -76,10 +85,11 @@ export class HomePage implements OnInit {
       await this.hband.toggleMeasurement(feature.metric, action.operation, action.stopOperation);
       return;
     }
-    const params = action.operation === 'history.metric'
-      ? { metric: action.metric ?? feature.metric, date: this.selectedDate() }
-      : {};
-    await this.hband.execute(action.operation, params);
+    if (action.operation === 'history.metric') {
+      await this.hband.readHistory(action.metric ?? feature.metric, this.selectedDate());
+      return;
+    }
+    await this.hband.execute(action.operation);
   }
 
   actionOperation(action: FeatureAction, feature: FeatureDefinition): string {
