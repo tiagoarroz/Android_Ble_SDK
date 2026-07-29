@@ -1,8 +1,13 @@
 import type { FeatureDefinition } from './hband.types';
 
 const liveAndHistory = (metric: FeatureDefinition['metric'], prefix: string) => [
-  { id: 'start', operation: `${prefix}.start`, labelKey: 'actions.start' },
-  { id: 'stop', operation: `${prefix}.stop`, labelKey: 'actions.stop', tone: 'secondary' as const },
+  {
+    id: 'measurement',
+    operation: `${prefix}.start`,
+    stopOperation: `${prefix}.stop`,
+    labelKey: 'actions.start',
+    activeLabelKey: 'actions.stop',
+  },
   { id: 'history', operation: 'history.metric', labelKey: 'actions.history', tone: 'secondary' as const, metric },
 ];
 

@@ -139,6 +139,18 @@
       "basalMetabolismKcal": "Basal metabolism (kcal)"
     }
   },
+  "measurementLogs": {
+    "eyebrow": "Measurement activity",
+    "title": "Measurement logs",
+    "count": "{{count}} entries",
+    "description": "Application operations, bridge responses and real data received from the device.",
+    "empty": "Events for this measurement will appear here.",
+    "operationRequested": "Operation sent",
+    "operationAccepted": "Operation accepted",
+    "operationFailed": "Operation failed",
+    "deviceData": "Data received from device",
+    "bridge": "Bridge response"
+  },
   "history": {
     "title": "History by date",
     "description": "Choose the day used by each metric's history button.",

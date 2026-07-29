@@ -1578,6 +1578,145 @@ ion-content {
   }
 }
 
+.measurement-log-panel {
+  background: var(--app-night);
+  border-radius: 18px;
+  color: #fff;
+  margin-top: 24px;
+  padding: 18px;
+}
+
+.measurement-log-panel__header {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+
+  span {
+    color: #7d929f;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    color: #f4f8fa;
+    font-size: 15px;
+    margin: 3px 0 0;
+  }
+
+  ion-badge {
+    --background: rgba(255, 255, 255, 0.08);
+    --color: #b8c8d0;
+  }
+}
+
+.measurement-log-panel__description {
+  color: #8fa3af;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 0 14px;
+}
+
+.measurement-log-scroll {
+  border-block: 1px solid rgba(255, 255, 255, 0.08);
+  max-height: 280px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #516772 transparent;
+  scrollbar-width: thin;
+}
+
+.measurement-log-entry {
+  align-items: start;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 12px 2px;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  > div {
+    min-width: 0;
+  }
+
+  header {
+    align-items: baseline;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  strong {
+    color: #dce7ec;
+    font-size: 11px;
+  }
+
+  time {
+    color: #657b88;
+    flex: 0 0 auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 9px;
+  }
+
+  code {
+    color: #74b5dd;
+    display: block;
+    font-size: 10px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+
+  pre {
+    color: #91a7b2;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    line-height: 1.45;
+    margin: 7px 0 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &[data-level="error"] .measurement-log-entry__dot {
+    background: var(--app-danger);
+  }
+
+  &[data-level="success"] .measurement-log-entry__dot {
+    background: var(--app-mint);
+  }
+
+  &[data-level="warning"] .measurement-log-entry__dot {
+    background: #efa53d;
+  }
+}
+
+.measurement-log-entry__dot {
+  background: var(--app-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(85, 164, 255, 0.08);
+  height: 7px;
+  margin-top: 5px;
+  width: 7px;
+}
+
+.measurement-log-empty {
+  align-items: center;
+  color: #8398a4;
+  display: flex;
+  font-size: 11px;
+  gap: 8px;
+  padding: 18px 2px 4px;
+
+  ion-icon {
+    font-size: 17px;
+  }
+}
+
 @media (max-width: 560px) {
   .history-date-panel {
     align-items: stretch;

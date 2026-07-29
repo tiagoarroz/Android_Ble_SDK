@@ -36,9 +36,12 @@ export class HBandService {
   readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly logs = signal<HBandLogEntry[]>([]);
   readonly busyOperation = signal<string | null>(null);
+  readonly activeMeasurements = signal<Partial<Record<MetricId, boolean>>>({});
   readonly simulation = signal(!this.isNative);
   readonly connected = computed(() => this.status().state === 'connected');
   private queue: Promise<unknown> = Promise.resolve();
+  private logSequence = 0;
+  private readonly operationMetrics = new Map<string, MetricId>();
 
   /**
    * Liga os eventos uma única vez e recupera o estado da bridge nativa.
@@ -49,7 +52,7 @@ export class HBandService {
       return;
     }
     await HBand.addListener('deviceFound', (device) => this.upsertDevice(device));
-    await HBand.addListener('statusChanged', (status) => this.status.set(status));
+    await HBand.addListener('statusChanged', (status) => this.storeStatus(status));
     await HBand.addListener('data', (event) => this.storeData(event));
     await HBand.addListener('log', (entry) => this.appendLog(entry));
     try {
@@ -83,9 +86,11 @@ export class HBandService {
   async disconnect(): Promise<void> {
     if (this.simulation()) {
       this.status.update((status) => ({ ...status, state: 'disconnected', device: undefined }));
+      this.activeMeasurements.set({});
       return;
     }
     await HBand.disconnect();
+    this.activeMeasurements.set({});
   }
 
   /**
@@ -94,15 +99,37 @@ export class HBandService {
    */
   execute(operation: string, params: Record<string, unknown> = {}): Promise<void> {
     const task = async () => {
+      const metric = this.metricForOperation(operation, params);
+      if (metric) {
+        this.operationMetrics.set(operation, metric);
+      }
       this.busyOperation.set(operation);
+      this.appendLog({
+        id: this.nextLogId(operation),
+        timestamp: new Date().toISOString(),
+        level: 'info',
+        message: operation,
+        operation,
+        metric,
+        kind: 'operation',
+      });
       try {
         if (this.simulation()) {
           this.simulateOperation(operation, params);
         } else {
           await HBand.execute({ operation, params });
         }
+        this.appendLog({
+          id: this.nextLogId(operation),
+          timestamp: new Date().toISOString(),
+          level: 'success',
+          message: operation,
+          operation,
+          metric,
+          kind: 'operation',
+        });
       } catch (error) {
-        this.fail(operation, error);
+        this.fail(operation, error, metric);
         throw error;
       } finally {
         this.busyOperation.set(null);
@@ -128,6 +155,34 @@ export class HBandService {
     return this.history()[metric];
   }
 
+  measurementActive(metric: MetricId): boolean {
+    return this.activeMeasurements()[metric] === true;
+  }
+
+  metricLogs(metric: MetricId): HBandLogEntry[] {
+    return this.logs().filter((entry) => entry.metric === metric);
+  }
+
+  /**
+   * Alterna a mesma ação visual entre os contratos nativos de início e fim.
+   * O estado só muda depois de a bridge aceitar a operação correspondente.
+   */
+  async toggleMeasurement(metric: MetricId, startOperation: string, stopOperation: string): Promise<void> {
+    const active = this.measurementActive(metric);
+    await this.execute(active ? stopOperation : startOperation);
+    this.activeMeasurements.update((measurements) => ({
+      ...measurements,
+      [metric]: !active,
+    }));
+  }
+
+  private storeStatus(status: HBandStatus): void {
+    this.status.set(status);
+    if (status.state === 'disconnected' || status.state === 'idle' || status.state === 'error') {
+      this.activeMeasurements.set({});
+    }
+  }
+
   private upsertDevice(device: HBandDevice): void {
     this.devices.update((devices) => {
       const next = devices.filter((item) => item.id !== device.id);
@@ -144,6 +199,15 @@ export class HBandService {
     if (!metric) {
       return;
     }
+    this.appendLog({
+      id: this.nextLogId(event.type),
+      timestamp: event.timestamp || new Date().toISOString(),
+      level: 'success',
+      message: event.type,
+      metric,
+      kind: 'data',
+      data: event,
+    });
     if (event.type === 'history') {
       this.history.update((history) => ({ ...history, [metric]: event }));
     } else {
@@ -160,18 +224,44 @@ export class HBandService {
   }
 
   private appendLog(entry: HBandLogEntry): void {
-    this.logs.update((logs) => [entry, ...logs].slice(0, 80));
+    const metric = entry.metric
+      ?? (entry.operation ? this.operationMetrics.get(entry.operation) : undefined)
+      ?? (entry.operation ? this.metricForOperation(entry.operation) : undefined);
+    this.logs.update((logs) => [{ ...entry, metric, kind: entry.kind ?? 'bridge' }, ...logs].slice(0, 200));
   }
 
-  private fail(operation: string, error: unknown): void {
+  private fail(operation: string, error: unknown, metric?: MetricId): void {
     const message = error instanceof Error ? error.message : String(error);
     this.appendLog({
-      id: `${Date.now()}-${operation}`,
+      id: this.nextLogId(operation),
       timestamp: new Date().toISOString(),
       level: 'error',
       message,
       operation,
+      metric,
+      kind: 'operation',
     });
+  }
+
+  /**
+   * Deduz a métrica a partir do contrato executado. Para histórico usa o
+   * parâmetro explícito; para medições usa o segmento `measure.<métrica>`.
+   */
+  private metricForOperation(
+    operation: string,
+    params: Record<string, unknown> = {},
+  ): MetricId | undefined {
+    if (operation === 'history.metric') {
+      const metric = params['metric'];
+      return typeof metric === 'string' && this.metricForType(metric) ? metric as MetricId : undefined;
+    }
+    const match = /^measure\.([^.]+)\.(start|stop)$/.exec(operation);
+    return match ? this.metricForType(match[1]) : undefined;
+  }
+
+  private nextLogId(source: string): string {
+    this.logSequence += 1;
+    return `${Date.now()}-${this.logSequence}-${source}`;
   }
 
   private seedSimulation(): void {

@@ -139,6 +139,18 @@
       "basalMetabolismKcal": "Métabolisme basal (kcal)"
     }
   },
+  "measurementLogs": {
+    "eyebrow": "Activité de la mesure",
+    "title": "Journaux de cette mesure",
+    "count": "{{count}} entrées",
+    "description": "Opérations de l'application, réponses du bridge et données réelles reçues de l'appareil.",
+    "empty": "Les événements de cette mesure apparaîtront ici.",
+    "operationRequested": "Opération envoyée",
+    "operationAccepted": "Opération acceptée",
+    "operationFailed": "Échec de l'opération",
+    "deviceData": "Données reçues de l'appareil",
+    "bridge": "Réponse du bridge"
+  },
   "history": {
     "title": "Historique par date",
     "description": "Choisissez le jour utilisé par le bouton d'historique de chaque mesure.",

@@ -18,7 +18,7 @@ import {
 import { DataVisualizerComponent } from '../components/data-visualizer/data-visualizer.component';
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
-import type { FeatureAction, FeatureDefinition } from '../core/hband.types';
+import type { FeatureAction, FeatureDefinition, HBandLogEntry } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
 @Component({
@@ -66,14 +66,64 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Acrescenta a data e a métrica apenas à operação histórica genérica,
-   * mantendo os contratos de medição em tempo real sem parâmetros artificiais.
+   * Alterna as medições com um único controlo e acrescenta a data apenas à
+   * operação histórica, sem alterar os contratos confirmados da bridge.
    */
   async run(action: FeatureAction, feature: FeatureDefinition): Promise<void> {
+    if (action.stopOperation) {
+      await this.hband.toggleMeasurement(feature.metric, action.operation, action.stopOperation);
+      return;
+    }
     const params = action.operation === 'history.metric'
       ? { metric: action.metric ?? feature.metric, date: this.selectedDate() }
       : {};
     await this.hband.execute(action.operation, params);
+  }
+
+  actionOperation(action: FeatureAction, feature: FeatureDefinition): string {
+    return action.stopOperation && this.hband.measurementActive(feature.metric)
+      ? action.stopOperation
+      : action.operation;
+  }
+
+  actionLabel(action: FeatureAction, feature: FeatureDefinition): string {
+    const labelKey = action.stopOperation
+      && this.hband.measurementActive(feature.metric)
+      && action.activeLabelKey
+      ? action.activeLabelKey
+      : action.labelKey;
+    return this.i18n.translate(labelKey);
+  }
+
+  /**
+   * Expõe o payload integral recebido da bridge dentro de uma área com scroll,
+   * incluindo amostras, registos históricos e valor bruto quando disponíveis.
+   */
+  formatLogPayload(entry: HBandLogEntry): string {
+    if (!entry.data) {
+      return entry.message;
+    }
+    return JSON.stringify({
+      values: entry.data.values,
+      samples: entry.data.samples,
+      records: entry.data.records,
+      raw: entry.data.raw,
+    }, null, 2);
+  }
+
+  logTitle(entry: HBandLogEntry): string {
+    if (entry.kind === 'data') {
+      return this.i18n.translate('measurementLogs.deviceData');
+    }
+    if (entry.kind === 'operation') {
+      const key = entry.level === 'success'
+        ? 'measurementLogs.operationAccepted'
+        : entry.level === 'error'
+          ? 'measurementLogs.operationFailed'
+          : 'measurementLogs.operationRequested';
+      return this.i18n.translate(key);
+    }
+    return this.i18n.translate('measurementLogs.bridge');
   }
 
   setDate(value: string | number | null | undefined): void {

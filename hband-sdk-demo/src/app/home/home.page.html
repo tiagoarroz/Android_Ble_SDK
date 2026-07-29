@@ -248,20 +248,66 @@
           <div class="feature-actions">
             @for (action of feature.actions; track action.id) {
               <ion-button
-                [fill]="action.tone === 'secondary' ? 'outline' : 'solid'"
-                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                [fill]="action.stopOperation && hband.measurementActive(feature.metric) ? 'outline' : action.tone === 'secondary' ? 'outline' : 'solid'"
+                [color]="action.stopOperation && hband.measurementActive(feature.metric) ? 'danger' : 'primary'"
+                [attr.aria-pressed]="action.stopOperation ? hband.measurementActive(feature.metric) : null"
+                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(actionOperation(action, feature)) || hband.busyOperation() !== null"
                 (click)="run(action, feature)"
               >
-                @if (hband.busyOperation() === action.operation) {
+                @if (hband.busyOperation() === actionOperation(action, feature)) {
                   <ion-spinner slot="start" name="crescent"></ion-spinner>
                 }
-                {{ i18n.translate(action.labelKey) }}
+                {{ actionLabel(action, feature) }}
               </ion-button>
             }
           </div>
           @if (feature.metric === 'met') {
             <ion-note class="bridge-note">{{ i18n.translate('features.met.historyOnly') }}</ion-note>
           }
+
+          <section class="measurement-log-panel">
+            <header class="measurement-log-panel__header">
+              <div>
+                <span>{{ i18n.translate('measurementLogs.eyebrow') }}</span>
+                <h3>{{ i18n.translate('measurementLogs.title') }}</h3>
+              </div>
+              <ion-badge color="light">
+                {{ i18n.translate('measurementLogs.count', { count: hband.metricLogs(feature.metric).length }) }}
+              </ion-badge>
+            </header>
+            <p class="measurement-log-panel__description">
+              {{ i18n.translate('measurementLogs.description') }}
+            </p>
+            @if (hband.metricLogs(feature.metric).length) {
+              <div
+                class="measurement-log-scroll"
+                role="log"
+                aria-live="polite"
+                [attr.aria-label]="i18n.translate('measurementLogs.title')"
+              >
+                @for (entry of hband.metricLogs(feature.metric); track entry.id) {
+                  <article class="measurement-log-entry" [attr.data-level]="entry.level">
+                    <span class="measurement-log-entry__dot"></span>
+                    <div>
+                      <header>
+                        <strong>{{ logTitle(entry) }}</strong>
+                        <time [attr.datetime]="entry.timestamp">{{ entry.timestamp | date:'mediumTime' }}</time>
+                      </header>
+                      @if (entry.operation) {
+                        <code>{{ entry.operation }}</code>
+                      }
+                      <pre>{{ formatLogPayload(entry) }}</pre>
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="measurement-log-empty">
+                <ion-icon name="pulse-outline"></ion-icon>
+                <span>{{ i18n.translate('measurementLogs.empty') }}</span>
+              </div>
+            }
+          </section>
         </div>
       </ion-content>
     }

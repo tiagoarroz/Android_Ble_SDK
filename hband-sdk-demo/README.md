@@ -19,6 +19,17 @@ métrica usa uma representação adequada: séries, medidores, barras, grelha de
 composição corporal ou traçado ECG. As restantes superfícies funcionais do SDK
 não fazem parte deste demonstrador.
 
+## Medição e logs
+
+Cada métrica em tempo real usa um único botão. O botão inicia a medição quando
+esta está inativa e passa a pará-la depois de a bridge aceitar o início. Ao
+desligar o dispositivo, todos os estados de medição são limpos.
+
+No fundo de cada modal existe um painel com scroll próprio. O painel apresenta
+as operações pedidas e aceites, mensagens da bridge e cada evento de dados
+recebido do dispositivo, incluindo valores, amostras, registos históricos e o
+valor bruto disponibilizado pelo SDK.
+
 ## Histórico diário
 
 O botão **Ler histórico** envia `history.metric` com:

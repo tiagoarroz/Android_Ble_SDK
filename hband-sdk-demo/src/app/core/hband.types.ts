@@ -52,6 +52,9 @@ export interface HBandLogEntry {
   level: 'info' | 'success' | 'warning' | 'error';
   message: string;
   operation?: string;
+  metric?: MetricId;
+  kind?: 'bridge' | 'operation' | 'data';
+  data?: HBandDataEvent;
 }
 
 export interface HBandOperationOptions {
@@ -83,7 +86,9 @@ export interface HBandPlugin {
 export interface FeatureAction {
   id: string;
   operation: string;
+  stopOperation?: string;
   labelKey: string;
+  activeLabelKey?: string;
   tone?: 'primary' | 'secondary' | 'danger';
   metric?: MetricId;
 }
