@@ -174,6 +174,14 @@ export class HBandService {
    */
   async toggleMeasurement(metric: MetricId, startOperation: string, stopOperation: string): Promise<void> {
     const active = this.measurementActive(metric);
+    if (!active && metric === 'ecg') {
+      this.data.update((data) => {
+        const current = data.ecg;
+        return current
+          ? { ...data, ecg: { ...current, samples: [] } }
+          : data;
+      });
+    }
     await this.execute(active ? stopOperation : startOperation);
     if (!active && metric === 'bloodGlucose') {
       this.finalMeasurements.update((measurements) => ({ ...measurements, bloodGlucose: undefined }));
@@ -231,7 +239,7 @@ export class HBandService {
           ...event,
           metric,
           values: { ...(previous?.values ?? {}), ...event.values },
-          samples: event.samples?.length ? event.samples : previous?.samples,
+          samples: this.mergeSamples(metric, previous?.samples, event.samples),
         };
         return { ...data, [metric]: merged };
       });
@@ -263,7 +271,8 @@ export class HBandService {
    */
   private measurementFinished(metric: MetricId, event: HBandDataEvent): boolean {
     const finishesAtFullProgress: MetricId[] = [
-      'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose', 'bodyComposition', 'stress',
+      'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose', 'ecg',
+      'bodyComposition', 'stress',
     ];
     if (finishesAtFullProgress.includes(metric)) {
       return this.progress(event) >= 100;
@@ -271,6 +280,24 @@ export class HBandService {
     return metric === 'hrv'
       && typeof event.values['milliseconds'] === 'number'
       && event.values['milliseconds'] > 0;
+  }
+
+  /**
+   * Mantém uma janela móvel do ECG para o gráfico não mostrar apenas o último
+   * pacote ADC. Nas restantes métricas conserva o comportamento de substituição.
+   */
+  private mergeSamples(
+    metric: MetricId,
+    previous: number[] | undefined,
+    incoming: number[] | undefined,
+  ): number[] | undefined {
+    if (!incoming?.length) {
+      return previous;
+    }
+    if (metric !== 'ecg') {
+      return incoming;
+    }
+    return [...(previous ?? []), ...incoming].slice(-1_000);
   }
 
   private metricForType(type: string): MetricId | undefined {

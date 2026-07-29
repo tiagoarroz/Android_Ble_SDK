@@ -401,11 +401,15 @@ public class HBandPlugin extends Plugin {
                 accept(call, operation);
                 return;
             case "measure.ecg.start":
-                manager.startDetectECG(directWriteResponse, false, ecgListener);
+                /*
+                 * O segundo parâmetro ativa o callback ADC usado para desenhar
+                 * a curva. Com false o SDK devolve apenas estado e diagnóstico.
+                 */
+                manager.startDetectECG(directWriteResponse, true, ecgListener);
                 accept(call, operation);
                 return;
             case "measure.ecg.stop":
-                manager.stopDetectECG(directWriteResponse, false, ecgListener);
+                manager.stopDetectECG(directWriteResponse, true, ecgListener);
                 accept(call, operation);
                 return;
             case "measure.bodyComposition.start":
@@ -802,7 +806,13 @@ public class HBandPlugin extends Plugin {
         }
 
         @Override public void onEcgDetectStateChange(EcgDetectState state) {
-            emitData("ecg", new JSObject().put("state", state.toString()), null, state.toString());
+            JSObject values = new JSObject();
+            values.put("state", String.valueOf(state.getDeviceState()));
+            values.put("progress", state.getProgress());
+            values.put("bpm", state.getHr2() > 0 ? state.getHr2() : state.getHr1());
+            values.put("hrvMilliseconds", state.getHrv());
+            values.put("qtcMilliseconds", state.getQtc());
+            emitData("ecg", values, null, state.toString());
         }
 
         @Override public void onEcgDetectResultChange(EcgDetectResult result) {
@@ -810,11 +820,18 @@ public class HBandPlugin extends Plugin {
         }
 
         @Override public void onEcgDetectDiagnosisChange(EcgDiagnosis diagnosis) {
-            emitData("ecg", new JSObject().put("diagnosis", diagnosis.toString()), null, diagnosis.toString());
+            JSObject values = new JSObject();
+            values.put("success", diagnosis.isSuccess());
+            values.put("bpm", diagnosis.getHeartRate());
+            values.put("hrvMilliseconds", diagnosis.getHrv());
+            values.put("qtMilliseconds", diagnosis.getQtTime());
+            values.put("durationSeconds", diagnosis.getDuration());
+            emitData("ecg", values, ecgSamples(diagnosis.getFilterSignals()), diagnosis.toString());
         }
 
-        @Override public void onEcgADCChange(int[] original, int[] filtered) {
-            emitData("ecg", new JSObject().put("samples", filtered == null ? 0 : filtered.length), intArray(filtered), null);
+        @Override public void onEcgADCChange(int[] ecgData, int[] powerData) {
+            JSArray samples = ecgSamples(ecgData);
+            emitData("ecg", new JSObject().put("sampleCount", samples.length()), samples, null);
         }
     };
 
@@ -1074,6 +1091,23 @@ public class HBandPlugin extends Plugin {
         JSArray result = new JSArray();
         for (int value : values) {
             result.put(value);
+        }
+        return result;
+    }
+
+    /**
+     * O primeiro array do callback ADC contém o sinal ECG. Remove o marcador
+     * Integer.MAX_VALUE que o SDK usa para amostras sem valor.
+     */
+    private JSArray ecgSamples(int[] values) {
+        JSArray result = new JSArray();
+        if (values == null) {
+            return result;
+        }
+        for (int value : values) {
+            if (value != Integer.MAX_VALUE) {
+                result.put(value);
+            }
         }
         return result;
     }

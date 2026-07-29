@@ -82,6 +82,26 @@ describe('HomePage', () => {
     expect(component.actionOperation(measurement, feature)).toBe('measure.stress.start');
   });
 
+  it('should accumulate a rolling ECG sample window from native ADC packets', () => {
+    const timestamp = new Date().toISOString();
+    feedDeviceData({
+      type: 'ecg',
+      metric: 'ecg',
+      timestamp,
+      values: { progress: 1 },
+      samples: [1, 3, 2],
+    });
+    feedDeviceData({
+      type: 'ecg',
+      metric: 'ecg',
+      timestamp,
+      values: { progress: 2 },
+      samples: [4, 2],
+    });
+
+    expect(component.hband.latestFor('ecg')?.samples).toEqual([1, 3, 2, 4, 2]);
+  });
+
   /**
    * Injeta callbacks equivalentes aos eventos nativos sem expor a operação
    * interna do serviço no contrato de produção.

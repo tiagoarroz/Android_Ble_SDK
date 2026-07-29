@@ -32,7 +32,8 @@ export class DataVisualizerComponent {
    * Separa os valores clínicos dos campos de controlo do protocolo.
    */
   resultEntries(): Array<[string, string | number | boolean | null]> {
-    return this.entries().filter(([field]) => !['progress', 'state', 'samples'].includes(field));
+    return this.entries().filter(([field]) =>
+      !['progress', 'state', 'samples', 'sampleCount', 'diagnosis'].includes(field));
   }
 
   primaryEntry(): [string, string | number | boolean | null] | undefined {
@@ -46,6 +47,13 @@ export class DataVisualizerComponent {
     }
     const max = Math.max(...samples);
     const min = Math.min(...samples);
+    // Um sinal constante continua a ser informação válida e deve ficar visível no centro do gráfico.
+    if (max === min) {
+      return samples.map((_, index) => {
+        const x = (index / (samples.length - 1)) * 100;
+        return `${x.toFixed(2)},24.00`;
+      }).join(' ');
+    }
     const range = Math.max(max - min, 1);
     return samples.map((value, index) => {
       const x = (index / (samples.length - 1)) * 100;
