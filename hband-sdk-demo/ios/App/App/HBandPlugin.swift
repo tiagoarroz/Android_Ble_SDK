@@ -190,6 +190,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             testBloodComposition(false, call: call, operation: operation)
         case "measure.miniCheckup.start":
             testHealthGlance(call, operation: operation)
+        case "history.activity.current":
+            readCurrentSteps(call, operation: operation)
         case "history.metric":
             readMetricHistory(call, operation: operation)
         default:
@@ -279,6 +281,14 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                     "chargeState": chargeState.rawValue
                 ]
             )
+        }
+        accept(call, operation: operation)
+    }
+
+    private func readCurrentSteps(_ call: CAPPluginCall, operation: String) {
+        manager.peripheralManage.veepooSDK_readStepData(withDayNumber: 0) {
+            [weak self] values in
+            self?.emitData(type: "steps", values: self?.stepValues(values ?? [:]) ?? [:])
         }
         accept(call, operation: operation)
     }
@@ -516,6 +526,14 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
+        if metric == "steps" {
+            guard readStepHistory(call, metric: metric, date: date) else {
+                return
+            }
+            accept(call, operation: operation)
+            return
+        }
+
         let completion: (VPReadDeviceBaseDataState, UInt, UInt, UInt) -> Void = {
             [weak self] state, _, _, _ in
             guard state == .complete else { return }
@@ -537,6 +555,46 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         accept(call, operation: operation)
+    }
+
+    /**
+     * Converte a data civil num deslocamento suportado pelo SDK e devolve o
+     * total diário de passos, distância e calorias num único registo.
+     */
+    private func readStepHistory(_ call: CAPPluginCall, metric: String, date: String) -> Bool {
+        guard
+            let target = dateValue(date),
+            let today = dateValue(dateString(Date())),
+            let dayOffset = Calendar.current.dateComponents([.day], from: target, to: today).day,
+            dayOffset >= 0,
+            dayOffset <= Int(manager.peripheralModel?.saveDays ?? 0)
+        else {
+            call.reject("HISTORY_DATE_OUTSIDE_DEVICE_RETENTION")
+            return false
+        }
+
+        manager.peripheralManage.veepooSDK_readStepData(withDayNumber: dayOffset) {
+            [weak self] source in
+            guard let self else { return }
+            let values = self.stepValues(source ?? [:])
+            self.emitHistory(
+                metric: metric,
+                date: date,
+                records: [[
+                    "timestamp": "\(date)T23:59:59",
+                    "values": values
+                ]]
+            )
+        }
+        return true
+    }
+
+    private func stepValues(_ source: [AnyHashable: Any]) -> [String: Any] {
+        [
+            "steps": Int(number(source["Step"]) ?? 0),
+            "distanceKm": number(source["Dis"]) ?? 0,
+            "caloriesKcal": number(source["Cal"]) ?? 0
+        ]
     }
 
     /**
@@ -765,11 +823,22 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     private func isValidDate(_ value: String) -> Bool {
+        dateValue(value) != nil
+    }
+
+    private func dateValue(_ value: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.isLenient = false
-        return formatter.date(from: value) != nil
+        return formatter.date(from: value)
+    }
+
+    private func dateString(_ value: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: value)
     }
 
     private func capabilitiesPayload() -> [String: String] {
@@ -793,6 +862,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             "bloodComposition": support(model.bloodAnalysisType > 0),
             "gsr": support(model.gsrType > 0),
             "sleep": "supported",
+            "steps": support(model.saveDays > 0),
             "sport": support(model.runningSaveTimes > 0),
             "autoMeasure": support(model.autoMonitSwitchType > 0),
             "alarms": "unknown",

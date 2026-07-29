@@ -12,6 +12,11 @@ interface MetPoint {
   intensity: MetIntensity;
 }
 
+interface ActivityPoint {
+  timestamp: string;
+  steps: number;
+}
+
 @Component({
   selector: 'app-data-visualizer',
   templateUrl: './data-visualizer.component.html',
@@ -79,6 +84,35 @@ export class DataVisualizerComponent {
 
   isBodyCompositionVisual(): boolean {
     return this.event.metric === 'bodyComposition' || this.event.type === 'bodyComposition';
+  }
+
+  /**
+   * A leitura atual já contém totais. No histórico Android os dados chegam em
+   * blocos de atividade, pelo que são somados sem alterar os registos brutos.
+   */
+  activityValue(field: 'steps' | 'distanceKm' | 'caloriesKcal'): number {
+    if (this.event.type !== 'history') {
+      const value = this.event.values[field];
+      return typeof value === 'number' ? value : 0;
+    }
+    return this.historyRecords().reduce((total, record) => {
+      const value = record.values[field];
+      return total + (typeof value === 'number' ? value : 0);
+    }, 0);
+  }
+
+  activityPoints(): ActivityPoint[] {
+    return this.historyRecords()
+      .map((record) => ({
+        timestamp: record.timestamp,
+        steps: typeof record.values['steps'] === 'number' ? record.values['steps'] : 0,
+      }))
+      .filter((point) => point.steps > 0);
+  }
+
+  activityBarHeight(steps: number): number {
+    const maximum = Math.max(1, ...this.activityPoints().map((point) => point.steps));
+    return Math.max(8, (steps / maximum) * 100);
   }
 
   progressValue(): number | null {

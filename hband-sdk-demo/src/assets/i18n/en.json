@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Ten metrics, one day at a time.",
+    "title": "Eleven metrics, one day at a time.",
     "description": "Connect the MF91, confirm its firmware capabilities, and view live measurements or history for a specific date."
   },
   "common": {
@@ -50,7 +50,10 @@
     "noDevice": "No device",
     "readyToScan": "Ready to scan for a band",
     "firmware": "Firmware {{version}}",
-    "unknown": "Unnamed device"
+    "unknown": "Unnamed device",
+    "battery": "Battery",
+    "lowBattery": "Low battery",
+    "refreshBattery": "Refresh battery"
   },
   "catalog": {
     "search": "Search for a feature",
@@ -89,6 +92,10 @@
       "completed": "Final result",
       "inProgress": "Measurement in progress",
       "waiting": "Start the measurement to track its progress and obtain the final result."
+    },
+    "activity": {
+      "today": "Accumulated activity",
+      "chart": "Step distribution throughout the day"
     },
     "met": {
       "chart": "Metabolic equivalent progression throughout the day",
@@ -291,6 +298,10 @@
     "bodyComposition": {
       "title": "Body composition",
       "description": "Measurement and history of body components reported by the device."
+    },
+    "steps": {
+      "title": "Steps",
+      "description": "Steps, distance and calories accumulated today or on a selected historical date."
     },
     "met": {
       "title": "MET",

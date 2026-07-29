@@ -323,6 +323,61 @@ ion-content {
   padding: 7px 10px;
 }
 
+.device-battery {
+  display: grid;
+  gap: 7px;
+  margin-top: 7px;
+  width: min(210px, 100%);
+}
+
+.device-battery__heading {
+  align-items: center;
+  color: #b8cad3;
+  display: flex;
+  font-size: 11px;
+  gap: 6px;
+  justify-content: center;
+
+  strong {
+    color: #fff;
+    margin-left: 3px;
+  }
+}
+
+.device-battery__track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  display: block;
+  height: 7px;
+  overflow: hidden;
+
+  i {
+    background: var(--app-mint);
+    border-radius: inherit;
+    display: block;
+    height: 100%;
+    transition: width 180ms ease;
+  }
+}
+
+.device-battery--low {
+  .device-battery__track i {
+    background: var(--app-danger);
+  }
+
+  small {
+    color: #ffafb7;
+    font-weight: 700;
+  }
+}
+
+.battery-refresh {
+  --color: #a9bdc7;
+  font-size: 10px;
+  margin: 0;
+  min-height: 30px;
+}
+
 .control-strip {
   align-items: center;
   display: grid;
@@ -1655,6 +1710,108 @@ ion-content {
 
 .composition-visual {
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.activity-visual {
+  display: grid;
+  gap: 14px;
+}
+
+.activity-visual__summary {
+  align-content: center;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(38, 215, 173, 0.22), transparent 42%),
+    linear-gradient(145deg, #0b2231, #12384a);
+  border-radius: 20px;
+  color: #fff;
+  display: grid;
+  min-height: 150px;
+  padding: 22px;
+
+  > span,
+  small {
+    color: #9fc0c9;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    font-size: clamp(38px, 7vw, 56px);
+    letter-spacing: -0.055em;
+    line-height: 1;
+    margin: 8px 0 4px;
+  }
+}
+
+.activity-visual__secondary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  span {
+    background: #f2f8f6;
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    display: grid;
+    padding: 14px;
+  }
+
+  strong {
+    color: var(--app-ink);
+    font-size: 20px;
+  }
+
+  small {
+    color: var(--app-ink-soft);
+    font-size: 9px;
+    font-weight: 750;
+    text-transform: uppercase;
+  }
+}
+
+.activity-visual__chart {
+  align-items: end;
+  border-bottom: 1px solid var(--app-border);
+  display: flex;
+  gap: 4px;
+  height: 118px;
+  overflow-x: auto;
+  padding: 8px 0 24px;
+
+  span {
+    align-items: center;
+    display: flex;
+    flex: 1 0 18px;
+    height: 100%;
+    justify-content: end;
+    min-width: 18px;
+    position: relative;
+  }
+
+  i {
+    background: linear-gradient(180deg, var(--app-mint), #0c9c81);
+    border-radius: 5px 5px 2px 2px;
+    display: block;
+    max-width: 18px;
+    min-height: 4px;
+    width: 72%;
+  }
+
+  time {
+    bottom: -19px;
+    color: var(--app-ink-soft);
+    font-size: 8px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+}
+
+.data-visualizer--compact .activity-visual__chart {
+  display: none;
 }
 
 .glucose-total-card {

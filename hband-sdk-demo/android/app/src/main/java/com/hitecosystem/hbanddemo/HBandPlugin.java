@@ -43,6 +43,7 @@ import com.veepoo.protocol.listener.data.IHRVOriginDataListener;
 import com.veepoo.protocol.listener.data.IHeartDataListener;
 import com.veepoo.protocol.listener.data.IHrvDetectListener;
 import com.veepoo.protocol.listener.data.IOriginDataListener;
+import com.veepoo.protocol.listener.data.IOriginData3Listener;
 import com.veepoo.protocol.listener.data.IPressureDetectListener;
 import com.veepoo.protocol.listener.data.IPwdDataListener;
 import com.veepoo.protocol.listener.data.IResponseListener;
@@ -80,6 +81,7 @@ import com.veepoo.protocol.model.datas.HrvManualData;
 import com.veepoo.protocol.model.datas.MetoManualData;
 import com.veepoo.protocol.model.datas.HeartData;
 import com.veepoo.protocol.model.datas.OriginData;
+import com.veepoo.protocol.model.datas.OriginData3;
 import com.veepoo.protocol.model.datas.OriginHalfHourData;
 import com.veepoo.protocol.model.datas.PersonInfoData;
 import com.veepoo.protocol.model.datas.PwdData;
@@ -110,6 +112,7 @@ import com.veepoo.protocol.model.settings.ReadOriginSetting;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -138,6 +141,8 @@ public class HBandPlugin extends Plugin {
     private final VPOperateManager manager = VPOperateManager.getInstance();
     private final Map<String, SearchResult> discoveredDevices = new LinkedHashMap<>();
     private final JSObject capabilities = new JSObject();
+    private int watchDataDays = 3;
+    private int originProtocolVersion = 1;
     private final IBleWriteResponse writeResponse = code -> emitLog(
         code == Code.REQUEST_SUCCESS ? "success" : "warning",
         "BLE write response: " + code,
@@ -509,6 +514,9 @@ public class HBandPlugin extends Plugin {
     }
 
     private void mapCapabilities(FunctionDeviceSupportData data) {
+        watchDataDays = Math.max(1, data.getWathcDay());
+        originProtocolVersion = data.getOriginProtcolVersion();
+        capabilities.put("steps", data.getWathcDay() > 0 ? "supported" : "unknown");
         putCapability("heartRate", data.getHeartDetect());
         putCapability("bloodPressure", data.getBp());
         putCapability("bloodOxygen", data.getSpo2H());
@@ -549,7 +557,14 @@ public class HBandPlugin extends Plugin {
     private void readBattery(PluginCall call) {
         manager.readBattery(writeResponse, data -> {
             JSObject values = new JSObject();
-            values.put("percent", data.isPercent() ? data.getBatteryPercent() : data.getBatteryLevel());
+            /*
+             * Alguns firmwares devolvem quatro níveis discretos em vez de uma
+             * percentagem. Cada nível representa 25%, conforme o SDK oficial.
+             */
+            int percent = data.isPercent()
+                ? data.getBatteryPercent()
+                : data.getBatteryLevel() * 25;
+            values.put("percent", Math.min(100, Math.max(0, percent)));
             values.put("lowBattery", data.isLowBattery());
             values.put("state", data.getState());
             emitData("battery", values, null, data.toString());
@@ -879,7 +894,11 @@ public class HBandPlugin extends Plugin {
             return;
         }
 
-        if ("ecg".equals(metric)) {
+        if ("steps".equals(metric)) {
+            if (!readStepHistory(call, metric, date)) {
+                return;
+            }
+        } else if ("ecg".equals(metric)) {
             readEcgHistory(metric, date);
         } else if ("bodyComposition".equals(metric)) {
             readBodyComponentHistory(metric, date);
@@ -892,6 +911,78 @@ public class HBandPlugin extends Plugin {
             readManualMetricHistory(metric, date, dataType);
         }
         accept(call, "history.metric");
+    }
+
+    /**
+     * Lê os blocos de atividade do dia pedido. O protocolo 3 agrupa vários
+     * blocos no mesmo callback; os protocolos anteriores entregam-nos um a um.
+     */
+    private boolean readStepHistory(PluginCall call, String metric, LocalDate date) {
+        long difference = ChronoUnit.DAYS.between(date, LocalDate.now());
+        if (difference < 0 || difference > watchDataDays) {
+            call.reject("HISTORY_DATE_OUTSIDE_DEVICE_RETENTION");
+            return false;
+        }
+
+        int dayOffset = (int) difference;
+        JSArray records = new JSArray();
+        if (originProtocolVersion >= 3) {
+            manager.readOriginDataSingleDay(
+                writeResponse,
+                new IOriginData3Listener() {
+                    @Override public void onOriginFiveMinuteListDataChange(List<OriginData3> data) {
+                        for (OriginData3 item : data) {
+                            appendStepHistoryRecord(records, item, date);
+                        }
+                    }
+                    @Override public void onOriginHalfHourDataChange(OriginHalfHourData data) {}
+                    @Override public void onOriginHRVOriginListDataChange(List<HRVOriginData> data) {}
+                    @Override public void onOriginSpo2OriginListDataChange(List<Spo2hOriginData> data) {}
+                    @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
+                    @Override public void onReadOriginProgress(float progress) {}
+                    @Override public void onReadOriginComplete() {
+                        emitHistory(metric, date.toString(), records);
+                    }
+                },
+                dayOffset,
+                1,
+                watchDataDays
+            );
+        } else {
+            manager.readOriginDataSingleDay(
+                writeResponse,
+                new IOriginDataListener() {
+                    @Override public void onOringinFiveMinuteDataChange(OriginData data) {
+                        appendStepHistoryRecord(records, data, date);
+                    }
+                    @Override public void onOringinHalfHourDataChange(OriginHalfHourData data) {}
+                    @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
+                    @Override public void onReadOriginProgress(float progress) {}
+                    @Override public void onReadOriginComplete() {
+                        emitHistory(metric, date.toString(), records);
+                    }
+                },
+                dayOffset,
+                1,
+                watchDataDays
+            );
+        }
+        return true;
+    }
+
+    private void appendStepHistoryRecord(JSArray records, OriginData item, LocalDate date) {
+        if (!sameDate(item.getmTime(), date)
+            || (item.getStepValue() <= 0 && item.getDisValue() <= 0 && item.getCalValue() <= 0)) {
+            return;
+        }
+        records.put(historyRecord(
+            item.getmTime(),
+            new JSObject()
+                .put("steps", item.getStepValue())
+                .put("distanceKm", item.getDisValue())
+                .put("caloriesKcal", item.getCalValue()),
+            null
+        ));
     }
 
     private DeviceManualDataType manualType(String metric) {
@@ -1129,7 +1220,7 @@ public class HBandPlugin extends Plugin {
             values.put("steps", data.getStep());
             values.put("distanceKm", data.getDis());
             values.put("caloriesKcal", data.getKcal());
-            emitData("activity", values, null, data.toString());
+            emitData("steps", values, null, data.toString());
         });
         accept(call, "history.activity.current");
     }

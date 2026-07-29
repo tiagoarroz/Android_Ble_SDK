@@ -69,6 +69,40 @@
               {{ rssi }} {{ i18n.translate('units.dbm') }}
             </span>
           }
+          @if (hband.connected()) {
+            @if (hband.battery(); as battery) {
+              <div class="device-battery" [class.device-battery--low]="battery.lowBattery">
+                <span class="device-battery__heading">
+                  <ion-icon name="battery-half-outline"></ion-icon>
+                  {{ i18n.translate('device.battery') }}
+                  <strong>{{ batteryPercent() }}%</strong>
+                </span>
+                <span
+                  class="device-battery__track"
+                  role="progressbar"
+                  [attr.aria-label]="i18n.translate('device.battery')"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-valuenow]="batteryPercent()"
+                >
+                  <i [style.width.%]="batteryPercent()"></i>
+                </span>
+                @if (battery.lowBattery) {
+                  <small>{{ i18n.translate('device.lowBattery') }}</small>
+                }
+              </div>
+            }
+            <ion-button
+              class="battery-refresh"
+              fill="clear"
+              size="small"
+              [disabled]="hband.busyOperation() !== null"
+              (click)="hband.refreshBattery()"
+            >
+              <ion-icon slot="start" name="refresh-outline"></ion-icon>
+              {{ i18n.translate('device.refreshBattery') }}
+            </ion-button>
+          }
         </div>
       </aside>
     </section>

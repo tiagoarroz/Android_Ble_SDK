@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Dix mesures, un jour à la fois.",
+    "title": "Onze mesures, un jour à la fois.",
     "description": "Connectez le MF91, confirmez les capacités du micrologiciel et consultez les mesures actuelles ou l'historique d'une date précise."
   },
   "common": {
@@ -50,7 +50,10 @@
     "noDevice": "Aucun appareil",
     "readyToScan": "Prêt à rechercher un bracelet",
     "firmware": "Micrologiciel {{version}}",
-    "unknown": "Appareil sans nom"
+    "unknown": "Appareil sans nom",
+    "battery": "Batterie",
+    "lowBattery": "Batterie faible",
+    "refreshBattery": "Actualiser la batterie"
   },
   "catalog": {
     "search": "Rechercher une fonctionnalité",
@@ -89,6 +92,10 @@
       "completed": "Résultat final",
       "inProgress": "Mesure en cours",
       "waiting": "Démarrez la mesure pour suivre sa progression et obtenir le résultat final."
+    },
+    "activity": {
+      "today": "Activité cumulée",
+      "chart": "Répartition des pas au cours de la journée"
     },
     "met": {
       "chart": "Évolution de l'équivalent métabolique au fil de la journée",
@@ -291,6 +298,10 @@
     "bodyComposition": {
       "title": "Composition corporelle",
       "description": "Mesure et historique des composants corporels signalés par l'appareil."
+    },
+    "steps": {
+      "title": "Pas",
+      "description": "Pas, distance et calories cumulés aujourd'hui ou à une date historique sélectionnée."
     },
     "met": {
       "title": "MET",

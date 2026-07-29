@@ -13,7 +13,7 @@
     }
   },
   "hero": {
-    "title": "Diez métricas, un día cada vez.",
+    "title": "Once métricas, un día cada vez.",
     "description": "Conecta la MF91, confirma las capacidades del firmware y consulta mediciones actuales o el historial de una fecha concreta."
   },
   "common": {
@@ -50,7 +50,10 @@
     "noDevice": "Ningún dispositivo",
     "readyToScan": "Listo para buscar una pulsera",
     "firmware": "Firmware {{version}}",
-    "unknown": "Dispositivo sin nombre"
+    "unknown": "Dispositivo sin nombre",
+    "battery": "Batería",
+    "lowBattery": "Batería baja",
+    "refreshBattery": "Actualizar batería"
   },
   "catalog": {
     "search": "Buscar una función",
@@ -89,6 +92,10 @@
       "completed": "Resultado final",
       "inProgress": "Medición en curso",
       "waiting": "Inicie la medición para seguir su progreso y obtener el resultado final."
+    },
+    "activity": {
+      "today": "Actividad acumulada",
+      "chart": "Distribución de pasos a lo largo del día"
     },
     "met": {
       "chart": "Evolución del equivalente metabólico a lo largo del día",
@@ -291,6 +298,10 @@
     "bodyComposition": {
       "title": "Composición corporal",
       "description": "Medición e historial de componentes corporales informados por el dispositivo."
+    },
+    "steps": {
+      "title": "Pasos",
+      "description": "Pasos, distancia y calorías acumulados hoy o en una fecha histórica seleccionada."
     },
     "met": {
       "title": "MET",

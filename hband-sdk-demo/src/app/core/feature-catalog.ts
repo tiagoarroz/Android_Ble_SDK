@@ -12,7 +12,8 @@ const liveAndHistory = (metric: FeatureDefinition['metric'], prefix: string) => 
 ];
 
 /**
- * Mantém o demonstrador limitado às métricas clínicas e fisiológicas pedidas.
+ * Mantém o demonstrador limitado às métricas clínicas, fisiológicas e de
+ * atividade pedidas.
  * A ausência de uma ação em tempo real é intencional quando o SDK só confirma
  * dados automáticos/históricos, como acontece com MET.
  */
@@ -64,6 +65,26 @@ export const FEATURE_CATALOG: FeatureDefinition[] = [
     descriptionKey: 'features.bodyComposition.description', icon: 'body-outline',
     capability: 'bodyComposition', visualization: 'composition',
     actions: liveAndHistory('bodyComposition', 'measure.bodyComposition'),
+  },
+  {
+    id: 'steps', metric: 'steps', titleKey: 'features.steps.title',
+    descriptionKey: 'features.steps.description', icon: 'footsteps-outline',
+    capability: 'steps', visualization: 'activity',
+    actions: [
+      {
+        id: 'current',
+        operation: 'history.activity.current',
+        labelKey: 'actions.current',
+        metric: 'steps',
+      },
+      {
+        id: 'history',
+        operation: 'history.metric',
+        labelKey: 'actions.history',
+        tone: 'secondary',
+        metric: 'steps',
+      },
+    ],
   },
   {
     id: 'met', metric: 'met', titleKey: 'features.met.title',

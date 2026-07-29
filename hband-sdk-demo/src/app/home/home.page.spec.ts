@@ -102,6 +102,30 @@ describe('HomePage', () => {
     expect(component.hband.latestFor('ecg')?.samples).toEqual([1, 3, 2, 4, 2]);
   });
 
+  it('should read current daily steps with distance and calories', async () => {
+    const feature = component.features.find((item) => item.metric === 'steps')!;
+    const current = feature.actions.find((action) => action.id === 'current')!;
+
+    await component.run(current, feature);
+
+    expect(component.hband.latestFor('steps')?.values).toEqual({
+      steps: 6842,
+      distanceKm: 4.7,
+      caloriesKcal: 286,
+    });
+  });
+
+  it('should retain the battery percentage reported outside metric events', () => {
+    feedDeviceData({
+      type: 'battery',
+      timestamp: new Date().toISOString(),
+      values: { percent: 75, lowBattery: false },
+    });
+
+    expect(component.hband.battery()?.percent).toBe(75);
+    expect(component.batteryPercent()).toBe(75);
+  });
+
   /**
    * Injeta callbacks equivalentes aos eventos nativos sem expor a operação
    * interna do serviço no contrato de produção.

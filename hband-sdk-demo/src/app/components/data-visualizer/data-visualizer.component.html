@@ -153,6 +153,39 @@
         }
       </div>
     }
+    @case ('activity') {
+      <div class="activity-visual">
+        <div class="activity-visual__summary">
+          <span>{{ i18n.translate('data.activity.today') }}</span>
+          <strong>{{ formatValue(activityValue('steps'), 'steps') }}</strong>
+          <small>{{ fieldLabel('steps') }}</small>
+        </div>
+        <div class="activity-visual__secondary">
+          <span>
+            <strong>{{ formatValue(activityValue('distanceKm'), 'distanceKm') }}</strong>
+            <small>{{ fieldLabel('distanceKm') }}</small>
+          </span>
+          <span>
+            <strong>{{ formatValue(activityValue('caloriesKcal'), 'caloriesKcal') }}</strong>
+            <small>{{ fieldLabel('caloriesKcal') }}</small>
+          </span>
+        </div>
+        @if (activityPoints().length > 1) {
+          <div
+            class="activity-visual__chart"
+            role="img"
+            [attr.aria-label]="i18n.translate('data.activity.chart')"
+          >
+            @for (point of activityPoints(); track point.timestamp) {
+              <span>
+                <i [style.height.%]="activityBarHeight(point.steps)"></i>
+                <time>{{ point.timestamp | date:'shortTime' }}</time>
+              </span>
+            }
+          </div>
+        }
+      </div>
+    }
     @default {
       <div class="metric-visual">
         @for (entry of entries(); track entry[0]) {

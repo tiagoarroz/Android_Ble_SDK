@@ -8,9 +8,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  analyticsOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
+  analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
   chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
-  helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
+  footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
@@ -45,9 +45,9 @@ export class HomePage implements OnInit {
 
   constructor() {
     addIcons({
-      analyticsOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
+      analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
       chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
-      helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
+      footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
       waterOutline,
     });
@@ -164,6 +164,10 @@ export class HomePage implements OnInit {
     return state === 'supported'
       ? 'checkmark-circle'
       : state === 'unsupported' ? 'close-circle-outline' : 'help-circle-outline';
+  }
+
+  batteryPercent(): number {
+    return Math.min(100, Math.max(0, this.hband.battery()?.percent ?? 0));
   }
 
   private localDate(date: Date): string {

@@ -6,8 +6,8 @@ export type ConnectionState =
 export type CapabilityState = 'supported' | 'unsupported' | 'unknown';
 export type MetricId =
   | 'heartRate' | 'bloodPressure' | 'oxygen' | 'temperature' | 'bloodGlucose'
-  | 'hrv' | 'ecg' | 'bodyComposition' | 'met' | 'stress';
-export type VisualizationType = 'gauge' | 'line' | 'bars' | 'ecg' | 'composition';
+  | 'hrv' | 'ecg' | 'bodyComposition' | 'met' | 'stress' | 'steps';
+export type VisualizationType = 'gauge' | 'line' | 'bars' | 'ecg' | 'composition' | 'activity';
 export type DataValue = string | number | boolean | null;
 
 export interface HBandDevice {
@@ -27,6 +27,12 @@ export interface HBandStatus {
   capabilities: Record<string, CapabilityState>;
   sdkVersion?: string;
   platform?: string;
+}
+
+export interface HBandBatteryStatus {
+  percent: number;
+  lowBattery: boolean;
+  updatedAt: string;
 }
 
 export interface HBandHistoryRecord {

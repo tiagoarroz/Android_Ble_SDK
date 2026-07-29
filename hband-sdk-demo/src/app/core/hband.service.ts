@@ -3,7 +3,8 @@ import { Capacitor } from '@capacitor/core';
 
 import { HBand } from './hband.plugin';
 import type {
-  HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry, HBandStatus, MetricId,
+  HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
+  HBandStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -24,13 +25,16 @@ const METRIC_OPERATIONS = new Set([
   'measure.ecg.start', 'measure.ecg.stop',
   'measure.bodyComposition.start', 'measure.bodyComposition.stop',
   'measure.stress.start', 'measure.stress.stop',
+  'history.activity.current',
   'history.metric',
+  'device.battery',
 ]);
 
 @Injectable({ providedIn: 'root' })
 export class HBandService {
   readonly isNative = Capacitor.isNativePlatform();
   readonly status = signal<HBandStatus>(INITIAL_STATUS);
+  readonly battery = signal<HBandBatteryStatus | null>(null);
   readonly devices = signal<HBandDevice[]>([]);
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
@@ -82,16 +86,23 @@ export class HBandService {
       return;
     }
     await HBand.connect({ deviceId, password });
+    await this.refreshBattery();
   }
 
   async disconnect(): Promise<void> {
     if (this.simulation()) {
       this.status.update((status) => ({ ...status, state: 'disconnected', device: undefined }));
       this.activeMeasurements.set({});
+      this.battery.set(null);
       return;
     }
     await HBand.disconnect();
     this.activeMeasurements.set({});
+    this.battery.set(null);
+  }
+
+  async refreshBattery(): Promise<void> {
+    await this.execute('device.battery');
   }
 
   /**
@@ -196,6 +207,7 @@ export class HBandService {
     this.status.set(status);
     if (status.state === 'disconnected' || status.state === 'unavailable') {
       this.activeMeasurements.set({});
+      this.battery.set(null);
     }
   }
 
@@ -211,6 +223,17 @@ export class HBandService {
    * substitua o valor atual apresentado no cartão da métrica.
    */
   private storeData(event: HBandDataEvent): void {
+    if (event.type === 'battery') {
+      const percent = event.values['percent'];
+      if (typeof percent === 'number' && Number.isFinite(percent)) {
+        this.battery.set({
+          percent: Math.min(100, Math.max(0, percent)),
+          lowBattery: event.values['lowBattery'] === true,
+          updatedAt: event.timestamp || new Date().toISOString(),
+        });
+      }
+      return;
+    }
     const metric = event.metric ?? this.metricForType(event.type);
     if (!metric) {
       return;
@@ -303,7 +326,7 @@ export class HBandService {
   private metricForType(type: string): MetricId | undefined {
     const metrics: MetricId[] = [
       'heartRate', 'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose',
-      'hrv', 'ecg', 'bodyComposition', 'met', 'stress',
+      'hrv', 'ecg', 'bodyComposition', 'met', 'stress', 'steps',
     ];
     return metrics.find((metric) => metric === type);
   }
@@ -340,6 +363,9 @@ export class HBandService {
       const metric = params['metric'];
       return typeof metric === 'string' && this.metricForType(metric) ? metric as MetricId : undefined;
     }
+    if (operation === 'history.activity.current') {
+      return 'steps';
+    }
     const match = /^measure\.([^.]+)\.(start|stop)$/.exec(operation);
     return match ? this.metricForType(match[1]) : undefined;
   }
@@ -352,7 +378,7 @@ export class HBandService {
   private seedSimulation(): void {
     const capabilities = Object.fromEntries([
       'heartRate', 'bloodPressure', 'bloodOxygen', 'temperature', 'bloodGlucose',
-      'hrv', 'ecg', 'bodyComposition', 'met', 'stress',
+      'hrv', 'ecg', 'bodyComposition', 'met', 'stress', 'steps',
     ].map((capability) => [capability, 'supported' as const]));
     this.status.set({
       available: true,
@@ -381,6 +407,7 @@ export class HBandService {
       state: 'connected',
       device: { ...device, firmware: 'simulation' },
     }));
+    this.battery.set({ percent: 82, lowBattery: false, updatedAt: new Date().toISOString() });
   }
 
   private simulateOperation(operation: string, params: Record<string, unknown>): void {
@@ -395,7 +422,16 @@ export class HBandService {
       'measure.ecg.start': { type: 'ecg', metric: 'ecg', timestamp: now, values: { bpm: 72 }, samples: [0, 12, 45, -18, -8, 2, 4, 42, -20, -7, 1, 3] },
       'measure.bodyComposition.start': { type: 'bodyComposition', metric: 'bodyComposition', timestamp: now, values: { bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6, boneMassKg: 2.8, basalMetabolismKcal: 1540 } },
       'measure.stress.start': { type: 'stress', metric: 'stress', timestamp: now, values: { score: 38 }, samples: [32, 36, 44, 40, 38] },
+      'history.activity.current': { type: 'steps', metric: 'steps', timestamp: now, values: { steps: 6842, distanceKm: 4.7, caloriesKcal: 286 } },
     };
+    if (operation === 'device.battery') {
+      this.storeData({
+        type: 'battery',
+        timestamp: now,
+        values: { percent: 82, lowBattery: false },
+      });
+      return;
+    }
     if (operation === 'history.metric') {
       const metric = params['metric'] as MetricId;
       const date = String(params['date']);
@@ -429,6 +465,12 @@ export class HBandService {
       bodyComposition: [{ bmi: 22.4, bodyFatPercent: 18.8, waterPercent: 58.2, muscleMassKg: 49.6 }],
       met: [{ met: 1.0 }, { met: 2.2 }, { met: 4.4 }, { met: 6.6 }],
       stress: [{ score: 31 }, { score: 44 }, { score: 38 }],
+      steps: [
+        { steps: 740, distanceKm: 0.5, caloriesKcal: 31 },
+        { steps: 1860, distanceKm: 1.3, caloriesKcal: 78 },
+        { steps: 2340, distanceKm: 1.6, caloriesKcal: 98 },
+        { steps: 1902, distanceKm: 1.3, caloriesKcal: 79 },
+      ],
     };
     return valueSets[metric].map((values, index) => ({
       timestamp: `${date}T${String(8 + index * 3).padStart(2, '0')}:00:00`,
