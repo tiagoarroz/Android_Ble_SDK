@@ -1,0 +1,365 @@
+{
+  "app": {
+    "title": "H Band SDK",
+    "subtitle": "Laboratoire MF91",
+    "language": "Langue",
+    "modelTag": "MF91 · H Band SDK",
+    "languages": {
+      "pt": "Portugais (Portugal)",
+      "br": "Portugais (Brésil)",
+      "en": "Anglais",
+      "es": "Espagnol",
+      "fr": "Français"
+    }
+  },
+  "hero": {
+    "title": "Explorez le MF91, signal après signal.",
+    "description": "Une démonstration visuelle des SDK H Band pour Android et iOS. Connectez le bracelet, confirmez les capacités signalées par le micrologiciel et testez chaque flux séparément."
+  },
+  "common": {
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "categories": {
+    "all": "Tout",
+    "connection": "Connexion",
+    "measurements": "Mesures",
+    "history": "Historique",
+    "automation": "Automatisation",
+    "interaction": "Interaction",
+    "advanced": "Avancé"
+  },
+  "connectionStates": {
+    "unavailable": "Indisponible",
+    "idle": "Prêt",
+    "scanning": "Recherche",
+    "connecting": "Connexion",
+    "authenticating": "Authentification",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "error": "Erreur"
+  },
+  "capabilities": {
+    "supported": "Pris en charge",
+    "unsupported": "Non pris en charge",
+    "unknown": "À confirmer",
+    "unsupportedDescription": "L'appareil connecté a déclaré que cette capacité n'est pas prise en charge. Les commandes restent bloquées afin de protéger l'état du bracelet.",
+    "catalogOnly": "Cette fonction est documentée dans le catalogue, mais ne dispose pas encore d'un contrat natif exécutable dans ce bridge."
+  },
+  "device": {
+    "noDevice": "Aucun appareil",
+    "readyToScan": "Prêt à rechercher un bracelet",
+    "firmware": "Micrologiciel {{version}}",
+    "unknown": "Appareil sans nom"
+  },
+  "catalog": {
+    "search": "Rechercher une fonctionnalité",
+    "simulation": "Données simulées",
+    "eyebrow": "Catalogue du SDK",
+    "title": "Fonctionnalités par type de données",
+    "featureCount": "{{count}} modules",
+    "noResults": "Aucun résultat",
+    "noResultsDescription": "Essayez un autre terme ou sélectionnez une autre catégorie."
+  },
+  "activity": {
+    "eyebrow": "Diagnostic",
+    "title": "Activité du SDK",
+    "sdkEvent": "Événement du SDK",
+    "empty": "Les commandes, réponses et erreurs apparaîtront ici."
+  },
+  "scan": {
+    "title": "Connecter le bracelet",
+    "heading": "Appareils H Band à proximité",
+    "description": "Gardez le MF91 à proximité et hors de toute autre session Bluetooth. Sélectionnez-le lorsqu'il apparaît dans la liste.",
+    "password": "Mot de passe de l'appareil",
+    "waiting": "En attente d'appareils…"
+  },
+  "data": {
+    "noData": "Pas encore de données",
+    "runAction": "Exécutez une action pour alimenter cette visualisation.",
+    "operation": "Première opération native",
+    "chart": "Graphique des échantillons",
+    "gauge": "Jauge de valeur",
+    "fields": {
+      "bpm": "Fréquence cardiaque (bpm)",
+      "state": "État",
+      "systolic": "Systolique (mmHg)",
+      "diastolic": "Diastolique (mmHg)",
+      "progress": "Progression (%)",
+      "percent": "Pourcentage",
+      "pulseBpm": "Pouls (bpm)",
+      "breathsPerMinute": "Respirations/minute",
+      "enabled": "Disponible",
+      "celsius": "Température (°C)",
+      "surfaceCelsius": "Température cutanée (°C)",
+      "level": "Niveau",
+      "milliseconds": "Millisecondes",
+      "value": "Valeur",
+      "mmolL": "Glycémie (mmol/L)",
+      "riskLevel": "Niveau de risque",
+      "result": "Résultat",
+      "lead": "Contact des électrodes",
+      "raw": "Valeur brute",
+      "isPercent": "Échelle en pourcentage",
+      "lowBattery": "Batterie faible",
+      "chargeState": "État de charge",
+      "synchronised": "Synchronisé",
+      "success": "Succès",
+      "steps": "Pas",
+      "distanceKm": "Distance (km)",
+      "caloriesKcal": "Calories (kcal)",
+      "totalMinutes": "Sommeil total (min)",
+      "deepMinutes": "Sommeil profond (min)",
+      "lightMinutes": "Sommeil léger (min)",
+      "awakeMinutes": "Éveillé (min)",
+      "charging": "En charge",
+      "dbm": "Signal (dBm)",
+      "score": "Score"
+    }
+  },
+  "profile": {
+    "title": "Données personnelles à synchroniser",
+    "description": "Renseignez toutes les valeurs. Rien n'est envoyé au bracelet tant que des champs manquent.",
+    "height": "Taille (cm)",
+    "weight": "Poids (kg)",
+    "birthYear": "Année de naissance",
+    "age": "Âge",
+    "targetSteps": "Objectif quotidien de pas",
+    "sex": "Sexe utilisé par le SDK",
+    "select": "Sélectionner",
+    "female": "Féminin",
+    "male": "Masculin",
+    "required": "Renseignez tous les champs avec des nombres entiers valides."
+  },
+  "units": {
+    "dbm": "dBm"
+  },
+  "actions": {
+    "open": "Ouvrir le module",
+    "close": "Fermer",
+    "scan": "Rechercher le MF91",
+    "scanAgain": "Rechercher à nouveau",
+    "changeDevice": "Changer d'appareil",
+    "disconnect": "Déconnecter",
+    "authenticate": "Authentifier",
+    "sync": "Synchroniser le profil",
+    "start": "Démarrer",
+    "stop": "Arrêter",
+    "read": "Lire",
+    "configure": "Configurer",
+    "history": "Lire l'historique",
+    "readBattery": "Lire la batterie",
+    "readSignal": "Lire le signal",
+    "syncTime": "Synchroniser l'heure",
+    "measureStress": "Mesurer le stress",
+    "miniCheckup": "Mini bilan",
+    "current": "Lire l'état actuel",
+    "readAll": "Tout lire",
+    "rawData": "Données brutes",
+    "manual": "Mesures manuelles",
+    "rrIntervals": "Intervalles RR",
+    "raiseWrist": "Lever le poignet",
+    "wearDetection": "Détection du port",
+    "functionSwitch": "Fonctions auxiliaires",
+    "language": "Définir la langue",
+    "units": "Définir les unités",
+    "findDevice": "Trouver le bracelet",
+    "findPhone": "Trouver le téléphone",
+    "music": "Contrôle de la musique",
+    "volume": "Volume",
+    "sos": "SOS",
+    "countdown": "Minuteur",
+    "builtIn": "Cadrans intégrés",
+    "custom": "Cadran personnalisé",
+    "server": "Cadrans du serveur",
+    "gps": "GPS et fuseau horaire",
+    "gnss": "GNSS et sécurité",
+    "agps": "Transférer l'AGPS",
+    "firmware": "Mettre à jour le micrologiciel",
+    "ppg": "PPG brut",
+    "acceleration": "Accélération",
+    "inspect": "Inspecter les capacités",
+    "classicBluetooth": "Bluetooth classique",
+    "network4g": "Configuration 4G",
+    "ai": "Fonctions d'IA",
+    "textImage": "Texte et image",
+    "qrCode": "Code QR",
+    "magneticTherapy": "Thérapie magnétique",
+    "tcm": "MTC",
+    "ptt": "PTT"
+  },
+  "features": {
+    "deviceSession": {
+      "title": "Découverte et session BLE",
+      "description": "Recherche, connexion, reconnexion, état Bluetooth et fermeture contrôlée de la session."
+    },
+    "authentication": {
+      "title": "Mot de passe et profil personnel",
+      "description": "Confirme le mot de passe, récupère les capacités et synchronise sexe, âge, taille, poids et objectif."
+    },
+    "deviceStatus": {
+      "title": "Batterie, signal et heure",
+      "description": "État d'énergie, RSSI, version du SDK et synchronisation de l'heure."
+    },
+    "heartRate": {
+      "title": "Fréquence cardiaque",
+      "description": "Mesure en temps réel, état du capteur et évolution des échantillons en bpm."
+    },
+    "bloodPressure": {
+      "title": "Pression artérielle",
+      "description": "Systolique, diastolique, progression et configuration du mode privé."
+    },
+    "oxygen": {
+      "title": "Oxygène sanguin",
+      "description": "SpO₂, pouls associé et progression de la mesure."
+    },
+    "breathing": {
+      "title": "Fréquence respiratoire",
+      "description": "Respirations par minute et progression du test respiratoire."
+    },
+    "temperature": {
+      "title": "Température",
+      "description": "Température corporelle et de base, mesure en direct et historique automatique."
+    },
+    "hrv": {
+      "title": "VFC",
+      "description": "Variabilité de la fréquence cardiaque, échantillons et analyse temporelle."
+    },
+    "ecg": {
+      "title": "ECG",
+      "description": "Tracé en temps réel, progression, résultats enregistrés et ECG multicanal."
+    },
+    "bloodGlucose": {
+      "title": "Glycémie",
+      "description": "Mesure, étalonnage privé et étalonnage multiple selon les repas."
+    },
+    "fatigueStress": {
+      "title": "Fatigue et stress",
+      "description": "Scores, progression et état de l'appareil pendant l'évaluation."
+    },
+    "bodyComposition": {
+      "title": "Composition corporelle",
+      "description": "Mesure et historique des composants corporels signalés par l'appareil."
+    },
+    "bloodComposition": {
+      "title": "Composition sanguine",
+      "description": "Composants sanguins, étalonnage et suivi des nouveaux résultats."
+    },
+    "gsrMini": {
+      "title": "GSR et mini bilan",
+      "description": "Conductance cutanée et séquence agrégée de mesures rapides."
+    },
+    "dailyActivity": {
+      "title": "Activité quotidienne",
+      "description": "Pas, distance, calories et données de mouvement actuelles ou historiques."
+    },
+    "sleep": {
+      "title": "Sommeil",
+      "description": "Périodes d'éveil, sommeil léger, profond et précision améliorée si disponible."
+    },
+    "healthHistory": {
+      "title": "Historique de santé",
+      "description": "Lecture agrégée et données d'origine par blocs de cinq minutes."
+    },
+    "sportHistory": {
+      "title": "Séances sportives",
+      "description": "Début, fin, état et historique détaillé des modes sportifs."
+    },
+    "clinicalHistory": {
+      "title": "Historiques cliniques",
+      "description": "SpO₂, VFC, température, mesures manuelles et intervalles RR."
+    },
+    "automaticMonitoring": {
+      "title": "Mesure automatique",
+      "description": "Intervalles et plages de mesures automatiques déclarées par le micrologiciel."
+    },
+    "alarms": {
+      "title": "Alarmes",
+      "description": "Alarmes simples et avancées, ajout, modification, suppression et événements de la montre."
+    },
+    "textAlarms": {
+      "title": "Alarmes textuelles",
+      "description": "Rappels textuels stockés et gérés directement sur l'appareil."
+    },
+    "healthReminders": {
+      "title": "Rappels de santé",
+      "description": "Eau, médicaments, activité, lavage des mains et autres types pris en charge."
+    },
+    "wearBehaviour": {
+      "title": "Port et comportement",
+      "description": "Sédentarité, détection du port et activation de l'écran en levant le poignet."
+    },
+    "powerFunctions": {
+      "title": "Énergie et fonctions auxiliaires",
+      "description": "Mode basse consommation et interrupteurs généraux des fonctions de santé."
+    },
+    "femaleHealth": {
+      "title": "Santé féminine",
+      "description": "Cycle, règles, grossesse et états associés pris en charge par le micrologiciel."
+    },
+    "display": {
+      "title": "Écran et luminosité",
+      "description": "Style, luminosité, durée, écran toujours éteint et options personnalisées."
+    },
+    "languageUnits": {
+      "title": "Langue et unités",
+      "description": "Langue de la montre, système métrique ou impérial et format de l'heure."
+    },
+    "find": {
+      "title": "Trouver l'appareil",
+      "description": "Fait sonner le bracelet ou répond à la demande de recherche du téléphone."
+    },
+    "camera": {
+      "title": "Appareil photo à distance",
+      "description": "Ouvre la session de déclenchement à distance et reçoit la commande de l'appareil."
+    },
+    "notificationsMusic": {
+      "title": "Notifications et musique",
+      "description": "Messages sociaux, appels, lecture, pause, volume et commandes à distance."
+    },
+    "weather": {
+      "title": "Météo",
+      "description": "État, unités et prévisions horaires ou quotidiennes envoyées à la montre."
+    },
+    "contactsSos": {
+      "title": "Contacts et SOS",
+      "description": "Liste, ordre, contact SOS et nombre de tentatives d'appel."
+    },
+    "clocksCountdown": {
+      "title": "Horloges et minuteur",
+      "description": "Horloge mondiale, alarmes temporisées et compte à rebours."
+    },
+    "watchFaces": {
+      "title": "Cadrans et images",
+      "description": "Cadrans intégrés, personnalisés, du serveur et transfert d'images."
+    },
+    "gps": {
+      "title": "GPS, GNSS et AGPS",
+      "description": "Localisation, fuseau horaire, Kaaba, données assistées et protection de sécurité."
+    },
+    "firmware": {
+      "title": "Micrologiciel et OTA",
+      "description": "Flux Nordic, Goodix, JieLi et autres, toujours avec un fichier validé."
+    },
+    "rawSensors": {
+      "title": "Capteurs et données brutes",
+      "description": "PPG, accélération, ADC, lumière verte et journaux de protocole pour le diagnostic."
+    },
+    "specialProjects": {
+      "title": "Projets et matériel spécifiques",
+      "description": "G08W, G15, JH58, QX17, ZT163, JE136P et autres extensions du SDK."
+    },
+    "connectedServices": {
+      "title": "BT classique, 4G et IA",
+      "description": "Audio Bluetooth, serveur 4G et interactions vocales, visuelles ou cadrans avec IA."
+    },
+    "contentTransfer": {
+      "title": "Transfert de contenu",
+      "description": "Envoi de texte, d'images, de codes QR et de contenus vers l'appareil."
+    },
+    "therapiesCustom": {
+      "title": "Thérapies et protocoles spéciaux",
+      "description": "Thérapie magnétique, médecine traditionnelle chinoise, PTT et protocoles personnalisés."
+    }
+  }
+}

@@ -2,6 +2,14 @@
 Android_Ble_SDK是一个用于快速与蓝牙BLE交互的工具包，仅提供给我们合作的客户下载使用，方便提升客户的开发效率。
 Android_Ble_SDK is a toolkit for quickly interacting with Bluetooth BLE. It is only available to our cooperative customers for download and use to improve their development efficiency.
 
+## Demonstração Ionic para MF91
+
+A aplicação multiplataforma de demonstração encontra-se em
+[`hband-sdk-demo`](./hband-sdk-demo/README.md). Inclui uma interface Ionic com
+Angular, plugins Capacitor nativos para os SDKs Android e iOS, catálogo
+funcional agrupado e visualizações adaptadas aos dados clínicos, atividade,
+sono e diagnóstico.
+
 ## 必要条件 | Necessary dependencies jar
 
     
@@ -309,7 +317,6 @@ en:
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 
 
 

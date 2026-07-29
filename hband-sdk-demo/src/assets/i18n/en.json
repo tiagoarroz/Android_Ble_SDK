@@ -1,0 +1,365 @@
+{
+  "app": {
+    "title": "H Band SDK",
+    "subtitle": "MF91 Lab",
+    "language": "Language",
+    "modelTag": "MF91 · H Band SDK",
+    "languages": {
+      "pt": "Portuguese (Portugal)",
+      "br": "Portuguese (Brazil)",
+      "en": "English",
+      "es": "Spanish",
+      "fr": "French"
+    }
+  },
+  "hero": {
+    "title": "Explore the MF91, signal by signal.",
+    "description": "A visual demonstration of the H Band SDKs for Android and iOS. Connect the band, confirm the capabilities reported by its firmware, and test each flow independently."
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "categories": {
+    "all": "All",
+    "connection": "Connection",
+    "measurements": "Measurements",
+    "history": "History",
+    "automation": "Automation",
+    "interaction": "Interaction",
+    "advanced": "Advanced"
+  },
+  "connectionStates": {
+    "unavailable": "Unavailable",
+    "idle": "Ready",
+    "scanning": "Scanning",
+    "connecting": "Connecting",
+    "authenticating": "Authenticating",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "error": "Error"
+  },
+  "capabilities": {
+    "supported": "Supported",
+    "unsupported": "Unsupported",
+    "unknown": "To be confirmed",
+    "unsupportedDescription": "The connected device reported that this capability is unsupported. Commands remain disabled to protect the band state.",
+    "catalogOnly": "This function is documented in the catalog but does not yet have an executable native contract in this bridge."
+  },
+  "device": {
+    "noDevice": "No device",
+    "readyToScan": "Ready to scan for a band",
+    "firmware": "Firmware {{version}}",
+    "unknown": "Unnamed device"
+  },
+  "catalog": {
+    "search": "Search for a feature",
+    "simulation": "Simulated data",
+    "eyebrow": "SDK catalogue",
+    "title": "Features by data type",
+    "featureCount": "{{count}} modules",
+    "noResults": "No results",
+    "noResultsDescription": "Try another term or select a different category."
+  },
+  "activity": {
+    "eyebrow": "Diagnostics",
+    "title": "SDK activity",
+    "sdkEvent": "SDK event",
+    "empty": "Commands, responses, and errors will appear here."
+  },
+  "scan": {
+    "title": "Connect band",
+    "heading": "Nearby H Band devices",
+    "description": "Keep the MF91 nearby and disconnected from other Bluetooth sessions. Select it when it appears in the list.",
+    "password": "Device password",
+    "waiting": "Waiting for devices…"
+  },
+  "data": {
+    "noData": "No data yet",
+    "runAction": "Run an action to populate this visualisation.",
+    "operation": "First native operation",
+    "chart": "Sample chart",
+    "gauge": "Value gauge",
+    "fields": {
+      "bpm": "Heart rate (bpm)",
+      "state": "State",
+      "systolic": "Systolic (mmHg)",
+      "diastolic": "Diastolic (mmHg)",
+      "progress": "Progress (%)",
+      "percent": "Percentage",
+      "pulseBpm": "Pulse (bpm)",
+      "breathsPerMinute": "Breaths/minute",
+      "enabled": "Available",
+      "celsius": "Temperature (°C)",
+      "surfaceCelsius": "Skin temperature (°C)",
+      "level": "Level",
+      "milliseconds": "Milliseconds",
+      "value": "Value",
+      "mmolL": "Glucose (mmol/L)",
+      "riskLevel": "Risk level",
+      "result": "Result",
+      "lead": "Electrode contact",
+      "raw": "Raw value",
+      "isPercent": "Percentage scale",
+      "lowBattery": "Low battery",
+      "chargeState": "Charge state",
+      "synchronised": "Synchronized",
+      "success": "Success",
+      "steps": "Steps",
+      "distanceKm": "Distance (km)",
+      "caloriesKcal": "Calories (kcal)",
+      "totalMinutes": "Total sleep (min)",
+      "deepMinutes": "Deep sleep (min)",
+      "lightMinutes": "Light sleep (min)",
+      "awakeMinutes": "Awake (min)",
+      "charging": "Charging",
+      "dbm": "Signal (dBm)",
+      "score": "Score"
+    }
+  },
+  "profile": {
+    "title": "Personal data synchronization",
+    "description": "Fill in every value. Nothing is sent to the band while fields are missing.",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "birthYear": "Birth year",
+    "age": "Age",
+    "targetSteps": "Daily step target",
+    "sex": "Sex used by the SDK",
+    "select": "Select",
+    "female": "Female",
+    "male": "Male",
+    "required": "Fill in every field with a valid integer value."
+  },
+  "units": {
+    "dbm": "dBm"
+  },
+  "actions": {
+    "open": "Open module",
+    "close": "Close",
+    "scan": "Scan for MF91",
+    "scanAgain": "Scan again",
+    "changeDevice": "Change device",
+    "disconnect": "Disconnect",
+    "authenticate": "Authenticate",
+    "sync": "Sync profile",
+    "start": "Start",
+    "stop": "Stop",
+    "read": "Read",
+    "configure": "Configure",
+    "history": "Read history",
+    "readBattery": "Read battery",
+    "readSignal": "Read signal",
+    "syncTime": "Sync time",
+    "measureStress": "Measure stress",
+    "miniCheckup": "Mini check-up",
+    "current": "Read current",
+    "readAll": "Read all",
+    "rawData": "Raw data",
+    "manual": "Manual measurements",
+    "rrIntervals": "RR intervals",
+    "raiseWrist": "Raise wrist",
+    "wearDetection": "Wear detection",
+    "functionSwitch": "Auxiliary functions",
+    "language": "Set language",
+    "units": "Set units",
+    "findDevice": "Find band",
+    "findPhone": "Find phone",
+    "music": "Music control",
+    "volume": "Volume",
+    "sos": "SOS",
+    "countdown": "Countdown",
+    "builtIn": "Built-in watch faces",
+    "custom": "Custom watch face",
+    "server": "Server watch faces",
+    "gps": "GPS and time zone",
+    "gnss": "GNSS and safety",
+    "agps": "Transfer AGPS",
+    "firmware": "Update firmware",
+    "ppg": "Raw PPG",
+    "acceleration": "Acceleration",
+    "inspect": "Inspect capabilities",
+    "classicBluetooth": "Classic Bluetooth",
+    "network4g": "4G configuration",
+    "ai": "AI features",
+    "textImage": "Text and image",
+    "qrCode": "QR code",
+    "magneticTherapy": "Magnetic therapy",
+    "tcm": "TCM",
+    "ptt": "PTT"
+  },
+  "features": {
+    "deviceSession": {
+      "title": "BLE discovery and session",
+      "description": "Scanning, connection, reconnection, Bluetooth state, and controlled session shutdown."
+    },
+    "authentication": {
+      "title": "Password and personal profile",
+      "description": "Confirms the password, retrieves capabilities, and syncs sex, age, height, weight, and target."
+    },
+    "deviceStatus": {
+      "title": "Battery, signal, and time",
+      "description": "Power state, RSSI, SDK version, and watch time synchronisation."
+    },
+    "heartRate": {
+      "title": "Heart rate",
+      "description": "Real-time measurement, sensor state, and sample progression in bpm."
+    },
+    "bloodPressure": {
+      "title": "Blood pressure",
+      "description": "Systolic, diastolic, progress, and private mode configuration."
+    },
+    "oxygen": {
+      "title": "Blood oxygen",
+      "description": "SpO₂, associated pulse, and measurement progress."
+    },
+    "breathing": {
+      "title": "Breathing rate",
+      "description": "Breaths per minute and respiratory test progress."
+    },
+    "temperature": {
+      "title": "Temperature",
+      "description": "Body and baseline temperature, live measurement, and automatic history."
+    },
+    "hrv": {
+      "title": "HRV",
+      "description": "Heart rate variability, samples, and time-based analysis."
+    },
+    "ecg": {
+      "title": "ECG",
+      "description": "Real-time trace, progress, saved results, and multi-lead ECG."
+    },
+    "bloodGlucose": {
+      "title": "Blood glucose",
+      "description": "Measurement, private calibration, and multiple meal-based calibration."
+    },
+    "fatigueStress": {
+      "title": "Fatigue and stress",
+      "description": "Scores, progress, and device state during assessment."
+    },
+    "bodyComposition": {
+      "title": "Body composition",
+      "description": "Measurement and history of body components reported by the device."
+    },
+    "bloodComposition": {
+      "title": "Blood composition",
+      "description": "Blood components, calibration, and monitoring of new results."
+    },
+    "gsrMini": {
+      "title": "GSR and mini check-up",
+      "description": "Skin conductance and an aggregated sequence of quick measurements."
+    },
+    "dailyActivity": {
+      "title": "Daily activity",
+      "description": "Current or historical steps, distance, calories, and motion data."
+    },
+    "sleep": {
+      "title": "Sleep",
+      "description": "Awake, light, deep sleep periods, and improved precision when available."
+    },
+    "healthHistory": {
+      "title": "Health history",
+      "description": "Aggregated reading and original data in five-minute blocks."
+    },
+    "sportHistory": {
+      "title": "Sport sessions",
+      "description": "Start, stop, state, and detailed history of sport modes."
+    },
+    "clinicalHistory": {
+      "title": "Clinical histories",
+      "description": "SpO₂, HRV, temperature, manual measurements, and RR intervals."
+    },
+    "automaticMonitoring": {
+      "title": "Automatic measurement",
+      "description": "Intervals and windows for automatic measurements declared by the firmware."
+    },
+    "alarms": {
+      "title": "Alarms",
+      "description": "Basic and advanced alarms, addition, editing, deletion, and watch events."
+    },
+    "textAlarms": {
+      "title": "Text alarms",
+      "description": "Text reminders stored and managed directly on the device."
+    },
+    "healthReminders": {
+      "title": "Health reminders",
+      "description": "Water, medication, activity, hand washing, and other supported types."
+    },
+    "wearBehaviour": {
+      "title": "Wear and behaviour",
+      "description": "Sedentary reminder, wear detection, and screen activation on wrist raise."
+    },
+    "powerFunctions": {
+      "title": "Power and auxiliary functions",
+      "description": "Low-power mode and global health feature switches."
+    },
+    "femaleHealth": {
+      "title": "Female health",
+      "description": "Cycle, period, pregnancy, and related states supported by the firmware."
+    },
+    "display": {
+      "title": "Display and brightness",
+      "description": "Style, brightness, duration, always-off screen, and custom options."
+    },
+    "languageUnits": {
+      "title": "Language and units",
+      "description": "Watch language, metric or imperial system, and time format."
+    },
+    "find": {
+      "title": "Find device",
+      "description": "Makes the band ring or responds to the request to find the phone."
+    },
+    "camera": {
+      "title": "Remote camera",
+      "description": "Opens the remote shutter session and receives the device command."
+    },
+    "notificationsMusic": {
+      "title": "Notifications and music",
+      "description": "Social messages, calls, playback, pause, volume, and remote commands."
+    },
+    "weather": {
+      "title": "Weather",
+      "description": "State, units, and hourly or daily forecast sent to the watch."
+    },
+    "contactsSos": {
+      "title": "Contacts and SOS",
+      "description": "List, order, SOS contact, and number of call attempts."
+    },
+    "clocksCountdown": {
+      "title": "Clocks and countdown",
+      "description": "World clock, timed alarms, and countdown."
+    },
+    "watchFaces": {
+      "title": "Watch faces and images",
+      "description": "Built-in, custom, server watch faces, and image transfer."
+    },
+    "gps": {
+      "title": "GPS, GNSS, and AGPS",
+      "description": "Location, time zone, Kaaba, assisted data, and safety protection."
+    },
+    "firmware": {
+      "title": "Firmware and OTA",
+      "description": "Nordic, Goodix, JieLi, and other flows, always requiring a validated file."
+    },
+    "rawSensors": {
+      "title": "Sensors and raw data",
+      "description": "PPG, acceleration, ADC, green light, and protocol logs for diagnostics."
+    },
+    "specialProjects": {
+      "title": "Hardware-specific projects",
+      "description": "G08W, G15, JH58, QX17, ZT163, JE136P, and other SDK extensions."
+    },
+    "connectedServices": {
+      "title": "Classic BT, 4G, and AI",
+      "description": "Bluetooth audio, 4G server, and voice, image, or AI watch-face interactions."
+    },
+    "contentTransfer": {
+      "title": "Content transfer",
+      "description": "Sends text, images, QR codes, and content to the device."
+    },
+    "therapiesCustom": {
+      "title": "Therapies and special protocols",
+      "description": "Magnetic therapy, traditional Chinese medicine, PTT, and custom protocols."
+    }
+  }
+}

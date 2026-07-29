@@ -72,19 +72,19 @@ public class AutoMeasureAdapter extends RecyclerView.Adapter<AutoMeasureAdapter.
                 case BLOOD_PRESSURE:
                     return "pressão arterial";
                 case BLOOD_GLUCOSE:
-                    return "";
+                    return "Glicemia";
                 case STRESS:
-                    return "";
+                    return "Stress";
                 case BLOOD_OXYGEN:
                     return "SpO2";
                 case BODY_TEMPERATURE:
-                    return "";
+                    return "Temperatura corporal";
                 case LORENZ:
-                    return "";
+                    return "Lorenz";
                 case HRV:
                     return "HRV";
                 case BLOOD_COMPOSITION:
-                    return "";
+                    return "Composição sanguínea";
             }
             return "UNKNOWN";
         }

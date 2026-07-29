@@ -1,0 +1,7 @@
+{
+  "name": "hband-sdk-demo",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

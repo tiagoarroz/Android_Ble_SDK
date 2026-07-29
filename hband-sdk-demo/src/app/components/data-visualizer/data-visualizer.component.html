@@ -1,0 +1,72 @@
+<div class="data-visualizer" [class.data-visualizer--compact]="compact">
+  @switch (type) {
+    @case ('line') {
+      <div class="line-visual">
+        @if (primaryEntry(); as primary) {
+          <span class="line-visual__value">{{ formatValue(primary[1]) }}</span>
+          <small>{{ fieldLabel(primary[0]) }}</small>
+        }
+        <svg viewBox="0 0 100 48" preserveAspectRatio="none" role="img" [attr.aria-label]="i18n.translate('data.chart')">
+          <defs>
+            <linearGradient id="lineFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#26d7ad" stop-opacity=".32"></stop>
+              <stop offset="100%" stop-color="#26d7ad" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <polyline class="line-visual__shadow" [attr.points]="chartPoints()"></polyline>
+          <polyline class="line-visual__stroke" [attr.points]="chartPoints()"></polyline>
+        </svg>
+      </div>
+    }
+    @case ('gauge') {
+      <div class="gauge-visual">
+        <svg viewBox="0 0 100 100" role="img" [attr.aria-label]="i18n.translate('data.gauge')">
+          <circle class="gauge-visual__track" cx="50" cy="50" r="40"></circle>
+          <circle class="gauge-visual__value" cx="50" cy="50" r="40" [attr.stroke-dasharray]="gaugeDash()"></circle>
+        </svg>
+        <span>
+          <strong>{{ formatValue(primaryEntry()?.[1] ?? null) }}</strong>
+          <small>{{ fieldLabel(primaryEntry()?.[0] || '') }}</small>
+        </span>
+      </div>
+    }
+    @case ('bars') {
+      <div class="bar-visual">
+        @for (entry of entries(); track entry[0]) {
+          <div>
+            <span class="bar-visual__track"><i [style.height.%]="barHeight(entry[1])"></i></span>
+            <strong>{{ formatValue(entry[1]) }}</strong>
+            <small>{{ fieldLabel(entry[0]) }}</small>
+          </div>
+        }
+      </div>
+    }
+    @case ('sleep') {
+      <div class="sleep-visual">
+        <div class="sleep-visual__timeline">
+          @for (sample of event.samples || []; track $index) {
+            <span [attr.data-stage]="sample"></span>
+          }
+        </div>
+        <div class="sleep-visual__legend">
+          @for (entry of entries(); track entry[0]) {
+            <span><i></i><strong>{{ formatValue(entry[1]) }}</strong> {{ fieldLabel(entry[0]) }}</span>
+          }
+        </div>
+      </div>
+    }
+    @default {
+      <div class="metric-visual">
+        @for (entry of entries(); track entry[0]) {
+          <div>
+            <strong>{{ formatValue(entry[1]) }}</strong>
+            <span>{{ fieldLabel(entry[0]) }}</span>
+          </div>
+        }
+      </div>
+    }
+  }
+  @if (!compact) {
+    <time class="data-timestamp">{{ event.timestamp | date:'medium' }}</time>
+  }
+</div>

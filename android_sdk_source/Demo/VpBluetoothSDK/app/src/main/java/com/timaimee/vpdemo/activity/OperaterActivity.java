@@ -3369,11 +3369,13 @@ public class OperaterActivity extends Activity implements AdapterView.OnItemClic
         } else if (oprater.equals(FUN_4G)) {
             startActivity(new Intent(this, Device4gOptActivity.class));
         } else if (oprater.equals(AUTO_MEASURE)) {
-            if (VpSpGetUtil.getVpSpVariInstance(mContext).isSupportAutoMeasure()) {
-                startActivity(new Intent(this, AutoMeasureActivity.class));
-            } else {
-                showToast("dispositivoConfiguração de medição automática");
+            boolean supportsAutoMeasure = VpSpGetUtil.getVpSpVariInstance(mContext).isSupportAutoMeasure();
+            DemoStepLogger.featureEvent("AUTO_MEASURE", "isSupportAutoMeasure=" + supportsAutoMeasure);
+            // Alguns firmwares não preenchem este flag, mas ainda respondem ao comando de leitura.
+            if (!supportsAutoMeasure) {
+                showToast("O dispositivo não declarou suporte para medição automática; a demo vai tentar ler a configuração.");
             }
+            startActivity(new Intent(this, AutoMeasureActivity.class));
         } else if (oprater.equals(NRF_OTA)) {
             startActivity(new Intent(this, NRFOtaActivity.class));
         } else if (oprater.equals(QIU_GUO_TCM)) {

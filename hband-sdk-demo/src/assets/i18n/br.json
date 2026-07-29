@@ -1,0 +1,365 @@
+{
+  "app": {
+    "title": "H Band SDK",
+    "subtitle": "Laboratório MF91",
+    "language": "Idioma",
+    "modelTag": "MF91 · H Band SDK",
+    "languages": {
+      "pt": "Português (Portugal)",
+      "br": "Português (Brasil)",
+      "en": "Inglês",
+      "es": "Espanhol",
+      "fr": "Francês"
+    }
+  },
+  "hero": {
+    "title": "Explore a MF91, sinal por sinal.",
+    "description": "Uma demonstração visual dos SDKs H Band para Android e iOS. Conecte a pulseira, confirme as capacidades informadas pelo firmware e teste cada fluxo de forma isolada."
+  },
+  "common": {
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "categories": {
+    "all": "Tudo",
+    "connection": "Conexão",
+    "measurements": "Medições",
+    "history": "Histórico",
+    "automation": "Automação",
+    "interaction": "Interação",
+    "advanced": "Avançado"
+  },
+  "connectionStates": {
+    "unavailable": "Indisponível",
+    "idle": "Pronto",
+    "scanning": "Procurando",
+    "connecting": "Conectando",
+    "authenticating": "Autenticando",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "error": "Erro"
+  },
+  "capabilities": {
+    "supported": "Compatível",
+    "unsupported": "Não compatível",
+    "unknown": "A confirmar",
+    "unsupportedDescription": "O dispositivo conectado informou que não oferece esta capacidade. Os comandos permanecem bloqueados para proteger o estado da pulseira.",
+    "catalogOnly": "Esta função está documentada no catálogo, mas ainda não possui um contrato nativo executável neste bridge."
+  },
+  "device": {
+    "noDevice": "Nenhum dispositivo",
+    "readyToScan": "Pronto para procurar uma pulseira",
+    "firmware": "Firmware {{version}}",
+    "unknown": "Dispositivo sem nome"
+  },
+  "catalog": {
+    "search": "Procurar uma funcionalidade",
+    "simulation": "Dados simulados",
+    "eyebrow": "Catálogo do SDK",
+    "title": "Funcionalidades por tipo de dados",
+    "featureCount": "{{count}} módulos",
+    "noResults": "Nenhum resultado",
+    "noResultsDescription": "Tente outro termo ou selecione uma categoria diferente."
+  },
+  "activity": {
+    "eyebrow": "Diagnóstico",
+    "title": "Atividade do SDK",
+    "sdkEvent": "Evento do SDK",
+    "empty": "Os comandos, respostas e erros aparecerão aqui."
+  },
+  "scan": {
+    "title": "Conectar pulseira",
+    "heading": "Dispositivos H Band próximos",
+    "description": "Mantenha a MF91 próxima e fora de outra sessão Bluetooth. Selecione-a quando aparecer na lista.",
+    "password": "Senha do dispositivo",
+    "waiting": "Aguardando dispositivos…"
+  },
+  "data": {
+    "noData": "Ainda sem dados",
+    "runAction": "Execute uma ação para preencher esta visualização.",
+    "operation": "Primeira operação nativa",
+    "chart": "Gráfico de amostras",
+    "gauge": "Indicador de valor",
+    "fields": {
+      "bpm": "Frequência cardíaca (bpm)",
+      "state": "Estado",
+      "systolic": "Sistólica (mmHg)",
+      "diastolic": "Diastólica (mmHg)",
+      "progress": "Progresso (%)",
+      "percent": "Percentual",
+      "pulseBpm": "Pulso (bpm)",
+      "breathsPerMinute": "Respirações/minuto",
+      "enabled": "Disponível",
+      "celsius": "Temperatura (°C)",
+      "surfaceCelsius": "Temperatura da pele (°C)",
+      "level": "Nível",
+      "milliseconds": "Milissegundos",
+      "value": "Valor",
+      "mmolL": "Glicose (mmol/L)",
+      "riskLevel": "Nível de risco",
+      "result": "Resultado",
+      "lead": "Contato dos eletrodos",
+      "raw": "Valor bruto",
+      "isPercent": "Escala percentual",
+      "lowBattery": "Bateria fraca",
+      "chargeState": "Estado de carga",
+      "synchronised": "Sincronizado",
+      "success": "Sucesso",
+      "steps": "Passos",
+      "distanceKm": "Distância (km)",
+      "caloriesKcal": "Calorias (kcal)",
+      "totalMinutes": "Sono total (min)",
+      "deepMinutes": "Sono profundo (min)",
+      "lightMinutes": "Sono leve (min)",
+      "awakeMinutes": "Acordado (min)",
+      "charging": "Carregando",
+      "dbm": "Sinal (dBm)",
+      "score": "Pontuação"
+    }
+  },
+  "profile": {
+    "title": "Dados pessoais para sincronização",
+    "description": "Preencha todos os valores. Nada é enviado à pulseira enquanto houver campos faltando.",
+    "height": "Altura (cm)",
+    "weight": "Peso (kg)",
+    "birthYear": "Ano de nascimento",
+    "age": "Idade",
+    "targetSteps": "Meta diária de passos",
+    "sex": "Sexo usado pelo SDK",
+    "select": "Selecionar",
+    "female": "Feminino",
+    "male": "Masculino",
+    "required": "Preencha todos os campos com valores inteiros válidos."
+  },
+  "units": {
+    "dbm": "dBm"
+  },
+  "actions": {
+    "open": "Abrir módulo",
+    "close": "Fechar",
+    "scan": "Procurar MF91",
+    "scanAgain": "Procurar novamente",
+    "changeDevice": "Trocar dispositivo",
+    "disconnect": "Desconectar",
+    "authenticate": "Autenticar",
+    "sync": "Sincronizar perfil",
+    "start": "Iniciar",
+    "stop": "Parar",
+    "read": "Ler",
+    "configure": "Configurar",
+    "history": "Ler histórico",
+    "readBattery": "Ler bateria",
+    "readSignal": "Ler sinal",
+    "syncTime": "Sincronizar hora",
+    "measureStress": "Medir estresse",
+    "miniCheckup": "Mini check-up",
+    "current": "Ler atual",
+    "readAll": "Ler tudo",
+    "rawData": "Dados brutos",
+    "manual": "Medições manuais",
+    "rrIntervals": "Intervalos RR",
+    "raiseWrist": "Levantar pulso",
+    "wearDetection": "Detecção de uso",
+    "functionSwitch": "Funções auxiliares",
+    "language": "Definir idioma",
+    "units": "Definir unidades",
+    "findDevice": "Encontrar pulseira",
+    "findPhone": "Encontrar telefone",
+    "music": "Controle de música",
+    "volume": "Volume",
+    "sos": "SOS",
+    "countdown": "Temporizador",
+    "builtIn": "Mostradores internos",
+    "custom": "Mostrador personalizado",
+    "server": "Mostradores do servidor",
+    "gps": "GPS e fuso horário",
+    "gnss": "GNSS e segurança",
+    "agps": "Transferir AGPS",
+    "firmware": "Atualizar firmware",
+    "ppg": "PPG bruto",
+    "acceleration": "Aceleração",
+    "inspect": "Inspecionar capacidades",
+    "classicBluetooth": "Bluetooth clássico",
+    "network4g": "Configuração 4G",
+    "ai": "Funções de IA",
+    "textImage": "Texto e imagem",
+    "qrCode": "Código QR",
+    "magneticTherapy": "Terapia magnética",
+    "tcm": "MTC",
+    "ptt": "PTT"
+  },
+  "features": {
+    "deviceSession": {
+      "title": "Descoberta e sessão BLE",
+      "description": "Pesquisa, conexão, reconexão, estado Bluetooth e encerramento controlado da sessão."
+    },
+    "authentication": {
+      "title": "Senha e perfil pessoal",
+      "description": "Confirma a senha, obtém capacidades e sincroniza sexo, idade, altura, peso e objetivo."
+    },
+    "deviceStatus": {
+      "title": "Bateria, sinal e hora",
+      "description": "Estado de energia, RSSI, versão do SDK e sincronização do relógio."
+    },
+    "heartRate": {
+      "title": "Frequência cardíaca",
+      "description": "Medição em tempo real, estado do sensor e evolução das amostras em bpm."
+    },
+    "bloodPressure": {
+      "title": "Pressão arterial",
+      "description": "Sistólica, diastólica, progresso e configuração do modo privado."
+    },
+    "oxygen": {
+      "title": "Oxigênio no sangue",
+      "description": "SpO₂, pulso associado e progresso da medição."
+    },
+    "breathing": {
+      "title": "Frequência respiratória",
+      "description": "Respirações por minuto e progresso do teste respiratório."
+    },
+    "temperature": {
+      "title": "Temperatura",
+      "description": "Temperatura corporal e basal, medição ao vivo e histórico automático."
+    },
+    "hrv": {
+      "title": "HRV",
+      "description": "Variabilidade da frequência cardíaca, amostras e análise temporal."
+    },
+    "ecg": {
+      "title": "ECG",
+      "description": "Traçado em tempo real, progresso, resultados salvos e ECG multiderivação."
+    },
+    "bloodGlucose": {
+      "title": "Glicose",
+      "description": "Medição, calibração privada e calibração múltipla por refeição."
+    },
+    "fatigueStress": {
+      "title": "Fadiga e estresse",
+      "description": "Pontuações, progresso e estado do dispositivo durante a avaliação."
+    },
+    "bodyComposition": {
+      "title": "Composição corporal",
+      "description": "Medição e histórico dos componentes corporais informados pelo dispositivo."
+    },
+    "bloodComposition": {
+      "title": "Composição sanguínea",
+      "description": "Componentes sanguíneos, calibração e monitoramento de novos resultados."
+    },
+    "gsrMini": {
+      "title": "GSR e mini check-up",
+      "description": "Condutância da pele e sequência agregada de medições rápidas."
+    },
+    "dailyActivity": {
+      "title": "Atividade diária",
+      "description": "Passos, distância, calorias e dados de movimento atuais ou históricos."
+    },
+    "sleep": {
+      "title": "Sono",
+      "description": "Períodos acordado, sono leve, profundo e precisão melhorada quando disponível."
+    },
+    "healthHistory": {
+      "title": "Histórico de saúde",
+      "description": "Leitura agregada e dados originais em blocos de cinco minutos."
+    },
+    "sportHistory": {
+      "title": "Sessões esportivas",
+      "description": "Início, fim, estado e histórico detalhado de modos esportivos."
+    },
+    "clinicalHistory": {
+      "title": "Históricos clínicos",
+      "description": "SpO₂, HRV, temperatura, medições manuais e intervalos RR."
+    },
+    "automaticMonitoring": {
+      "title": "Medição automática",
+      "description": "Intervalos e janelas para medições automáticas informadas pelo firmware."
+    },
+    "alarms": {
+      "title": "Alarmes",
+      "description": "Alarmes simples e avançados, adição, alteração, remoção e eventos do relógio."
+    },
+    "textAlarms": {
+      "title": "Alarmes de texto",
+      "description": "Lembretes com texto armazenados e gerenciados diretamente no dispositivo."
+    },
+    "healthReminders": {
+      "title": "Lembretes de saúde",
+      "description": "Água, medicação, atividade, lavagem das mãos e outros tipos compatíveis."
+    },
+    "wearBehaviour": {
+      "title": "Uso e comportamento",
+      "description": "Sedentarismo, detecção de uso e ativação da tela ao levantar o pulso."
+    },
+    "powerFunctions": {
+      "title": "Energia e funções auxiliares",
+      "description": "Baixo consumo e controles globais de funcionalidades de saúde."
+    },
+    "femaleHealth": {
+      "title": "Saúde feminina",
+      "description": "Ciclo, período, gravidez e estados relacionados compatíveis com o firmware."
+    },
+    "display": {
+      "title": "Tela e brilho",
+      "description": "Estilo, brilho, duração, tela sempre apagada e opções personalizadas."
+    },
+    "languageUnits": {
+      "title": "Idioma e unidades",
+      "description": "Idioma do relógio, sistema métrico ou imperial e formato de hora."
+    },
+    "find": {
+      "title": "Encontrar dispositivo",
+      "description": "Faz a pulseira tocar ou responde ao pedido de encontrar o telefone."
+    },
+    "camera": {
+      "title": "Câmera remota",
+      "description": "Abre a sessão de disparo remoto e recebe o comando do dispositivo."
+    },
+    "notificationsMusic": {
+      "title": "Notificações e música",
+      "description": "Mensagens sociais, chamadas, reprodução, pausa, volume e comandos remotos."
+    },
+    "weather": {
+      "title": "Meteorologia",
+      "description": "Estado, unidades e previsão horária ou diária enviada para o relógio."
+    },
+    "contactsSos": {
+      "title": "Contatos e SOS",
+      "description": "Lista, ordem, contato SOS e número de tentativas de chamada."
+    },
+    "clocksCountdown": {
+      "title": "Relógios e temporizador",
+      "description": "Relógio mundial, alarmes temporizados e contagem regressiva."
+    },
+    "watchFaces": {
+      "title": "Mostradores e imagens",
+      "description": "Mostradores internos, personalizados, do servidor e transferência de imagens."
+    },
+    "gps": {
+      "title": "GPS, GNSS e AGPS",
+      "description": "Localização, fuso horário, Kaaba, dados assistidos e proteção de segurança."
+    },
+    "firmware": {
+      "title": "Firmware e OTA",
+      "description": "Fluxos Nordic, Goodix, JieLi e outros, sempre dependentes de arquivo validado."
+    },
+    "rawSensors": {
+      "title": "Sensores e dados brutos",
+      "description": "PPG, aceleração, ADC, luz verde e registros de protocolo para diagnóstico."
+    },
+    "specialProjects": {
+      "title": "Projetos e hardware específicos",
+      "description": "G08W, G15, JH58, QX17, ZT163, JE136P e outras extensões do SDK."
+    },
+    "connectedServices": {
+      "title": "BT clássico, 4G e IA",
+      "description": "Áudio Bluetooth, servidor 4G e interações de voz, imagem ou mostradores com IA."
+    },
+    "contentTransfer": {
+      "title": "Transferência de conteúdo",
+      "description": "Envio de texto, imagem, códigos QR e conteúdos para o dispositivo."
+    },
+    "therapiesCustom": {
+      "title": "Terapias e protocolos especiais",
+      "description": "Terapia magnética, medicina tradicional chinesa, PTT e protocolos personalizados."
+    }
+  }
+}

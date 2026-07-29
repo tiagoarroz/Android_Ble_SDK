@@ -1,0 +1,400 @@
+<ion-header class="app-header" [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <span class="brand-lockup">
+        <span class="brand-mark"><ion-icon name="pulse-outline"></ion-icon></span>
+        <span>
+          <strong>{{ i18n.translate('app.title') }}</strong>
+          <small>{{ i18n.translate('app.subtitle') }}</small>
+        </span>
+      </span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-select
+        class="language-select"
+        interface="popover"
+        [value]="i18n.language()"
+        [attr.aria-label]="i18n.translate('app.language')"
+        (ionChange)="i18n.setLanguage($event.detail.value)"
+      >
+        <ion-select-option value="pt">{{ i18n.translate('app.languages.pt') }}</ion-select-option>
+        <ion-select-option value="br">{{ i18n.translate('app.languages.br') }}</ion-select-option>
+        <ion-select-option value="en">{{ i18n.translate('app.languages.en') }}</ion-select-option>
+        <ion-select-option value="es">{{ i18n.translate('app.languages.es') }}</ion-select-option>
+        <ion-select-option value="fr">{{ i18n.translate('app.languages.fr') }}</ion-select-option>
+      </ion-select>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <main class="demo-shell">
+    <section class="hero-panel">
+      <div class="hero-copy">
+        <ion-chip class="eyebrow-chip">
+          <ion-icon name="watch-outline"></ion-icon>
+          <ion-label>{{ i18n.translate('app.modelTag') }}</ion-label>
+        </ion-chip>
+        <h1>{{ i18n.translate('hero.title') }}</h1>
+        <p>{{ i18n.translate('hero.description') }}</p>
+        <div class="hero-actions">
+          <ion-button (click)="openScan()">
+            <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
+            {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scan') }}
+          </ion-button>
+          @if (hband.connected()) {
+            <ion-button fill="outline" color="light" (click)="hband.disconnect()">
+              {{ i18n.translate('actions.disconnect') }}
+            </ion-button>
+          }
+        </div>
+      </div>
+
+      <aside class="connection-card">
+        <div class="connection-orbit" [class.is-connected]="hband.connected()">
+          <span class="orbit-ring orbit-ring--outer"></span>
+          <span class="orbit-ring orbit-ring--inner"></span>
+          <span class="device-glyph"><ion-icon name="watch-outline"></ion-icon></span>
+        </div>
+        <div class="connection-card__body">
+          <span class="status-row">
+            <span class="status-dot" [class.is-connected]="hband.connected()"></span>
+            {{ statusLabel() }}
+          </span>
+          <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
+          <small>
+            {{ hband.status().device?.firmware
+              ? i18n.translate('device.firmware', { version: hband.status().device?.firmware || '' })
+              : i18n.translate('device.readyToScan') }}
+          </small>
+          @if (hband.status().device?.rssi; as rssi) {
+            <span class="signal-pill">
+              <ion-icon name="radio-outline"></ion-icon>
+              {{ rssi }} {{ i18n.translate('units.dbm') }}
+            </span>
+          }
+        </div>
+      </aside>
+    </section>
+
+    <section class="control-strip">
+      <ion-searchbar
+        [placeholder]="i18n.translate('catalog.search')"
+        [value]="searchTerm()"
+        (ionInput)="setSearch($event.detail.value)"
+      ></ion-searchbar>
+      <div class="simulation-control">
+        <ion-toggle
+          [checked]="hband.simulation()"
+          [disabled]="!hband.isNative"
+          (ionChange)="hband.setSimulation($event.detail.checked)"
+        >
+          {{ i18n.translate('catalog.simulation') }}
+        </ion-toggle>
+      </div>
+    </section>
+
+    <ion-segment
+      class="category-segment"
+      scrollable
+      [value]="selectedCategory()"
+      (ionChange)="setCategory($event.detail.value)"
+    >
+      @for (category of categories; track category.id) {
+        <ion-segment-button [value]="category.id">
+          <ion-label>{{ i18n.translate(category.labelKey) }}</ion-label>
+        </ion-segment-button>
+      }
+    </ion-segment>
+
+    <div class="section-heading">
+      <div>
+        <span>{{ i18n.translate('catalog.eyebrow') }}</span>
+        <h2>{{ i18n.translate('catalog.title') }}</h2>
+      </div>
+      <ion-badge color="light">
+        {{ i18n.translate('catalog.featureCount', { count: filteredFeatures().length }) }}
+      </ion-badge>
+    </div>
+
+    <section class="feature-grid">
+      @for (feature of filteredFeatures(); track feature.id) {
+        <article
+          class="feature-card"
+          [class.feature-card--unsupported]="capability(feature) === 'unsupported'"
+          tabindex="0"
+          role="button"
+          (click)="openFeature(feature)"
+          (keydown.enter)="openFeature(feature)"
+        >
+          <header>
+            <span class="feature-icon"><ion-icon [name]="feature.icon"></ion-icon></span>
+            @if (feature.capability) {
+              <span class="capability-badge" [attr.data-state]="capability(feature)">
+                <ion-icon [name]="statusIcon(feature)"></ion-icon>
+                {{ i18n.translate('capabilities.' + capability(feature)) }}
+              </span>
+            }
+          </header>
+          <h3>{{ i18n.translate(feature.titleKey) }}</h3>
+          <p>{{ i18n.translate(feature.descriptionKey) }}</p>
+          @if (hband.latestFor(feature.id); as event) {
+            <app-data-visualizer
+              [event]="event"
+              [type]="feature.visualization"
+              [compact]="true"
+            ></app-data-visualizer>
+          } @else {
+            <div class="feature-placeholder">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          }
+          <footer>
+            <span>{{ i18n.translate('actions.open') }}</span>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </footer>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <ion-icon name="search-outline"></ion-icon>
+          <h3>{{ i18n.translate('catalog.noResults') }}</h3>
+          <p>{{ i18n.translate('catalog.noResultsDescription') }}</p>
+        </div>
+      }
+    </section>
+
+    <section class="activity-panel">
+      <div class="section-heading section-heading--compact">
+        <div>
+          <span>{{ i18n.translate('activity.eyebrow') }}</span>
+          <h2>{{ i18n.translate('activity.title') }}</h2>
+        </div>
+      </div>
+      <div class="activity-log">
+        @for (entry of hband.logs(); track entry.id) {
+          <div class="activity-entry" [attr.data-level]="entry.level">
+            <span class="activity-entry__dot"></span>
+            <div>
+              <strong>{{ entry.operation || i18n.translate('activity.sdkEvent') }}</strong>
+              <p>{{ entry.message }}</p>
+            </div>
+            <time>{{ entry.timestamp | date:'HH:mm:ss' }}</time>
+          </div>
+        } @empty {
+          <div class="activity-empty">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            {{ i18n.translate('activity.empty') }}
+          </div>
+        }
+      </div>
+    </section>
+  </main>
+</ion-content>
+
+<ion-modal
+  class="scan-modal"
+  [isOpen]="scanOpen()"
+  (didDismiss)="scanOpen.set(false)"
+>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ i18n.translate('scan.title') }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="scanOpen.set(false)">{{ i18n.translate('actions.close') }}</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="modal-intro">
+        <span class="modal-icon"><ion-icon name="bluetooth-outline"></ion-icon></span>
+        <h2>{{ i18n.translate('scan.heading') }}</h2>
+        <p>{{ i18n.translate('scan.description') }}</p>
+      </div>
+      <ion-item lines="none" class="password-field">
+        <ion-input
+          type="password"
+          inputmode="numeric"
+          maxlength="4"
+          [label]="i18n.translate('scan.password')"
+          labelPlacement="stacked"
+          [value]="password()"
+          (ionInput)="password.set($event.detail.value || '0000')"
+        ></ion-input>
+      </ion-item>
+      @if (hband.status().state === 'scanning') {
+        <ion-progress-bar type="indeterminate"></ion-progress-bar>
+      }
+      <ion-list class="device-list">
+        @for (device of hband.devices(); track device.id) {
+          <ion-item button detail (click)="connect(device.id)">
+            <span class="device-list__icon" slot="start"><ion-icon name="watch-outline"></ion-icon></span>
+            <ion-label>
+              <h3>{{ device.name || i18n.translate('device.unknown') }}</h3>
+              <p>{{ device.id }}</p>
+            </ion-label>
+            <ion-note slot="end">{{ device.rssi }} {{ i18n.translate('units.dbm') }}</ion-note>
+          </ion-item>
+        } @empty {
+          <div class="scan-empty">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p>{{ i18n.translate('scan.waiting') }}</p>
+          </div>
+        }
+      </ion-list>
+      <div class="modal-actions">
+        <ion-button expand="block" fill="outline" (click)="openScan()">
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          {{ i18n.translate('actions.scanAgain') }}
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="feature-modal"
+  [isOpen]="selectedFeature() !== null"
+  (didDismiss)="closeFeature()"
+>
+  <ng-template>
+    @if (selectedFeature(); as feature) {
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ i18n.translate(feature.titleKey) }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeFeature()">{{ i18n.translate('actions.close') }}</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="feature-detail">
+          <header class="feature-detail__header">
+            <span class="feature-detail__icon"><ion-icon [name]="feature.icon"></ion-icon></span>
+            <div>
+              <ion-chip [attr.data-state]="capability(feature)">
+                <ion-icon [name]="statusIcon(feature)"></ion-icon>
+                <ion-label>{{ i18n.translate('capabilities.' + capability(feature)) }}</ion-label>
+              </ion-chip>
+              <h2>{{ i18n.translate(feature.titleKey) }}</h2>
+              <p>{{ i18n.translate(feature.descriptionKey) }}</p>
+            </div>
+          </header>
+
+          <div class="detail-visualization">
+            @if (hband.latestFor(feature.id); as event) {
+              <app-data-visualizer
+                [event]="event"
+                [type]="feature.visualization"
+              ></app-data-visualizer>
+            } @else {
+              <div class="detail-empty">
+                <ion-icon name="analytics-outline"></ion-icon>
+                <strong>{{ i18n.translate('data.noData') }}</strong>
+                <span>{{ i18n.translate('data.runAction') }}</span>
+              </div>
+            }
+          </div>
+
+          @if (capability(feature) === 'unsupported') {
+            <div class="support-warning">
+              <ion-icon name="information-circle-outline"></ion-icon>
+              <span>{{ i18n.translate('capabilities.unsupportedDescription') }}</span>
+            </div>
+          }
+
+          @if (feature.id === 'authentication') {
+            <section class="profile-form">
+              <header>
+                <strong>{{ i18n.translate('profile.title') }}</strong>
+                <span>{{ i18n.translate('profile.description') }}</span>
+              </header>
+              <div class="profile-form__grid">
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  [label]="i18n.translate('profile.height')"
+                  labelPlacement="stacked"
+                  [value]="profileHeight()"
+                  (ionInput)="profileHeight.set($event.detail.value || '')"
+                ></ion-input>
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  [label]="i18n.translate('profile.weight')"
+                  labelPlacement="stacked"
+                  [value]="profileWeight()"
+                  (ionInput)="profileWeight.set($event.detail.value || '')"
+                ></ion-input>
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  [label]="i18n.translate('profile.birthYear')"
+                  labelPlacement="stacked"
+                  [value]="profileBirthYear()"
+                  (ionInput)="profileBirthYear.set($event.detail.value || '')"
+                ></ion-input>
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  [label]="i18n.translate('profile.age')"
+                  labelPlacement="stacked"
+                  [value]="profileAge()"
+                  (ionInput)="profileAge.set($event.detail.value || '')"
+                ></ion-input>
+                <ion-input
+                  type="number"
+                  inputmode="numeric"
+                  [label]="i18n.translate('profile.targetSteps')"
+                  labelPlacement="stacked"
+                  [value]="profileTargetSteps()"
+                  (ionInput)="profileTargetSteps.set($event.detail.value || '')"
+                ></ion-input>
+                <ion-select
+                  interface="popover"
+                  [label]="i18n.translate('profile.sex')"
+                  labelPlacement="stacked"
+                  [placeholder]="i18n.translate('profile.select')"
+                  [value]="profileSex()"
+                  (ionChange)="profileSex.set($event.detail.value || '')"
+                >
+                  <ion-select-option value="female">{{ i18n.translate('profile.female') }}</ion-select-option>
+                  <ion-select-option value="male">{{ i18n.translate('profile.male') }}</ion-select-option>
+                </ion-select>
+              </div>
+              @if (profileError()) {
+                <ion-note color="danger">{{ i18n.translate('profile.required') }}</ion-note>
+              }
+            </section>
+          }
+
+          <div class="feature-actions">
+            @for (action of feature.actions; track action.id) {
+              <ion-button
+                [fill]="action.tone === 'secondary' ? 'outline' : 'solid'"
+                [color]="action.tone === 'danger' ? 'danger' : 'primary'"
+                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                (click)="run(action.operation)"
+              >
+                @if (hband.busyOperation() === action.operation) {
+                  <ion-spinner slot="start" name="crescent"></ion-spinner>
+                }
+                {{ i18n.translate(action.labelKey) }}
+              </ion-button>
+            }
+          </div>
+          @if (!hband.simulation() && !hband.operationAvailable(feature.actions[0].operation)) {
+            <ion-note class="bridge-note">
+              {{ i18n.translate('capabilities.catalogOnly') }}
+            </ion-note>
+          }
+
+          <div class="technical-note">
+            <span>{{ i18n.translate('data.operation') }}</span>
+            <code>{{ feature.actions[0].operation }}</code>
+          </div>
+        </div>
+      </ion-content>
+    }
+  </ng-template>
+</ion-modal>

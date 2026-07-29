@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.timaimee.vpdemo.R;
 import com.timaimee.vpdemo.adapter.AutoMeasureAdapter;
+import com.timaimee.vpdemo.demo.DemoStepLogger;
 import com.veepoo.protocol.VPOperateManager;
 import com.veepoo.protocol.listener.base.IBleWriteResponse;
 import com.veepoo.protocol.listener.data.IAutoMeasureSettingDataListener;
@@ -73,16 +74,22 @@ public class AutoMeasureActivity extends AppCompatActivity implements IAutoMeasu
         data.clear();
         data.addAll(autoMeasureDataList);
         adapter.notifyDataSetChanged();
+        DemoStepLogger.featureEvent("AUTO_MEASURE_READ", "itens=" + autoMeasureDataList.size());
+        if (autoMeasureDataList.isEmpty()) {
+            showMsg("O dispositivo não devolveu medições automáticas configuráveis.");
+        }
     }
 
     @Override
     public void onSettingDataChangeFail() {
-        showMsg("Configurar");
+        DemoStepLogger.stepError("AUTO_MEASURE_READ", "Falha ao ler configuração de medição automática");
+        showMsg("Falha ao ler a configuração de medição automática.");
     }
 
     @Override
     public void onSettingDataChangeSuccess() {
-        showMsg("Configurar");
+        DemoStepLogger.stepSuccess("AUTO_MEASURE_WRITE", "Configuração de medição automática guardada");
+        showMsg("Configuração de medição automática guardada.");
         adapter.notifyDataSetChanged();
     }
 
