@@ -16,6 +16,7 @@ const INITIAL_STATUS: HBandStatus = {
 };
 
 const DEVICE_SESSION_KEY = 'hband-device-session';
+const BATTERY_REFRESH_INTERVAL_MS = 60_000;
 
 interface RememberedDeviceSession {
   deviceId: string;
@@ -58,6 +59,8 @@ export class HBandService {
   private logSequence = 0;
   private readonly operationMetrics = new Map<string, MetricId>();
   private syncPromise: Promise<void> | null = null;
+  private pendingSyncDate: string | null = null;
+  private batteryRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
   /**
    * Liga os eventos uma única vez e recupera o estado da bridge nativa.
@@ -110,6 +113,7 @@ export class HBandService {
   }
 
   async disconnect(): Promise<void> {
+    this.stopBatteryUpdates();
     if (this.simulation()) {
       this.status.update((status) => ({ ...status, state: 'disconnected', device: undefined }));
       this.activeMeasurements.set({});
@@ -129,12 +133,29 @@ export class HBandService {
   /**
    * Replica a sequência observada na aplicação de referência: bateria, hora,
    * atividade atual e dados do dia. No Android, uma única leitura de origem
-   * distribui as métricas; todas as operações usam a mesma fila.
+   * distribui as métricas; todas as operações usam a mesma fila. Se a data
+   * mudar durante uma sincronização, conserva apenas o pedido mais recente.
    */
   synchroniseDate(date: string): Promise<void> {
+    this.pendingSyncDate = date;
     if (this.syncPromise) {
       return this.syncPromise;
     }
+    this.syncPromise = this.runPendingSynchronisations().finally(() => {
+      this.syncPromise = null;
+    });
+    return this.syncPromise;
+  }
+
+  private async runPendingSynchronisations(): Promise<void> {
+    while (this.pendingSyncDate) {
+      const date = this.pendingSyncDate;
+      this.pendingSyncDate = null;
+      await this.synchroniseRequestedDate(date);
+    }
+  }
+
+  private async synchroniseRequestedDate(date: string): Promise<void> {
     const catalogMetrics: MetricId[] = [
       'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
       'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
@@ -154,31 +175,27 @@ export class HBandService {
         }))),
     ];
 
-    this.syncPromise = (async () => {
-      let completed = 0;
-      let failed = 0;
-      this.syncStatus.set({
-        state: 'syncing', date, completed, total: operations.length, failed,
-      });
-      for (const item of operations) {
-        this.syncStatus.update((status) => ({ ...status, current: item.operation }));
-        try {
-          await this.execute(item.operation, item.params ?? {});
-        } catch {
-          failed += 1;
-        }
-        completed += 1;
-        this.syncStatus.update((status) => ({ ...status, completed, failed }));
-      }
-      this.syncStatus.update((status) => ({
-        ...status,
-        state: failed > 0 ? 'partial' : 'complete',
-        current: undefined,
-      }));
-    })().finally(() => {
-      this.syncPromise = null;
+    let completed = 0;
+    let failed = 0;
+    this.history.set({});
+    this.syncStatus.set({
+      state: 'syncing', date, completed, total: operations.length, failed,
     });
-    return this.syncPromise;
+    for (const item of operations) {
+      this.syncStatus.update((status) => ({ ...status, current: item.operation }));
+      try {
+        await this.execute(item.operation, item.params ?? {});
+      } catch {
+        failed += 1;
+      }
+      completed += 1;
+      this.syncStatus.update((status) => ({ ...status, completed, failed }));
+    }
+    this.syncStatus.update((status) => ({
+      ...status,
+      state: failed > 0 ? 'partial' : 'complete',
+      current: undefined,
+    }));
   }
 
   /**
@@ -299,12 +316,43 @@ export class HBandService {
     const wasConnected = this.status().state === 'connected';
     this.status.set(status);
     if (!wasConnected && status.state === 'connected') {
+      this.startBatteryUpdates();
       void this.synchroniseDate(this.localDate(new Date()));
     }
     if (status.state === 'disconnected' || status.state === 'unavailable') {
+      this.stopBatteryUpdates();
       this.activeMeasurements.set({});
       this.battery.set(null);
     }
+  }
+
+  /**
+   * Atualiza a bateria em segundo plano sem introduzir comandos BLE durante
+   * uma medição ou sincronização já em curso.
+   */
+  private startBatteryUpdates(): void {
+    if (this.batteryRefreshTimer !== null) {
+      return;
+    }
+    this.batteryRefreshTimer = setInterval(() => {
+      const measurementRunning = Object.values(this.activeMeasurements()).some(Boolean);
+      if (
+        this.connected()
+        && !measurementRunning
+        && this.busyOperation() === null
+        && this.syncStatus().state !== 'syncing'
+      ) {
+        void this.refreshBattery().catch(() => undefined);
+      }
+    }, BATTERY_REFRESH_INTERVAL_MS);
+  }
+
+  private stopBatteryUpdates(): void {
+    if (this.batteryRefreshTimer === null) {
+      return;
+    }
+    clearInterval(this.batteryRefreshTimer);
+    this.batteryRefreshTimer = null;
   }
 
   private metricSupported(metric: MetricId): boolean {

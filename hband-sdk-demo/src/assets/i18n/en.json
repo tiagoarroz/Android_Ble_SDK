@@ -12,10 +12,6 @@
       "fr": "French"
     }
   },
-  "hero": {
-    "title": "Nine metrics, one day at a time.",
-    "description": "Connect the MF91, confirm its firmware capabilities, and view live measurements or history for a specific date."
-  },
   "common": {
     "yes": "Yes",
     "no": "No"
@@ -52,15 +48,13 @@
     "firmware": "Firmware {{version}}",
     "unknown": "Unnamed device",
     "battery": "Battery",
-    "lowBattery": "Low battery",
-    "refreshBattery": "Refresh battery"
+    "lowBattery": "Low battery"
   },
   "catalog": {
     "search": "Search for a feature",
     "simulation": "Simulated data",
     "eyebrow": "SDK catalogue",
     "title": "Features by data type",
-    "featureCount": "{{count}} modules",
     "noResults": "No results",
     "noResultsDescription": "Try another term or select a different category."
   },
@@ -185,9 +179,9 @@
   },
   "history": {
     "title": "History by date",
-    "description": "Choose the day used by each metric's history button.",
+    "description": "Choose a day to fetch its data automatically.",
     "date": "Date",
-    "noData": "Read history for this date."
+    "noData": "No data was received for this date."
   },
   "sync": {
     "action": "Sync day",
@@ -212,9 +206,8 @@
     "dbm": "dBm"
   },
   "actions": {
-    "open": "Open module",
     "close": "Close",
-    "scan": "Scan for MF91",
+    "scanBand": "Scan for bracelet",
     "scanAgain": "Scan again",
     "changeDevice": "Change device",
     "disconnect": "Disconnect",
@@ -224,7 +217,6 @@
     "stop": "Stop",
     "read": "Read",
     "configure": "Configure",
-    "history": "Read history",
     "readBattery": "Read battery",
     "readSignal": "Read signal",
     "syncTime": "Sync time",

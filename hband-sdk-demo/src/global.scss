@@ -192,25 +192,6 @@ ion-content {
   text-transform: uppercase;
 }
 
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 30px;
-
-  ion-button {
-    --border-radius: 13px;
-    --box-shadow: none;
-    font-weight: 750;
-    min-height: 48px;
-  }
-
-  ion-button:first-child {
-    --background: var(--app-mint);
-    --color: var(--app-night);
-  }
-}
-
 .connection-card {
   align-items: center;
   align-self: stretch;
@@ -285,6 +266,26 @@ ion-content {
   small {
     color: #91a8b5;
     line-height: 1.4;
+  }
+}
+
+.connection-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-button {
+    --border-radius: 12px;
+    --box-shadow: none;
+    font-weight: 750;
+    margin: 0;
+    min-height: 42px;
+  }
+
+  ion-button:first-child {
+    --background: var(--app-mint);
+    --color: var(--app-night);
   }
 }
 
@@ -369,13 +370,6 @@ ion-content {
     color: #ffafb7;
     font-weight: 700;
   }
-}
-
-.battery-refresh {
-  --color: #a9bdc7;
-  font-size: 10px;
-  margin: 0;
-  min-height: 30px;
 }
 
 .control-strip {
@@ -510,20 +504,6 @@ ion-content {
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
-  }
-
-  > footer {
-    align-items: center;
-    border-top: 1px solid #edf1ef;
-    color: #52616c;
-    display: flex;
-    font-size: 11px;
-    font-weight: 800;
-    justify-content: space-between;
-    letter-spacing: 0.04em;
-    margin-top: auto;
-    padding-top: 14px;
-    text-transform: uppercase;
   }
 
   &--unsupported {
@@ -1387,7 +1367,26 @@ ion-content {
 
 /* Superfícies específicas do catálogo clínico reduzido. */
 .hero-panel--focused {
-  min-height: 310px;
+  gap: 18px;
+  grid-template-columns: 1fr;
+  min-height: 0;
+  padding: 28px;
+
+  .hero-copy {
+    align-self: start;
+    max-width: none;
+  }
+
+  .connection-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: start;
+    min-height: 230px;
+    text-align: left;
+  }
+
+  .connection-card__body {
+    justify-items: start;
+  }
 }
 
 .history-date-panel {
@@ -1442,14 +1441,10 @@ ion-content {
 }
 
 .history-sync-control {
-  align-items: flex-end !important;
+  align-items: stretch !important;
   display: grid !important;
   gap: 6px !important;
   min-width: 170px;
-
-  ion-button {
-    margin: 0;
-  }
 
   > span {
     color: var(--app-ink-soft);
@@ -2236,6 +2231,24 @@ ion-content {
 }
 
 @media (max-width: 560px) {
+  .hero-panel--focused {
+    padding: 22px;
+
+    .connection-card {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .connection-card__body {
+      justify-items: center;
+    }
+
+    .connection-card__actions {
+      justify-content: center;
+    }
+  }
+
   .history-date-panel {
     align-items: stretch;
     flex-direction: column;

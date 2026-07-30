@@ -9,10 +9,10 @@ import {
 import { addIcons } from 'ionicons';
 import {
   analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
-  chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
+  closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
-  waterOutline, syncOutline,
+  waterOutline,
 } from 'ionicons/icons';
 
 import { DataVisualizerComponent } from '../components/data-visualizer/data-visualizer.component';
@@ -46,10 +46,10 @@ export class HomePage implements OnInit {
   constructor() {
     addIcons({
       analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
-      chevronForwardOutline, closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
+      closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
-      waterOutline, syncOutline,
+      waterOutline,
     });
   }
 
@@ -67,26 +67,18 @@ export class HomePage implements OnInit {
     this.scanOpen.set(false);
   }
 
-  async synchroniseSelectedDate(): Promise<void> {
-    await this.hband.synchroniseDate(this.selectedDate());
-  }
-
   syncPercent(): number {
     const sync = this.hband.syncStatus();
     return sync.total > 0 ? Math.round((sync.completed / sync.total) * 100) : 0;
   }
 
   /**
-   * Alterna as medições com um único controlo e acrescenta a data apenas à
-   * operação histórica, sem alterar os contratos confirmados da bridge.
+   * Alterna as medições com um único controlo ou executa uma leitura pontual,
+   * sem alterar os contratos confirmados da bridge.
    */
   async run(action: FeatureAction, feature: FeatureDefinition): Promise<void> {
     if (action.stopOperation) {
       await this.hband.toggleMeasurement(feature.metric, action.operation, action.stopOperation);
-      return;
-    }
-    if (action.operation === 'history.metric') {
-      await this.hband.readHistory(action.metric ?? feature.metric, this.selectedDate());
       return;
     }
     await this.hband.execute(action.operation);
@@ -138,8 +130,19 @@ export class HomePage implements OnInit {
     return this.i18n.translate('measurementLogs.bridge');
   }
 
-  setDate(value: string | number | null | undefined): void {
-    this.selectedDate.set(String(value ?? this.today).slice(0, 10));
+  /**
+   * Atualiza a data apresentada e pede imediatamente os dados desse dia
+   * quando existe uma pulseira ligada.
+   */
+  async setDate(value: string | number | null | undefined): Promise<void> {
+    const date = String(value ?? '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date === this.selectedDate()) {
+      return;
+    }
+    this.selectedDate.set(date);
+    if (this.hband.connected()) {
+      await this.hband.synchroniseDate(date);
+    }
   }
 
   measurementProgress(event: HBandDataEvent | undefined): number {

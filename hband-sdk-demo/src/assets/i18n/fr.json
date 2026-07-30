@@ -12,10 +12,6 @@
       "fr": "Français"
     }
   },
-  "hero": {
-    "title": "Neuf mesures, un jour à la fois.",
-    "description": "Connectez le MF91, confirmez les capacités du micrologiciel et consultez les mesures actuelles ou l'historique d'une date précise."
-  },
   "common": {
     "yes": "Oui",
     "no": "Non"
@@ -52,15 +48,13 @@
     "firmware": "Micrologiciel {{version}}",
     "unknown": "Appareil sans nom",
     "battery": "Batterie",
-    "lowBattery": "Batterie faible",
-    "refreshBattery": "Actualiser la batterie"
+    "lowBattery": "Batterie faible"
   },
   "catalog": {
     "search": "Rechercher une fonctionnalité",
     "simulation": "Données simulées",
     "eyebrow": "Catalogue du SDK",
     "title": "Fonctionnalités par type de données",
-    "featureCount": "{{count}} modules",
     "noResults": "Aucun résultat",
     "noResultsDescription": "Essayez un autre terme ou sélectionnez une autre catégorie."
   },
@@ -185,9 +179,9 @@
   },
   "history": {
     "title": "Historique par date",
-    "description": "Choisissez le jour utilisé par le bouton d'historique de chaque mesure.",
+    "description": "Choisissez un jour pour récupérer automatiquement ses données.",
     "date": "Date",
-    "noData": "Lisez l'historique pour cette date."
+    "noData": "Aucune donnée n'a été reçue pour cette date."
   },
   "sync": {
     "action": "Synchroniser le jour",
@@ -212,9 +206,8 @@
     "dbm": "dBm"
   },
   "actions": {
-    "open": "Ouvrir le module",
     "close": "Fermer",
-    "scan": "Rechercher le MF91",
+    "scanBand": "Rechercher un bracelet",
     "scanAgain": "Rechercher à nouveau",
     "changeDevice": "Changer d'appareil",
     "disconnect": "Déconnecter",
@@ -224,7 +217,6 @@
     "stop": "Arrêter",
     "read": "Lire",
     "configure": "Configurer",
-    "history": "Lire l'historique",
     "readBattery": "Lire la batterie",
     "readSignal": "Lire le signal",
     "syncTime": "Synchroniser l'heure",

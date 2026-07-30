@@ -35,19 +35,6 @@
           <ion-icon name="watch-outline"></ion-icon>
           <ion-label>{{ i18n.translate('app.modelTag') }}</ion-label>
         </ion-chip>
-        <h1>{{ i18n.translate('hero.title') }}</h1>
-        <p>{{ i18n.translate('hero.description') }}</p>
-        <div class="hero-actions">
-          <ion-button (click)="openScan()">
-            <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
-            {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scan') }}
-          </ion-button>
-          @if (hband.connected()) {
-            <ion-button fill="outline" color="light" (click)="hband.disconnect()">
-              {{ i18n.translate('actions.disconnect') }}
-            </ion-button>
-          }
-        </div>
       </div>
 
       <aside class="connection-card">
@@ -92,17 +79,18 @@
                 }
               </div>
             }
-            <ion-button
-              class="battery-refresh"
-              fill="clear"
-              size="small"
-              [disabled]="hband.busyOperation() !== null"
-              (click)="hband.refreshBattery()"
-            >
-              <ion-icon slot="start" name="refresh-outline"></ion-icon>
-              {{ i18n.translate('device.refreshBattery') }}
-            </ion-button>
           }
+          <div class="connection-card__actions">
+            <ion-button (click)="openScan()">
+              <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
+              {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scanBand') }}
+            </ion-button>
+            @if (hband.connected()) {
+              <ion-button fill="outline" color="light" (click)="hband.disconnect()">
+                {{ i18n.translate('actions.disconnect') }}
+              </ion-button>
+            }
+          </div>
         </div>
       </aside>
     </section>
@@ -122,26 +110,11 @@
         labelPlacement="stacked"
         [max]="today"
         [value]="selectedDate()"
-        (ionInput)="setDate($event.detail.value)"
+        [disabled]="!hband.connected()"
+        (ionChange)="setDate($event.detail.value)"
       ></ion-input>
-      <div class="history-sync-control">
-        <ion-button
-          fill="outline"
-          [disabled]="!hband.connected() || hband.syncStatus().state === 'syncing'"
-          (click)="synchroniseSelectedDate()"
-        >
-          @if (hband.syncStatus().state === 'syncing') {
-            <ion-spinner slot="start" name="crescent"></ion-spinner>
-          } @else {
-            <ion-icon slot="start" name="sync-outline"></ion-icon>
-          }
-          {{ i18n.translate(
-            hband.syncStatus().state === 'syncing'
-              ? 'sync.inProgress'
-              : 'sync.action'
-          ) }}
-        </ion-button>
-        @if (hband.syncStatus().state !== 'idle') {
+      @if (hband.syncStatus().state !== 'idle') {
+        <div class="history-sync-control">
           <span>
             {{ i18n.translate('sync.progress', {
               completed: hband.syncStatus().completed,
@@ -149,8 +122,8 @@
             }) }}
           </span>
           <ion-progress-bar [value]="syncPercent() / 100"></ion-progress-bar>
-        }
-      </div>
+        </div>
+      }
     </section>
 
     <div class="section-heading">
@@ -158,9 +131,6 @@
         <span>{{ i18n.translate('catalog.eyebrow') }}</span>
         <h2>{{ i18n.translate('catalog.title') }}</h2>
       </div>
-      <ion-badge color="light">
-        {{ i18n.translate('catalog.featureCount', { count: features.length }) }}
-      </ion-badge>
     </div>
 
     <section class="feature-grid">
@@ -175,10 +145,12 @@
         >
           <header>
             <span class="feature-icon"><ion-icon [name]="feature.icon"></ion-icon></span>
-            <span class="capability-badge" [attr.data-state]="capability(feature)">
-              <ion-icon [name]="statusIcon(feature)"></ion-icon>
-              {{ i18n.translate('capabilities.' + capability(feature)) }}
-            </span>
+            @if (capability(feature) !== 'unknown') {
+              <span class="capability-badge" [attr.data-state]="capability(feature)">
+                <ion-icon [name]="statusIcon(feature)"></ion-icon>
+                {{ i18n.translate('capabilities.' + capability(feature)) }}
+              </span>
+            }
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
           <p>{{ i18n.translate(feature.descriptionKey) }}</p>
@@ -187,10 +159,6 @@
           } @else {
             <div class="feature-placeholder"><span></span><span></span><span></span><span></span><span></span></div>
           }
-          <footer>
-            <span>{{ i18n.translate('actions.open') }}</span>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </footer>
         </article>
       }
     </section>
@@ -262,10 +230,12 @@
           <header class="feature-detail__header">
             <span class="feature-detail__icon"><ion-icon [name]="feature.icon"></ion-icon></span>
             <div>
-              <ion-chip [attr.data-state]="capability(feature)">
-                <ion-icon [name]="statusIcon(feature)"></ion-icon>
-                <ion-label>{{ i18n.translate('capabilities.' + capability(feature)) }}</ion-label>
-              </ion-chip>
+              @if (capability(feature) !== 'unknown') {
+                <ion-chip [attr.data-state]="capability(feature)">
+                  <ion-icon [name]="statusIcon(feature)"></ion-icon>
+                  <ion-label>{{ i18n.translate('capabilities.' + capability(feature)) }}</ion-label>
+                </ion-chip>
+              }
               <h2>{{ i18n.translate(feature.titleKey) }}</h2>
               <p>{{ i18n.translate(feature.descriptionKey) }}</p>
             </div>
