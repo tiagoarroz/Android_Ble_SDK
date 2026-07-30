@@ -1,10 +1,11 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 
 import { HBand } from './hband.plugin';
+import { HistoryRepositoryService } from './history-repository.service';
 import type {
   HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
-  HBandStatus, HBandSyncStatus, MetricId,
+  HBandHistoryState, HBandStatus, HBandSyncStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -16,7 +17,12 @@ const INITIAL_STATUS: HBandStatus = {
 };
 
 const DEVICE_SESSION_KEY = 'hband-device-session';
+const HISTORY_DEVICE_KEY = 'hband-history-device';
 const BATTERY_REFRESH_INTERVAL_MS = 60_000;
+const CATALOG_METRICS: MetricId[] = [
+  'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
+  'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
+];
 
 interface RememberedDeviceSession {
   deviceId: string;
@@ -35,11 +41,14 @@ const METRIC_OPERATIONS = new Set([
   'history.activity.current',
   'history.metric',
   'history.daily',
+  'history.manual.daily',
+  'history.cached',
   'device.battery',
 ]);
 
 @Injectable({ providedIn: 'root' })
 export class HBandService {
+  private readonly historyRepository = inject(HistoryRepositoryService);
   readonly isNative = Capacitor.isNativePlatform();
   readonly status = signal<HBandStatus>(INITIAL_STATUS);
   readonly battery = signal<HBandBatteryStatus | null>(null);
@@ -47,6 +56,12 @@ export class HBandService {
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
+  readonly historyState = signal<HBandHistoryState>({
+    date: this.localDate(new Date()),
+    phase: 'idle',
+    source: 'none',
+    recordCount: 0,
+  });
   readonly syncStatus = signal<HBandSyncStatus>({
     state: 'idle', completed: 0, total: 0, failed: 0,
   });
@@ -60,6 +75,10 @@ export class HBandService {
   private readonly operationMetrics = new Map<string, MetricId>();
   private syncPromise: Promise<void> | null = null;
   private pendingSyncDate: string | null = null;
+  private backgroundSyncPromise: Promise<void> | null = null;
+  private backgroundSyncRequested = false;
+  private selectedHistoryDate = this.localDate(new Date());
+  private historyDeviceId = this.rememberedDeviceId();
   private batteryRefreshTimer: ReturnType<typeof setInterval> | null = null;
 
   /**
@@ -104,6 +123,8 @@ export class HBandService {
   }
 
   async connect(deviceId: string, password = '0000'): Promise<void> {
+    this.historyDeviceId = deviceId;
+    this.rememberHistoryDevice(deviceId);
     if (this.simulation()) {
       this.simulateConnection(deviceId);
       return;
@@ -131,12 +152,17 @@ export class HBandService {
   }
 
   /**
-   * Replica a sequência observada na aplicação de referência: bateria, hora,
-   * atividade atual e dados do dia. No Android, uma única leitura de origem
-   * distribui as métricas; todas as operações usam a mesma fila. Se a data
-   * mudar durante uma sincronização, conserva apenas o pedido mais recente.
+   * Apresenta imediatamente o arquivo local e tenta depois atualizá-lo a partir
+   * do SDK. O pedido funciona também sem ligação, permitindo consultar dias que
+   * já tenham sido guardados anteriormente neste telemóvel.
    */
-  synchroniseDate(date: string): Promise<void> {
+  async synchroniseDate(date: string): Promise<void> {
+    this.selectedHistoryDate = date;
+    await this.loadStoredDate(date);
+    if (!this.connected()) {
+      this.setHistoryPhase('offline');
+      return;
+    }
     this.pendingSyncDate = date;
     if (this.syncPromise) {
       return this.syncPromise;
@@ -155,47 +181,91 @@ export class HBandService {
     }
   }
 
-  private async synchroniseRequestedDate(date: string): Promise<void> {
-    const catalogMetrics: MetricId[] = [
-      'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
-      'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
-    ];
-    const metrics = catalogMetrics.filter((metric) => this.metricSupported(metric));
-    const android = this.status().platform === 'android';
+  /**
+   * Atualiza o dia pedido com uma única leitura diária nativa. No iOS, dias
+   * fora da retenção da pulseira consultam apenas a base local do próprio SDK.
+   */
+  private async synchroniseRequestedDate(
+    date: string,
+    includeSessionOperations = true,
+    reportProgress = true,
+    forceCachedIOSRead = false,
+  ): Promise<void> {
+    const daysAgo = this.daysBetween(date, this.localDate(new Date()));
+    const retentionDays = this.historyRetentionDays();
+    const outsideRetention = daysAgo < 0 || daysAgo > retentionDays;
+    const cachedIOSRead = this.status().platform === 'ios'
+      && (outsideRetention || forceCachedIOSRead);
+    if (outsideRetention && !cachedIOSRead) {
+      if (date === this.selectedHistoryDate) {
+        this.setHistoryPhase('outsideRetention');
+      }
+      return;
+    }
+    const historyOperations: Array<{ operation: string; params: Record<string, unknown> }> =
+      this.status().platform === 'android'
+        ? [
+          { operation: 'history.daily', params: { date } },
+          { operation: 'history.manual.daily', params: { date } },
+          ...(['ecg', 'bodyComposition'] as MetricId[])
+            .filter((metric) => this.metricSupported(metric))
+            .map((metric) => ({
+              operation: 'history.metric',
+              params: { metric, date },
+            })),
+        ]
+        : [{
+          operation: cachedIOSRead ? 'history.cached' : 'history.daily',
+          params: { date },
+        }];
     const operations: Array<{ operation: string; params?: Record<string, unknown> }> = [
-      { operation: 'device.battery' },
-      { operation: 'device.time' },
-      { operation: 'history.activity.current' },
-      ...(android
-        ? [{ operation: 'history.daily', params: { date } }]
-        : metrics
-        .map((metric) => ({
-          operation: 'history.metric',
-          params: { metric, date },
-        }))),
+      ...(includeSessionOperations
+        ? [
+          { operation: 'device.battery' },
+          { operation: 'device.time' },
+          { operation: 'history.activity.current' },
+        ]
+        : []),
+      ...historyOperations,
     ];
 
     let completed = 0;
     let failed = 0;
-    this.history.set({});
-    this.syncStatus.set({
-      state: 'syncing', date, completed, total: operations.length, failed,
-    });
+    if (reportProgress) {
+      this.setHistoryPhase('syncing');
+      this.syncStatus.set({
+        state: 'syncing', date, completed, total: operations.length, failed,
+      });
+    }
     for (const item of operations) {
-      this.syncStatus.update((status) => ({ ...status, current: item.operation }));
+      if (reportProgress) {
+        this.syncStatus.update((status) => ({ ...status, current: item.operation }));
+      }
       try {
         await this.execute(item.operation, item.params ?? {});
       } catch {
         failed += 1;
       }
       completed += 1;
-      this.syncStatus.update((status) => ({ ...status, completed, failed }));
+      if (reportProgress) {
+        this.syncStatus.update((status) => ({ ...status, completed, failed }));
+      }
     }
-    this.syncStatus.update((status) => ({
-      ...status,
-      state: failed > 0 ? 'partial' : 'complete',
-      current: undefined,
-    }));
+    if (date === this.selectedHistoryDate) {
+      await this.loadStoredDate(date, true);
+    }
+    if (reportProgress) {
+      this.syncStatus.update((status) => ({
+        ...status,
+        state: failed > 0 ? 'partial' : 'complete',
+        current: undefined,
+      }));
+      this.setHistoryPhase(
+        failed > 0
+          ? 'error'
+          : this.historyState().recordCount > 0 ? 'ready' : 'empty',
+      );
+    }
   }
 
   /**
@@ -313,11 +383,19 @@ export class HBandService {
   }
 
   private storeStatus(status: HBandStatus): void {
-    const wasConnected = this.status().state === 'connected';
+    const previous = this.status();
+    const wasConnected = previous.state === 'connected';
+    const previousDeviceId = this.historyDeviceId;
+    if (status.device?.id) {
+      this.historyDeviceId = status.device.id;
+      this.rememberHistoryDevice(status.device.id);
+    }
     this.status.set(status);
-    if (!wasConnected && status.state === 'connected') {
+    const retentionChanged = previous.historyRetentionDays !== status.historyRetentionDays;
+    const deviceChanged = previousDeviceId !== this.historyDeviceId;
+    if (status.state === 'connected' && (!wasConnected || retentionChanged || deviceChanged)) {
       this.startBatteryUpdates();
-      void this.synchroniseDate(this.localDate(new Date()));
+      void this.synchroniseRetainedHistory();
     }
     if (status.state === 'disconnected' || status.state === 'unavailable') {
       this.stopBatteryUpdates();
@@ -365,6 +443,118 @@ export class HBandService {
     return new Date(date.getTime() - offset).toISOString().slice(0, 10);
   }
 
+  /**
+   * Preenche automaticamente todos os dias que a pulseira ainda consegue
+   * fornecer. No iOS, a primeira leitura atualiza a base Veepoo e os restantes
+   * dias são consultados nessa base, evitando repetir downloads BLE completos.
+   */
+  private synchroniseRetainedHistory(): Promise<void> {
+    if (this.backgroundSyncPromise) {
+      this.backgroundSyncRequested = true;
+      return this.backgroundSyncPromise;
+    }
+    this.backgroundSyncRequested = false;
+    this.backgroundSyncPromise = (async () => {
+      const today = this.localDate(new Date());
+      const retentionDays = this.historyRetentionDays();
+      for (let offset = 0; offset <= retentionDays; offset += 1) {
+        if (!this.connected()) {
+          break;
+        }
+        const date = this.dateWithOffset(today, -offset);
+        await this.synchroniseRequestedDate(
+          date,
+          offset === 0,
+          date === this.selectedHistoryDate,
+          this.status().platform === 'ios' && offset > 0,
+        );
+      }
+      if (this.selectedHistoryDate) {
+        await this.loadStoredDate(this.selectedHistoryDate, true);
+      }
+    })()
+      .catch((error) => this.fail('history.backgroundSync', error))
+      .finally(() => {
+        this.backgroundSyncPromise = null;
+        if (this.backgroundSyncRequested && this.connected()) {
+          void this.synchroniseRetainedHistory();
+        }
+      });
+    return this.backgroundSyncPromise;
+  }
+
+  /**
+   * Carrega apenas o arquivo associado à pulseira atual. A mudança de data ou
+   * uma ligação inexistente nunca reutilizam dados de outra MF91.
+   */
+  private async loadStoredDate(date: string, preserveSource = false): Promise<void> {
+    const deviceId = this.historyDeviceId;
+    this.historyState.update((state) => ({
+      ...state,
+      date,
+      phase: 'loading',
+      retentionDays: this.historyRetentionDays(),
+    }));
+    if (!deviceId) {
+      if (date === this.selectedHistoryDate) {
+        this.history.set({});
+        this.historyState.set({
+          date,
+          phase: 'empty',
+          source: 'none',
+          recordCount: 0,
+          retentionDays: this.historyRetentionDays(),
+        });
+      }
+      return;
+    }
+    const snapshot = await this.historyRepository.loadDate(deviceId, date);
+    if (date !== this.selectedHistoryDate) {
+      return;
+    }
+    const current = this.historyState();
+    this.history.set(snapshot.events);
+    this.historyState.set({
+      date,
+      phase: snapshot.recordCount > 0 ? 'ready' : 'empty',
+      source: preserveSource && current.source !== 'none'
+        ? current.source
+        : snapshot.recordCount > 0 ? 'local' : 'none',
+      recordCount: snapshot.recordCount,
+      lastUpdatedAt: snapshot.updatedAt,
+      retentionDays: this.historyRetentionDays(),
+    });
+  }
+
+  private setHistoryPhase(phase: HBandHistoryState['phase']): void {
+    this.historyState.update((state) => ({
+      ...state,
+      phase,
+      retentionDays: this.historyRetentionDays(),
+    }));
+  }
+
+  private historyRetentionDays(): number {
+    const value = this.status().historyRetentionDays;
+    return typeof value === 'number' && Number.isFinite(value)
+      ? Math.max(0, Math.floor(value))
+      : 0;
+  }
+
+  private daysBetween(from: string, to: string): number {
+    const start = Date.parse(`${from}T00:00:00Z`);
+    const end = Date.parse(`${to}T00:00:00Z`);
+    return Number.isFinite(start) && Number.isFinite(end)
+      ? Math.round((end - start) / 86_400_000)
+      : Number.POSITIVE_INFINITY;
+  }
+
+  private dateWithOffset(date: string, offset: number): string {
+    const value = new Date(`${date}T12:00:00Z`);
+    value.setUTCDate(value.getUTCDate() + offset);
+    return value.toISOString().slice(0, 10);
+  }
+
   private upsertDevice(device: HBandDevice): void {
     this.devices.update((devices) => {
       const next = devices.filter((item) => item.id !== device.id);
@@ -402,23 +592,38 @@ export class HBandService {
       data: event,
     });
     if (event.type === 'history') {
-      this.history.update((history) => {
-        const previous = history[metric];
-        if (!previous || previous.date !== event.date) {
-          return { ...history, [metric]: event };
-        }
-        const records = this.mergeHistoryRecords(previous.records ?? [], event.records ?? []);
-        return {
+      if (!event.date || !event.records?.length) {
+        return;
+      }
+      if (event.date === this.selectedHistoryDate) {
+        this.history.update((history) => ({
           ...history,
-          [metric]: {
-            ...previous,
-            ...event,
-            values: { ...previous.values, ...event.values, records: records.length },
-            records,
-            samples: [...(previous.samples ?? []), ...(event.samples ?? [])],
-          },
-        };
-      });
+          [metric]: this.mergeHistoryEvents(history[metric], event),
+        }));
+      }
+      const deviceId = this.historyDeviceId;
+      if (deviceId) {
+        void this.historyRepository.mergeEvent(deviceId, { ...event, metric }).then((merged) => {
+          if (event.date !== this.selectedHistoryDate) {
+            return;
+          }
+          this.history.update((history) => ({ ...history, [metric]: merged }));
+          const current = this.historyState();
+          const source = current.source === 'local' || current.source === 'merged'
+            ? 'merged'
+            : 'device';
+          this.historyState.set({
+            ...current,
+            phase: 'ready',
+            source,
+            recordCount: Object.values(this.history()).reduce(
+              (total, item) => total + (item?.records?.length ?? 0),
+              0,
+            ),
+            lastUpdatedAt: new Date().toISOString(),
+          });
+        }).catch((error) => this.fail('history.persist', error, metric));
+      }
     } else {
       /*
        * ECG, composição corporal, Stress e outras medições distribuem amostras,
@@ -570,11 +775,12 @@ export class HBandService {
   private simulateConnection(deviceId: string): void {
     const device = this.devices().find((item) => item.id === deviceId)
       ?? { id: deviceId, name: 'MF91', model: 'MF91', rssi: -48 };
-    this.status.update((status) => ({
-      ...status,
+    this.storeStatus({
+      ...this.status(),
+      historyRetentionDays: 3,
       state: 'connected',
       device: { ...device, firmware: 'simulation' },
-    }));
+    });
     this.battery.set({ percent: 82, lowBattery: false, updatedAt: new Date().toISOString() });
   }
 
@@ -612,6 +818,24 @@ export class HBandService {
         records,
         samples: records.flatMap((record) => record.samples ?? this.numericValues(record.values)),
       });
+      return;
+    }
+    if (operation === 'history.daily' || operation === 'history.cached') {
+      const date = String(params['date']);
+      for (const metric of CATALOG_METRICS.filter((item) => this.metricSupported(item))) {
+        const records = this.simulatedHistory(metric, date);
+        this.storeData({
+          type: 'history',
+          metric,
+          date,
+          timestamp: now,
+          values: { records: records.length },
+          records,
+          samples: records.flatMap(
+            (record) => record.samples ?? this.numericValues(record.values),
+          ),
+        });
+      }
       return;
     }
     const event = live[operation];
@@ -657,6 +881,36 @@ export class HBandService {
   }
 
   /**
+   * Conserva apenas o identificador não secreto do arquivo selecionado. Assim,
+   * desligar voluntariamente a pulseira não torna o histórico inacessível
+   * depois de reiniciar a aplicação.
+   */
+  private rememberHistoryDevice(deviceId: string): void {
+    localStorage.setItem(HISTORY_DEVICE_KEY, deviceId);
+  }
+
+  /**
+   * Recupera apenas o identificador da última pulseira para permitir consultar
+   * o respetivo arquivo antes de a ligação BLE ser restabelecida.
+   */
+  private rememberedDeviceId(): string | null {
+    try {
+      const historyDevice = localStorage.getItem(HISTORY_DEVICE_KEY);
+      if (historyDevice) {
+        return historyDevice;
+      }
+      const serialized = localStorage.getItem(DEVICE_SESSION_KEY);
+      if (!serialized) {
+        return null;
+      }
+      const session = JSON.parse(serialized) as Partial<RememberedDeviceSession>;
+      return typeof session.deviceId === 'string' ? session.deviceId : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Tenta ligar diretamente ao último endereço autenticado. A bridge nativa
    * continua responsável pelas novas tentativas se a pulseira estiver
    * temporariamente fora de alcance.
@@ -691,11 +945,34 @@ export class HBandService {
   ): HBandHistoryRecord[] {
     const records = new Map<string, HBandHistoryRecord>();
     for (const record of [...previous, ...incoming]) {
-      const key = `${record.timestamp}|${JSON.stringify(record.values)}`;
-      records.set(key, record);
+      const current = records.get(record.timestamp);
+      records.set(record.timestamp, {
+        ...current,
+        ...record,
+        values: { ...(current?.values ?? {}), ...record.values },
+        samples: record.samples?.length ? record.samples : current?.samples,
+      });
     }
     return [...records.values()].sort(
       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
     );
+  }
+
+  private mergeHistoryEvents(
+    previous: HBandDataEvent | undefined,
+    incoming: HBandDataEvent,
+  ): HBandDataEvent {
+    const records = this.mergeHistoryRecords(previous?.records ?? [], incoming.records ?? []);
+    return {
+      ...previous,
+      ...incoming,
+      values: {
+        ...(previous?.values ?? {}),
+        ...incoming.values,
+        records: records.length,
+      },
+      records,
+      samples: records.flatMap((record) => record.samples ?? []),
+    };
   }
 }

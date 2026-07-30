@@ -177,9 +177,30 @@
   },
   "history": {
     "title": "Histórico por data",
-    "description": "Escolha um dia para obter automaticamente os respetivos dados.",
+    "description": "Os dados ficam guardados neste telemóvel e são atualizados automaticamente pela pulseira.",
     "date": "Data",
-    "noData": "Não foram recebidos dados para esta data."
+    "noData": "Não foram recebidos dados para esta data.",
+    "records": "{{count}} registos",
+    "updatedAt": "atualizado em {{date}}",
+    "retention": "A MF91 disponibiliza hoje e até {{days}} dias anteriores.",
+    "sources": {
+      "local": "Arquivo local",
+      "device": "Dados da pulseira",
+      "merged": "Arquivo local atualizado pela pulseira"
+    },
+    "status": {
+      "idle": "Arquivo pronto",
+      "loading": "A carregar o arquivo local",
+      "syncing": "A atualizar com a pulseira",
+      "ready": "Histórico disponível",
+      "empty": "Sem dados para este dia",
+      "offlineWithData": "A apresentar o arquivo deste telemóvel",
+      "offlineEmpty": "Sem dados guardados neste telemóvel",
+      "outsideRetentionWithData": "A pulseira já não conserva este dia; a apresentar o arquivo local",
+      "outsideRetentionEmpty": "A pulseira já não conserva este dia e não existe uma cópia local",
+      "errorWithData": "A atualização falhou; os dados guardados continuam disponíveis",
+      "errorEmpty": "Não foi possível atualizar este dia"
+    }
   },
   "sync": {
     "action": "Sincronizar dia",

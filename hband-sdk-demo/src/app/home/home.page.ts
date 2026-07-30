@@ -8,11 +8,11 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+  albumsOutline, analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
   bodyOutline, calendarOutline, checkmarkCircle,
-  closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
+  closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-  refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
+  refreshOutline, speedometerOutline, syncOutline, thermometerOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
 
@@ -46,17 +46,20 @@ export class HomePage implements OnInit {
 
   constructor() {
     addIcons({
-      analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+      albumsOutline, analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
       bodyOutline, calendarOutline, checkmarkCircle,
-      closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
+      closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-      refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
+      refreshOutline, speedometerOutline, syncOutline, thermometerOutline, watchOutline,
       waterOutline,
     });
   }
 
   async ngOnInit(): Promise<void> {
     await this.hband.initialize();
+    if (!this.hband.connected()) {
+      await this.hband.synchroniseDate(this.selectedDate());
+    }
   }
 
   async openScan(): Promise<void> {
@@ -133,8 +136,8 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Atualiza a data apresentada e pede imediatamente os dados desse dia
-   * quando existe uma pulseira ligada.
+   * Atualiza a data apresentada e abre imediatamente o arquivo desse dia.
+   * Se existir ligação, o serviço tenta também obter dados mais recentes.
    */
   async setDate(value: string | number | null | undefined): Promise<void> {
     const date = String(value ?? '').slice(0, 10);
@@ -142,9 +145,55 @@ export class HomePage implements OnInit {
       return;
     }
     this.selectedDate.set(date);
-    if (this.hband.connected()) {
-      await this.hband.synchroniseDate(date);
+    await this.hband.synchroniseDate(date);
+  }
+
+  /**
+   * Explica se o dia veio do arquivo local, da pulseira ou da união de ambos,
+   * distinguindo a ausência de ligação da retenção já ultrapassada.
+   */
+  historyStatusLabel(): string {
+    const state = this.hband.historyState();
+    const hasData = state.recordCount > 0;
+    const key = state.phase === 'offline'
+      ? hasData ? 'history.status.offlineWithData' : 'history.status.offlineEmpty'
+      : state.phase === 'outsideRetention'
+        ? hasData ? 'history.status.outsideRetentionWithData' : 'history.status.outsideRetentionEmpty'
+        : state.phase === 'error'
+          ? hasData ? 'history.status.errorWithData' : 'history.status.errorEmpty'
+          : `history.status.${state.phase}`;
+    return this.i18n.translate(key);
+  }
+
+  historyStatusIcon(): string {
+    const phase = this.hband.historyState().phase;
+    return phase === 'syncing' || phase === 'loading'
+      ? 'sync-outline'
+      : phase === 'offline' ? 'cloud-offline-outline' : 'albums-outline';
+  }
+
+  historyMetadata(): string {
+    const state = this.hband.historyState();
+    const parts: string[] = [];
+    if (state.source !== 'none') {
+      parts.push(this.i18n.translate(`history.sources.${state.source}`));
     }
+    parts.push(this.i18n.translate('history.records', { count: state.recordCount }));
+    if (state.lastUpdatedAt) {
+      parts.push(this.i18n.translate('history.updatedAt', {
+        date: new Intl.DateTimeFormat(this.locale(), {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }).format(new Date(state.lastUpdatedAt)),
+      }));
+    }
+    return parts.join(' · ');
+  }
+
+  historyRetentionLabel(): string {
+    return this.i18n.translate('history.retention', {
+      days: this.hband.historyState().retentionDays ?? 0,
+    });
   }
 
   measurementProgress(event: HBandDataEvent | undefined): number {
@@ -212,5 +261,9 @@ export class HomePage implements OnInit {
   private localDate(date: Date): string {
     const offset = date.getTimezoneOffset() * 60_000;
     return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+  }
+
+  private locale(): string {
+    return this.i18n.language() === 'br' ? 'pt-BR' : this.i18n.language();
   }
 }

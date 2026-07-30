@@ -177,9 +177,30 @@
   },
   "history": {
     "title": "Historique par date",
-    "description": "Choisissez un jour pour récupérer automatiquement ses données.",
+    "description": "Les données sont enregistrées sur ce téléphone et actualisées automatiquement depuis le bracelet.",
     "date": "Date",
-    "noData": "Aucune donnée n'a été reçue pour cette date."
+    "noData": "Aucune donnée n'a été reçue pour cette date.",
+    "records": "{{count}} enregistrements",
+    "updatedAt": "mis à jour le {{date}}",
+    "retention": "Le MF91 fournit aujourd'hui et jusqu'à {{days}} jours précédents.",
+    "sources": {
+      "local": "Archive locale",
+      "device": "Données du bracelet",
+      "merged": "Archive locale actualisée depuis le bracelet"
+    },
+    "status": {
+      "idle": "Archive prête",
+      "loading": "Chargement de l'archive locale",
+      "syncing": "Actualisation depuis le bracelet",
+      "ready": "Historique disponible",
+      "empty": "Aucune donnée pour ce jour",
+      "offlineWithData": "Affichage de l'archive de ce téléphone",
+      "offlineEmpty": "Aucune donnée enregistrée sur ce téléphone",
+      "outsideRetentionWithData": "Le bracelet ne conserve plus ce jour ; affichage de l'archive locale",
+      "outsideRetentionEmpty": "Le bracelet ne conserve plus ce jour et aucune copie locale n'existe",
+      "errorWithData": "Échec de l'actualisation ; les données enregistrées restent disponibles",
+      "errorEmpty": "Impossible d'actualiser ce jour"
+    }
   },
   "sync": {
     "action": "Synchroniser le jour",

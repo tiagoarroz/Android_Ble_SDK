@@ -177,9 +177,30 @@
   },
   "history": {
     "title": "Histórico por data",
-    "description": "Escolha um dia para obter automaticamente os dados correspondentes.",
+    "description": "Os dados ficam salvos neste celular e são atualizados automaticamente pela pulseira.",
     "date": "Data",
-    "noData": "Não foram recebidos dados para esta data."
+    "noData": "Não foram recebidos dados para esta data.",
+    "records": "{{count}} registros",
+    "updatedAt": "atualizado em {{date}}",
+    "retention": "A MF91 disponibiliza hoje e até {{days}} dias anteriores.",
+    "sources": {
+      "local": "Arquivo local",
+      "device": "Dados da pulseira",
+      "merged": "Arquivo local atualizado pela pulseira"
+    },
+    "status": {
+      "idle": "Arquivo pronto",
+      "loading": "Carregando o arquivo local",
+      "syncing": "Atualizando com a pulseira",
+      "ready": "Histórico disponível",
+      "empty": "Sem dados para este dia",
+      "offlineWithData": "Mostrando o arquivo deste celular",
+      "offlineEmpty": "Sem dados salvos neste celular",
+      "outsideRetentionWithData": "A pulseira já não conserva este dia; mostrando o arquivo local",
+      "outsideRetentionEmpty": "A pulseira já não conserva este dia e não existe uma cópia local",
+      "errorWithData": "A atualização falhou; os dados salvos continuam disponíveis",
+      "errorEmpty": "Não foi possível atualizar este dia"
+    }
   },
   "sync": {
     "action": "Sincronizar dia",

@@ -87,7 +87,6 @@
         labelPlacement="stacked"
         [max]="today"
         [value]="selectedDate()"
-        [disabled]="!hband.connected()"
         (ionChange)="setDate($event.detail.value)"
       ></ion-input>
       @if (hband.syncStatus().state !== 'idle') {
@@ -101,6 +100,20 @@
           <ion-progress-bar [value]="syncPercent() / 100"></ion-progress-bar>
         </div>
       }
+      <div
+        class="history-archive-status"
+        [attr.data-phase]="hband.historyState().phase"
+        role="status"
+      >
+        <ion-icon [name]="historyStatusIcon()"></ion-icon>
+        <div>
+          <strong>{{ historyStatusLabel() }}</strong>
+          <span>{{ historyMetadata() }}</span>
+          @if (hband.connected()) {
+            <small>{{ historyRetentionLabel() }}</small>
+          }
+        </div>
+      </div>
     </section>
 
     <div class="section-heading">

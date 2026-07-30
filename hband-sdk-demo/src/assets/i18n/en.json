@@ -177,9 +177,30 @@
   },
   "history": {
     "title": "History by date",
-    "description": "Choose a day to fetch its data automatically.",
+    "description": "Data is saved on this phone and refreshed automatically from the band.",
     "date": "Date",
-    "noData": "No data was received for this date."
+    "noData": "No data was received for this date.",
+    "records": "{{count}} records",
+    "updatedAt": "updated on {{date}}",
+    "retention": "The MF91 provides today and up to {{days}} previous days.",
+    "sources": {
+      "local": "Local archive",
+      "device": "Band data",
+      "merged": "Local archive refreshed from the band"
+    },
+    "status": {
+      "idle": "Archive ready",
+      "loading": "Loading local archive",
+      "syncing": "Refreshing from the band",
+      "ready": "History available",
+      "empty": "No data for this day",
+      "offlineWithData": "Showing this phone's archive",
+      "offlineEmpty": "No data saved on this phone",
+      "outsideRetentionWithData": "The band no longer retains this day; showing the local archive",
+      "outsideRetentionEmpty": "The band no longer retains this day and no local copy exists",
+      "errorWithData": "Refresh failed; saved data remains available",
+      "errorEmpty": "This day could not be refreshed"
+    }
   },
   "sync": {
     "action": "Sync day",

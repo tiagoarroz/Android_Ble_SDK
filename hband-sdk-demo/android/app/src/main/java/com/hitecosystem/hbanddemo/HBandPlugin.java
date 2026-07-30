@@ -115,7 +115,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -561,6 +560,9 @@ public class HBandPlugin extends Plugin {
             case "history.daily":
                 readDailyHistory(call);
                 return;
+            case "history.manual.daily":
+                readDailyManualHistory(call);
+                return;
             case "history.activity.current":
                 readCurrentActivity(call);
                 return;
@@ -685,6 +687,10 @@ public class HBandPlugin extends Plugin {
         } else {
             capabilities.put(key, status == EFunctionStatus.UNSUPPORT ? "unsupported" : "supported");
         }
+    }
+
+    private boolean capabilityUsable(String key) {
+        return !"unsupported".equals(capabilities.optString(key, "unknown"));
     }
 
     private void readBattery(PluginCall call) {
@@ -1341,6 +1347,196 @@ public class HBandPlugin extends Plugin {
         }
     }
 
+    /**
+     * Lê num único pedido todas as medições manuais do dia. A G Band conserva
+     * estas tabelas separadas dos blocos automáticos; emitir cada métrica
+     * individualmente permite à camada web uni-las pelo instante.
+     */
+    private void readDailyManualHistory(PluginCall call) {
+        JSObject params = call.getObject("params");
+        String dateText = params == null ? null : params.getString("date");
+        if (dateText == null) {
+            call.reject("HISTORY_DATE_REQUIRED");
+            return;
+        }
+        final LocalDate date;
+        try {
+            date = LocalDate.parse(dateText);
+        } catch (RuntimeException error) {
+            call.reject("HISTORY_DATE_INVALID");
+            return;
+        }
+        long start = date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        long end = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toEpochSecond();
+        JSArray heartRate = new JSArray();
+        JSArray bloodPressure = new JSArray();
+        JSArray oxygen = new JSArray();
+        JSArray temperature = new JSArray();
+        JSArray bloodGlucose = new JSArray();
+        JSArray stress = new JSArray();
+        List<DeviceManualDataType> requested = new ArrayList<>();
+        if (capabilityUsable("heartRate")) {
+            requested.add(DeviceManualDataType.HEART_RATE);
+        }
+        if (capabilityUsable("bloodPressure")) {
+            requested.add(DeviceManualDataType.BLOOD_PRESSURE);
+        }
+        if (capabilityUsable("bloodOxygen")) {
+            requested.add(DeviceManualDataType.BLOOD_OXYGEN);
+        }
+        if (capabilityUsable("temperature")) {
+            requested.add(DeviceManualDataType.BODY_TEMPERATURE);
+        }
+        if (capabilityUsable("bloodGlucose")) {
+            requested.add(DeviceManualDataType.BLOOD_GLUCOSE);
+        }
+        if (capabilityUsable("stress")) {
+            requested.add(DeviceManualDataType.STRESS);
+        }
+        if (requested.isEmpty()) {
+            emitDailyManualHistories(
+                date, heartRate, bloodPressure, oxygen,
+                temperature, bloodGlucose, stress
+            );
+            accept(call, "history.manual.daily");
+            return;
+        }
+        manager.readDeviceManualData(
+            writeResponse,
+            start,
+            requested,
+            requested,
+            new AbsDeviceManualDetectDataListener() {
+                @Override public void onHeartRateDataChange(List<HeartRateManualData> data) {
+                    for (HeartRateManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            int[] rates = item.getRate();
+                            heartRate.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject().put(
+                                    "bpm",
+                                    rates != null && rates.length > 0 ? rates[rates.length - 1] : 0
+                                ),
+                                intArray(rates)
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onBloodPressureDataChange(List<BloodPressureManualData> data) {
+                    for (BloodPressureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            bloodPressure.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject()
+                                    .put("systolic", item.getSystolic())
+                                    .put("diastolic", item.getDiastolic())
+                                    .put("pulseBpm", item.getHeartRate()),
+                                null
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onBloodOxygenDataChange(List<BloodOxygenManualData> data) {
+                    for (BloodOxygenManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            int[] values = item.getOxygen();
+                            oxygen.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject().put(
+                                    "percent",
+                                    values != null && values.length > 0
+                                        ? values[values.length - 1]
+                                        : 0
+                                ),
+                                intArray(values)
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onBodyTemperatureDataChange(List<BodyTemperatureManualData> data) {
+                    for (BodyTemperatureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            temperature.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject()
+                                    .put("celsius", item.getTemperature())
+                                    .put("baselineCelsius", item.getBaseTemperature()),
+                                null
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onBloodGlucoseDataChange(List<BloodGlucoseManualData> data) {
+                    for (BloodGlucoseManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            bloodGlucose.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject()
+                                    .put("mmolL", item.getBloodGlucoseValue())
+                                    .put("riskLevel", String.valueOf(item.getRisk())),
+                                null
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onHrvManualDataChange(List<HrvManualData> data) {}
+                @Override public void onMetoManualDataChange(List<MetoManualData> data) {}
+
+                @Override public void onPressureManualDataChange(List<PressureManualData> data) {
+                    for (PressureManualData item : data) {
+                        if (inDay(item.getTimeStamp(), start, end)) {
+                            stress.put(historyRecord(
+                                item.getTimeStamp(),
+                                new JSObject().put("score", item.getPressure()),
+                                null
+                            ));
+                        }
+                    }
+                }
+
+                @Override public void onReadComplete() {
+                    emitDailyManualHistories(
+                        date, heartRate, bloodPressure, oxygen,
+                        temperature, bloodGlucose, stress
+                    );
+                    accept(call, "history.manual.daily");
+                }
+
+                @Override public void onReadFail() {
+                    emitLog("error", "Daily manual history read failed", "history.manual.daily");
+                    emitDailyManualHistories(
+                        date, heartRate, bloodPressure, oxygen,
+                        temperature, bloodGlucose, stress
+                    );
+                    accept(call, "history.manual.daily");
+                }
+            }
+        );
+    }
+
+    private void emitDailyManualHistories(
+        LocalDate date,
+        JSArray heartRate,
+        JSArray bloodPressure,
+        JSArray oxygen,
+        JSArray temperature,
+        JSArray bloodGlucose,
+        JSArray stress
+    ) {
+        String day = date.toString();
+        emitHistory("heartRate", day, heartRate);
+        emitHistory("bloodPressure", day, bloodPressure);
+        emitHistory("oxygen", day, oxygen);
+        emitHistory("temperature", day, temperature);
+        emitHistory("bloodGlucose", day, bloodGlucose);
+        emitHistory("stress", day, stress);
+    }
+
     private void readManualMetricHistory(
         PluginCall call,
         String metric,
@@ -1660,6 +1856,12 @@ public class HBandPlugin extends Plugin {
         status.put("bluetoothEnabled", manager.isBluetoothOpened());
         status.put("state", connectionState);
         status.put("capabilities", capabilities);
+        /*
+         * Expõe o deslocamento máximo aceite pelo próprio SDK. A camada web
+         * usa-o para arquivar todos os dias ainda disponíveis sem pedir à
+         * pulseira datas que esta já eliminou.
+         */
+        status.put("historyRetentionDays", watchDataDays);
         status.put("sdkVersion", VPOperateManager.VPPROTOCOL_VERSION);
         status.put("platform", "android");
         if (currentAddress != null) {

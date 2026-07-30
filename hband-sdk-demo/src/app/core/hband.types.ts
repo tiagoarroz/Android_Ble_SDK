@@ -25,6 +25,7 @@ export interface HBandStatus {
   state: ConnectionState;
   device?: HBandDevice;
   capabilities: Record<string, CapabilityState>;
+  historyRetentionDays?: number;
   sdkVersion?: string;
   platform?: string;
 }
@@ -42,6 +43,20 @@ export interface HBandSyncStatus {
   completed: number;
   total: number;
   failed: number;
+}
+
+export type HBandHistorySource = 'none' | 'local' | 'device' | 'merged';
+export type HBandHistoryPhase =
+  | 'idle' | 'loading' | 'syncing' | 'ready' | 'offline'
+  | 'outsideRetention' | 'empty' | 'error';
+
+export interface HBandHistoryState {
+  date: string;
+  phase: HBandHistoryPhase;
+  source: HBandHistorySource;
+  recordCount: number;
+  lastUpdatedAt?: string;
+  retentionDays?: number;
 }
 
 export interface HBandHistoryRecord {

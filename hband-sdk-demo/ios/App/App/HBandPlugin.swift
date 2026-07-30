@@ -190,6 +190,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             readCurrentSteps(call, operation: operation)
         case "history.metric":
             readMetricHistory(call, operation: operation)
+        case "history.daily":
+            readDailyHistory(call, operation: operation)
+        case "history.cached":
+            readCachedHistory(call, operation: operation)
         default:
             call.reject("OPERATION_NOT_IMPLEMENTED:\(operation)")
         }
@@ -498,6 +502,112 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     /**
+     * Sincroniza uma única vez cada área nativa necessária e, no fim, consulta
+     * todas as métricas da data pedida na base local Veepoo. Evita repetir a
+     * mesma transferência completa para frequência, pressão, ECG e Stress.
+     */
+    private func readDailyHistory(_ call: CAPPluginCall, operation: String) {
+        guard
+            let params = call.getObject("params"),
+            let date = params["date"] as? String,
+            isValidDate(date)
+        else {
+            call.reject("HISTORY_DATE_REQUIRED")
+            return
+        }
+
+        var readers: [(@escaping () -> Void) -> Void] = []
+        readers.append { [weak self] completion in
+            guard let self else { return }
+            var completed = false
+            self.manager.peripheralManage.veepooSdkStartReadDeviceAllData {
+                state, _, _, _ in
+                guard state == .complete, !completed else { return }
+                completed = true
+                completion()
+            }
+        }
+        if manager.peripheralModel?.bloodOxygenType ?? 0 > 0
+            || manager.peripheralModel?.oxygenType ?? 0 > 0 {
+            readers.append { [weak self] completion in
+                guard let self else { return }
+                var completed = false
+                self.manager.peripheralManage.veepooSdkStartReadDeviceOxygenData {
+                    state, _, _, _ in
+                    guard state == .complete, !completed else { return }
+                    completed = true
+                    completion()
+                }
+            }
+        }
+        if let model = manager.peripheralModel,
+           model.temperatureType > 0,
+           model.temperatureType != 5 {
+            readers.append { [weak self] completion in
+                guard let self else { return }
+                var completed = false
+                self.manager.peripheralManage.veepooSdkStartReadDeviceTemperatureData {
+                    state, _, _, _ in
+                    guard state == .complete, !completed else { return }
+                    completed = true
+                    completion()
+                }
+            }
+        }
+
+        runHistoryReaders(readers, index: 0) { [weak self] in
+            guard let self else { return }
+            self.historyMetrics().forEach {
+                self.queryHistory(metric: $0, date: date)
+            }
+            self.accept(call, operation: operation)
+        }
+    }
+
+    /**
+     * Consulta o arquivo nativo sem iniciar uma transferência BLE. É usado para
+     * copiar para o arquivo Angular os dias já acumulados por versões anteriores.
+     */
+    private func readCachedHistory(_ call: CAPPluginCall, operation: String) {
+        guard
+            let params = call.getObject("params"),
+            let date = params["date"] as? String,
+            isValidDate(date)
+        else {
+            call.reject("HISTORY_DATE_REQUIRED")
+            return
+        }
+        historyMetrics().forEach { queryHistory(metric: $0, date: date) }
+        accept(call, operation: operation)
+    }
+
+    /**
+     * Executa operações longas do SDK em série, respeitando a limitação do
+     * protocolo que impede duas leituras de memória em simultâneo.
+     */
+    private func runHistoryReaders(
+        _ readers: [(@escaping () -> Void) -> Void],
+        index: Int,
+        completion: @escaping () -> Void
+    ) {
+        guard index < readers.count else {
+            completion()
+            return
+        }
+        let reader = readers[index]
+        reader { [weak self] in
+            self?.runHistoryReaders(readers, index: index + 1, completion: completion)
+        }
+    }
+
+    private func historyMetrics() -> [String] {
+        [
+            "steps", "heartRate", "bloodPressure", "oxygen", "temperature",
+            "bloodGlucose", "ecg", "bodyComposition", "stress"
+        ]
+    }
+
+    /**
      * Sincroniza primeiro a área de dados apropriada do dispositivo e só
      * consulta a base local do SDK quando este assinala a leitura como completa.
      */
@@ -598,6 +708,27 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
 
         let records: [[String: Any]]
         switch metric {
+        case "steps":
+            let original = VPDataBaseOperation.veepooSDKGetOriginalData(
+                withDate: date,
+                andTableID: tableID
+            ) as? [String: [String: Any]] ?? [:]
+            records = original.keys.sorted().compactMap { time in
+                guard let source = original[time] else { return nil }
+                let steps = number(source["stepValue"]) ?? 0
+                let distance = number(source["disValue"]) ?? 0
+                let calories = number(source["calValue"]) ?? 0
+                guard steps > 0 || distance > 0 || calories > 0 else { return nil }
+                return historyRecord(
+                    date: date,
+                    time: time,
+                    values: [
+                        "steps": steps,
+                        "distanceKm": distance,
+                        "caloriesKcal": calories
+                    ]
+                )
+            }
         case "heartRate", "stress":
             let original = VPDataBaseOperation.veepooSDKGetOriginalData(
                 withDate: date,
@@ -860,6 +991,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             "bluetoothEnabled": bluetoothEnabled,
             "state": connectionState,
             "capabilities": capabilitiesPayload(),
+            "historyRetentionDays": Int(manager.peripheralModel?.saveDays ?? 0),
             "sdkVersion": "2.2.XX.15",
             "platform": "ios"
         ]
