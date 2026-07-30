@@ -3,7 +3,6 @@
     "title": "H Band SDK",
     "subtitle": "Laboratoire MF91",
     "language": "Langue",
-    "modelTag": "MF91 · H Band SDK",
     "languages": {
       "pt": "Portugais (Portugal)",
       "br": "Portugais (Brésil)",
@@ -44,7 +43,6 @@
   },
   "device": {
     "noDevice": "Aucun appareil",
-    "readyToScan": "Prêt à rechercher un bracelet",
     "firmware": "Micrologiciel {{version}}",
     "unknown": "Appareil sans nom",
     "battery": "Batterie",

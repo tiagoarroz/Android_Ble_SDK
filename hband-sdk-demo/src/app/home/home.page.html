@@ -30,13 +30,6 @@
 <ion-content [fullscreen]="true">
   <main class="demo-shell">
     <section class="hero-panel hero-panel--focused">
-      <div class="hero-copy">
-        <ion-chip class="eyebrow-chip">
-          <ion-icon name="watch-outline"></ion-icon>
-          <ion-label>{{ i18n.translate('app.modelTag') }}</ion-label>
-        </ion-chip>
-      </div>
-
       <aside class="connection-card">
         <div class="connection-orbit" [class.is-connected]="hband.connected()">
           <span class="orbit-ring orbit-ring--outer"></span>
@@ -48,45 +41,29 @@
             <span class="status-dot" [class.is-connected]="hband.connected()"></span>
             {{ statusLabel() }}
           </span>
-          <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
-          <small>{{ i18n.translate('device.readyToScan') }}</small>
-          @if (hband.status().device?.rssi; as rssi) {
-            <span class="signal-pill">
-              <ion-icon name="radio-outline"></ion-icon>
-              {{ rssi }} {{ i18n.translate('units.dbm') }}
-            </span>
-          }
-          @if (hband.connected()) {
-            @if (hband.battery(); as battery) {
-              <div class="device-battery" [class.device-battery--low]="battery.lowBattery">
-                <span class="device-battery__heading">
-                  <ion-icon name="battery-half-outline"></ion-icon>
-                  {{ i18n.translate('device.battery') }}
-                  <strong>{{ batteryPercent() }}%</strong>
-                </span>
+          <div class="device-identity">
+            <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
+            @if (hband.connected()) {
+              @if (hband.battery()) {
                 <span
-                  class="device-battery__track"
-                  role="progressbar"
-                  [attr.aria-label]="i18n.translate('device.battery')"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  [attr.aria-valuenow]="batteryPercent()"
+                  class="device-battery"
+                  [attr.data-level]="batteryLevel()"
+                  [attr.aria-label]="i18n.translate('device.battery') + ': ' + batteryPercent() + '%'"
                 >
-                  <i [style.width.%]="batteryPercent()"></i>
+                  <ion-icon [name]="batteryIcon()"></ion-icon>
+                  <span>{{ batteryPercent() }}%</span>
                 </span>
-                @if (battery.lowBattery) {
-                  <small>{{ i18n.translate('device.lowBattery') }}</small>
-                }
-              </div>
+              }
             }
-          }
+          </div>
           <div class="connection-card__actions">
-            <ion-button (click)="openScan()">
+            <ion-button class="connection-action connection-action--primary" (click)="openScan()">
               <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
               {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scanBand') }}
             </ion-button>
             @if (hband.connected()) {
-              <ion-button fill="outline" color="light" (click)="hband.disconnect()">
+              <ion-button class="connection-action connection-action--secondary" fill="outline" (click)="hband.disconnect()">
+                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
                 {{ i18n.translate('actions.disconnect') }}
               </ion-button>
             }

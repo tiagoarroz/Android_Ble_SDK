@@ -3,7 +3,6 @@
     "title": "H Band SDK",
     "subtitle": "MF91 Lab",
     "language": "Language",
-    "modelTag": "MF91 · H Band SDK",
     "languages": {
       "pt": "Portuguese (Portugal)",
       "br": "Portuguese (Brazil)",
@@ -44,7 +43,6 @@
   },
   "device": {
     "noDevice": "No device",
-    "readyToScan": "Ready to scan for a band",
     "firmware": "Firmware {{version}}",
     "unknown": "Unnamed device",
     "battery": "Battery",

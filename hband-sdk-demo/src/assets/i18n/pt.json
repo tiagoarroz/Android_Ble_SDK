@@ -3,7 +3,6 @@
     "title": "H Band SDK",
     "subtitle": "Laboratório MF91",
     "language": "Idioma",
-    "modelTag": "MF91 · H Band SDK",
     "languages": {
       "pt": "Português (Portugal)",
       "br": "Português (Brasil)",
@@ -44,7 +43,6 @@
   },
   "device": {
     "noDevice": "Nenhum dispositivo",
-    "readyToScan": "Pronto para procurar uma pulseira",
     "firmware": "Firmware {{version}}",
     "unknown": "Dispositivo sem nome",
     "battery": "Bateria",

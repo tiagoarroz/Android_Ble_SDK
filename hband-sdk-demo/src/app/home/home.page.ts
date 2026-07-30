@@ -8,10 +8,11 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
+  analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+  bodyOutline, calendarOutline, checkmarkCircle,
   closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-  radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
+  refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
 
@@ -45,10 +46,11 @@ export class HomePage implements OnInit {
 
   constructor() {
     addIcons({
-      analyticsOutline, batteryHalfOutline, bluetoothOutline, bodyOutline, calendarOutline, checkmarkCircle,
+      analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+      bodyOutline, calendarOutline, checkmarkCircle,
       closeCircleOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-      radioOutline, refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
+      refreshOutline, speedometerOutline, thermometerOutline, watchOutline,
       waterOutline,
     });
   }
@@ -181,6 +183,30 @@ export class HomePage implements OnInit {
 
   batteryPercent(): number {
     return Math.min(100, Math.max(0, this.hband.battery()?.percent ?? 0));
+  }
+
+  /**
+   * Escolhe um ícone que permite reconhecer visualmente a autonomia sem
+   * depender apenas do valor percentual.
+   */
+  batteryIcon(): string {
+    const level = this.batteryLevel();
+    return level === 'low'
+      ? 'battery-dead-outline'
+      : level === 'medium' ? 'battery-half-outline' : 'battery-full-outline';
+  }
+
+  /**
+   * Agrupa a carga em três estados visuais e respeita também o aviso de
+   * bateria fraca enviado diretamente pelo dispositivo.
+   */
+  batteryLevel(): 'low' | 'medium' | 'high' {
+    const battery = this.hband.battery();
+    const percent = this.batteryPercent();
+    if (battery?.lowBattery || percent <= 20) {
+      return 'low';
+    }
+    return percent <= 60 ? 'medium' : 'high';
   }
 
   private localDate(date: Date): string {
