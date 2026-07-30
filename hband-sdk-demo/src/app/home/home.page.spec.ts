@@ -126,6 +126,15 @@ describe('HomePage', () => {
     expect(component.batteryPercent()).toBe(75);
   });
 
+  it('should highlight every date stored for the current band', () => {
+    component.hband.historyDates.set(['2026-06-08', '2026-06-11']);
+
+    expect(component.historyHighlightedDates()).toEqual([
+      jasmine.objectContaining({ date: '2026-06-08' }),
+      jasmine.objectContaining({ date: '2026-06-11' }),
+    ]);
+  });
+
   /**
    * Injeta callbacks equivalentes aos eventos nativos sem expor a operação
    * interna do serviço no contrato de produção.

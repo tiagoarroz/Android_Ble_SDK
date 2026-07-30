@@ -56,6 +56,7 @@ export class HBandService {
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly history = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
+  readonly historyDates = signal<string[]>([]);
   readonly historyState = signal<HBandHistoryState>({
     date: this.localDate(new Date()),
     phase: 'idle',
@@ -87,6 +88,7 @@ export class HBandService {
   async initialize(): Promise<void> {
     if (this.simulation()) {
       this.seedSimulation();
+      await this.refreshHistoryDates();
       return;
     }
     await HBand.addListener('deviceFound', (device) => this.upsertDevice(device));
@@ -96,6 +98,7 @@ export class HBandService {
     try {
       const status = await HBand.getStatus();
       this.storeStatus(status);
+      await this.refreshHistoryDates();
       if (
         status.available
         && status.bluetoothEnabled
@@ -125,6 +128,8 @@ export class HBandService {
   async connect(deviceId: string, password = '0000'): Promise<void> {
     this.historyDeviceId = deviceId;
     this.rememberHistoryDevice(deviceId);
+    this.historyDates.set([]);
+    await this.refreshHistoryDates();
     if (this.simulation()) {
       this.simulateConnection(deviceId);
       return;
@@ -393,6 +398,10 @@ export class HBandService {
     this.status.set(status);
     const retentionChanged = previous.historyRetentionDays !== status.historyRetentionDays;
     const deviceChanged = previousDeviceId !== this.historyDeviceId;
+    if (deviceChanged) {
+      this.historyDates.set([]);
+      void this.refreshHistoryDates();
+    }
     if (status.state === 'connected' && (!wasConnected || retentionChanged || deviceChanged)) {
       this.startBatteryUpdates();
       void this.synchroniseRetainedHistory();
@@ -604,6 +613,8 @@ export class HBandService {
       const deviceId = this.historyDeviceId;
       if (deviceId) {
         void this.historyRepository.mergeEvent(deviceId, { ...event, metric }).then((merged) => {
+          this.historyDates.update((dates) =>
+            [...new Set([...dates, event.date as string])].sort());
           if (event.date !== this.selectedHistoryDate) {
             return;
           }
@@ -908,6 +919,19 @@ export class HBandService {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Reconstitui os dias destacados a partir do arquivo da última pulseira,
+   * incluindo quando a aplicação arranca sem ligação BLE.
+   */
+  private async refreshHistoryDates(): Promise<void> {
+    const deviceId = this.historyDeviceId;
+    if (!deviceId) {
+      this.historyDates.set([]);
+      return;
+    }
+    this.historyDates.set(await this.historyRepository.listDates(deviceId));
   }
 
   /**

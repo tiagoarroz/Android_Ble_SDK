@@ -5,7 +5,7 @@ import type {
 } from './hband.types';
 
 const DATABASE_NAME = 'hband-history';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const HISTORY_STORE = 'history-days';
 
 interface StoredHistoryEvent {
@@ -65,6 +65,23 @@ export class HistoryRepositoryService {
   }
 
   /**
+   * Lista apenas datas que contêm pelo menos um registo. O calendário usa este
+   * índice para destacar dias com medições sem carregar todos os payloads.
+   */
+  async listDates(deviceId: string): Promise<string[]> {
+    await this.writeQueue.catch(() => undefined);
+    const database = await this.database();
+    const stored = database
+      ? await this.readDeviceFromDatabase(database, deviceId)
+      : [...this.memoryFallback.values()].filter((item) => item.deviceId === deviceId);
+    return [...new Set(
+      stored
+        .filter((item) => (item.event.records?.length ?? 0) > 0)
+        .map((item) => item.date),
+    )].sort();
+  }
+
+  /**
    * Faz upsert do bloco mais recente, usando o instante como identidade do
    * registo. Este comportamento reproduz o `INSERT OR REPLACE` observado na
    * G Band e impede duplicados quando a pulseira volta a enviar o mesmo dia.
@@ -119,9 +136,15 @@ export class HistoryRepositoryService {
       const request = globalThis.indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
       request.onupgradeneeded = () => {
         const database = request.result;
+        let store: IDBObjectStore;
         if (!database.objectStoreNames.contains(HISTORY_STORE)) {
-          const store = database.createObjectStore(HISTORY_STORE, { keyPath: 'key' });
+          store = database.createObjectStore(HISTORY_STORE, { keyPath: 'key' });
           store.createIndex('device-date', ['deviceId', 'date'], { unique: false });
+        } else {
+          store = request.transaction!.objectStore(HISTORY_STORE);
+        }
+        if (!store.indexNames.contains('device-id')) {
+          store.createIndex('device-id', 'deviceId', { unique: false });
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -152,6 +175,19 @@ export class HistoryRepositoryService {
       const transaction = database.transaction(HISTORY_STORE, 'readonly');
       const request = transaction.objectStore(HISTORY_STORE).get(key);
       request.onsuccess = () => resolve(request.result as StoredHistoryEvent | undefined);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private readDeviceFromDatabase(
+    database: IDBDatabase,
+    deviceId: string,
+  ): Promise<StoredHistoryEvent[]> {
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(HISTORY_STORE, 'readonly');
+      const index = transaction.objectStore(HISTORY_STORE).index('device-id');
+      const request = index.getAll(IDBKeyRange.only(deviceId));
+      request.onsuccess = () => resolve(request.result as StoredHistoryEvent[]);
       request.onerror = () => reject(request.error);
     });
   }

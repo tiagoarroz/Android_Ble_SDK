@@ -32,22 +32,21 @@ valor bruto disponibilizado pelo SDK.
 
 ## Histórico diário
 
-Ao autenticar a pulseira, a aplicação executa uma sincronização serializada do
-dia atual. O botão **Sincronizar dia** repete o mesmo fluxo para a data
-selecionada e mostra o progresso:
+Ao autenticar a pulseira, a aplicação sincroniza automaticamente todos os dias
+ainda retidos pelo firmware. No dispositivo MF91 ensaiado, o SDK reporta hoje e
+até aos três dias anteriores. Mudar a data abre imediatamente o arquivo local e
+atualiza-o pela pulseira quando a data ainda está disponível.
 
 1. lê a bateria;
 2. acerta a hora do dispositivo;
 3. lê os totais de atividade atuais;
-4. importa os blocos originais do dia.
+4. importa os blocos automáticos;
+5. importa medições manuais;
+6. lê ECG e composição corporal nas respetivas áreas dedicadas.
 
-No Android, uma única operação `history.daily` usa `readOriginDataSingleDay`.
-Os blocos `OriginData3` são convertidos em registos de passos, frequência
-cardíaca, pressão arterial, oxigénio, temperatura, glicemia e stress sem lançar
-em paralelo leitores incompatíveis. ECG e composição corporal continuam a usar
-os leitores dedicados do SDK. No iOS, as sincronizações e consultas à base
-local do SDK são igualmente executadas em série e filtradas pela data
-`yyyy-MM-dd`.
+Os dados ficam arquivados por pulseira, métrica e data. O calendário destaca os
+dias com medições, que continuam consultáveis sem ligação. Leituras repetidas
+são unidas pelo timestamp em vez de duplicadas.
 
 Os históricos apresentam o intervalo mais recente, gráfico posicionado entre
 0–24 horas, média diária, mínimo e máximo. A pressão arterial conserva as duas
@@ -110,5 +109,8 @@ xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
   médico.
 - A análise funcional usada para alinhar a experiência está documentada em
   [`docs/G_BAND_INTEROPERABILITY.md`](docs/G_BAND_INTEROPERABILITY.md).
+- A retenção, persistência, deduplicação e sequências Android/iOS estão
+  documentadas em
+  [`docs/HISTORY_AND_SYNC.md`](docs/HISTORY_AND_SYNC.md).
 - A validação física está descrita em
   [`docs/MF91_PHYSICAL_TEST_PLAN.md`](docs/MF91_PHYSICAL_TEST_PLAN.md).

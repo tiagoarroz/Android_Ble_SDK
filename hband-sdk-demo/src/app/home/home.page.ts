@@ -3,9 +3,10 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonBadge, IonButton, IonButtons, IonChip, IonContent, IonHeader, IonIcon,
-  IonInput, IonItem, IonLabel, IonList, IonModal, IonNote, IonProgressBar,
+  IonDatetime, IonInput, IonItem, IonLabel, IonList, IonModal, IonNote, IonProgressBar,
   IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
+import type { DatetimeHighlight } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
   albumsOutline, analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
@@ -29,7 +30,7 @@ import { I18nService } from '../core/i18n.service';
   templateUrl: 'home.page.html',
   imports: [
     CommonModule, FormsModule, DataVisualizerComponent, IonBadge, IonButton,
-    IonButtons, IonChip, IonContent, IonHeader, IonIcon, IonInput, IonItem,
+    IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem,
     IonLabel, IonList, IonModal, IonNote, IonProgressBar, IonSelect,
     IonSelectOption, IonSpinner, IonTitle, IonToolbar,
   ],
@@ -40,6 +41,7 @@ export class HomePage implements OnInit {
   readonly features = FEATURE_CATALOG;
   readonly selectedFeature = signal<FeatureDefinition | null>(null);
   readonly scanOpen = signal(false);
+  readonly historyCalendarOpen = signal(false);
   readonly password = signal('0000');
   readonly selectedDate = signal(this.localDate(new Date()));
   readonly today = this.localDate(new Date());
@@ -146,6 +148,34 @@ export class HomePage implements OnInit {
     }
     this.selectedDate.set(date);
     await this.hband.synchroniseDate(date);
+  }
+
+  /**
+   * Fecha o calendário depois de selecionar um dia e reutiliza o mesmo fluxo
+   * de carregamento local e atualização BLE do seletor anterior.
+   */
+  async selectCalendarDate(value: string | string[] | null | undefined): Promise<void> {
+    const selected = Array.isArray(value) ? value[0] : value;
+    await this.setDate(selected);
+    this.historyCalendarOpen.set(false);
+  }
+
+  /**
+   * O `ion-datetime` recebe uma lista derivada do índice persistente da
+   * pulseira atual, não apenas das métricas carregadas no ecrã.
+   */
+  historyHighlightedDates(): DatetimeHighlight[] {
+    return this.hband.historyDates().map((date) => ({
+      date,
+      backgroundColor: '#13795b',
+      textColor: '#ffffff',
+      border: '1px solid #0b5f46',
+    }));
+  }
+
+  formattedSelectedDate(): string {
+    return new Intl.DateTimeFormat(this.locale(), { dateStyle: 'medium' })
+      .format(new Date(`${this.selectedDate()}T12:00:00`));
   }
 
   /**
@@ -263,7 +293,7 @@ export class HomePage implements OnInit {
     return new Date(date.getTime() - offset).toISOString().slice(0, 10);
   }
 
-  private locale(): string {
+  locale(): string {
     return this.i18n.language() === 'br' ? 'pt-BR' : this.i18n.language();
   }
 }

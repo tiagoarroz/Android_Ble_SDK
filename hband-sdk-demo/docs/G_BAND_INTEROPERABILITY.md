@@ -24,8 +24,22 @@ Na demonstração, o equivalente foi implementado com:
 - uma leitura diária `readOriginDataSingleDay` no Android;
 - separação dos blocos originais em passos, frequência cardíaca, pressão
   arterial, oxigénio, temperatura, glicemia e stress;
-- armazenamento em memória por métrica e por instante, sem apagar eventos
-  reais já recebidos.
+- arquivo persistente por pulseira, métrica, data e instante;
+- união de blocos automáticos, medições manuais e leitores dedicados;
+- calendário com destaque dos dias existentes no arquivo.
+
+## Histórico acumulado observado
+
+Com a G Band desligada da pulseira, o calendário mostrou dados em 8 e 11 de
+junho de 2026. Foi possível abrir 8 de junho e consultar a frequência cardíaca
+desse dia, incluindo média diária de 71 bpm, mínimo de 56 bpm e máximo de
+93 bpm.
+
+Essa data estava muito além da janela disponível na MF91. A análise do APK
+confirmou Room/SQLite, chaves compostas por conta/MAC/data ou
+conta/MAC/timestamp e upserts equivalentes a `INSERT OR REPLACE`. A interface
+combina, portanto, dados que já estão na base da aplicação com a janela ainda
+disponível na pulseira.
 
 ## Formatos reproduzidos
 
@@ -68,6 +82,8 @@ não atribui validade clínica aos valores.
 
 - A G Band pode conservar dados já sincronizados na sua base local, enquanto a
   pulseira só expõe os blocos ainda retidos.
+- Na MF91 ensaiada, o SDK reportou hoje e até aos três dias anteriores; outros
+  firmwares podem reportar uma retenção diferente.
 - ECG e composição corporal não fazem parte do bloco diário comum e mantêm os
   leitores próprios.
 - O serviço foreground reduz suspensões enquanto o processo existe, mas não
@@ -75,3 +91,5 @@ não atribui validade clínica aos valores.
 - A tentativa de composição corporal na aplicação de referência chegou ao fim
   sem resultado válido, compatível com contacto insuficiente dos elétrodos; não
   foi tratada como confirmação clínica nem funcional do resultado.
+- A arquitetura histórica completa da demonstração está descrita em
+  [`HISTORY_AND_SYNC.md`](HISTORY_AND_SYNC.md).

@@ -36,6 +36,24 @@ describe('HistoryRepositoryService', () => {
     expect(secondBand.events.heartRate?.records?.[0].values['bpm']).toBe(82);
   });
 
+  it('should list only dates stored for the requested band', async () => {
+    const deviceId = `MF91-DATES-${Date.now()}`;
+    await repository.mergeEvent(
+      deviceId,
+      historyEvent('2026-06-08', '2026-06-08T08:00:00', 66),
+    );
+    await repository.mergeEvent(
+      deviceId,
+      historyEvent('2026-06-11', '2026-06-11T09:00:00', 72),
+    );
+    await repository.mergeEvent(
+      `${deviceId}-OTHER`,
+      historyEvent('2026-06-09', '2026-06-09T09:00:00', 80),
+    );
+
+    expect(await repository.listDates(deviceId)).toEqual(['2026-06-08', '2026-06-11']);
+  });
+
   function historyEvent(date: string, timestamp: string, bpm: number): HBandDataEvent {
     return {
       type: 'history',

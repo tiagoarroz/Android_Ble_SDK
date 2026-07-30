@@ -80,15 +80,19 @@
           <p>{{ i18n.translate('history.description') }}</p>
         </div>
       </div>
-      <ion-input
-        class="history-date-input"
-        type="date"
-        [label]="i18n.translate('history.date')"
-        labelPlacement="stacked"
-        [max]="today"
-        [value]="selectedDate()"
-        (ionChange)="setDate($event.detail.value)"
-      ></ion-input>
+      <button
+        class="history-date-trigger"
+        type="button"
+        aria-haspopup="dialog"
+        [attr.aria-label]="i18n.translate('history.openCalendar')"
+        (click)="historyCalendarOpen.set(true)"
+      >
+        <span>
+          <small>{{ i18n.translate('history.date') }}</small>
+          <strong>{{ formattedSelectedDate() }}</strong>
+        </span>
+        <ion-icon name="calendar-outline"></ion-icon>
+      </button>
       @if (hband.syncStatus().state !== 'idle') {
         <div class="history-sync-control">
           <span>
@@ -105,7 +109,9 @@
         [attr.data-phase]="hband.historyState().phase"
         role="status"
       >
-        <ion-icon [name]="historyStatusIcon()"></ion-icon>
+        <span class="history-archive-status__icon">
+          <ion-icon [name]="historyStatusIcon()"></ion-icon>
+        </span>
         <div>
           <strong>{{ historyStatusLabel() }}</strong>
           <span>{{ historyMetadata() }}</span>
@@ -154,6 +160,43 @@
     </section>
   </main>
 </ion-content>
+
+<ion-modal
+  class="history-calendar-modal"
+  [isOpen]="historyCalendarOpen()"
+  (didDismiss)="historyCalendarOpen.set(false)"
+>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ i18n.translate('history.calendarTitle') }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="historyCalendarOpen.set(false)">
+            {{ i18n.translate('actions.close') }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="history-calendar-content">
+        <ion-datetime
+          presentation="date"
+          [locale]="locale()"
+          [firstDayOfWeek]="1"
+          [max]="today"
+          [value]="selectedDate()"
+          [highlightedDates]="historyHighlightedDates()"
+          [showDefaultButtons]="false"
+          (ionChange)="selectCalendarDate($event.detail.value)"
+        ></ion-datetime>
+        <div class="history-calendar-legend">
+          <span></span>
+          {{ i18n.translate('history.hasMeasurements') }}
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
 
 <ion-modal class="scan-modal" [isOpen]="scanOpen()" (didDismiss)="scanOpen.set(false)">
   <ng-template>
