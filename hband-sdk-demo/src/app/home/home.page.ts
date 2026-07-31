@@ -54,10 +54,12 @@ export class HomePage implements OnInit {
   readonly savePromptOpen = signal(false);
   readonly savingMeasurement = signal(false);
   readonly scanOpen = signal(false);
-  readonly renameDeviceOpen = signal(false);
+  readonly deviceDetailsOpen = signal(false);
+  readonly editingDeviceName = signal(false);
   readonly renameDeviceName = signal('');
   readonly renamingDevice = signal(false);
-  readonly renameDeviceError = signal<'empty' | 'tooLong' | 'failed' | null>(null);
+  readonly disconnectingDevice = signal(false);
+  readonly renameDeviceError = signal<'empty' | 'invalid' | 'tooLong' | 'failed' | null>(null);
   readonly historyCalendarOpen = signal(false);
   readonly password = signal('0000');
   readonly selectedDate = signal(this.localDate(new Date()));
@@ -110,67 +112,83 @@ export class HomePage implements OnInit {
     this.scanOpen.set(false);
   }
 
-  /**
-   * Abre o editor com o nome confirmado pela sessão atual. O valor só é
-   * refletido no painel depois de a pulseira aceitar a escrita BLE.
-   */
-  openRenameDevice(): void {
+  /** Abre os detalhes apenas para a pulseira autenticada na sessão atual. */
+  openDeviceDetails(): void {
     const device = this.hband.status().device;
     if (!this.hband.connected() || !device) {
       return;
     }
     this.renameDeviceName.set(device.name ?? '');
     this.renameDeviceError.set(null);
-    this.renameDeviceOpen.set(true);
+    this.editingDeviceName.set(false);
+    this.deviceDetailsOpen.set(true);
+  }
+
+  startDeviceNameEdit(): void {
+    const currentName = this.hband.status().device?.name ?? '';
+    this.renameDeviceName.set(currentName.slice(0, 8));
+    this.renameDeviceError.set(null);
+    this.editingDeviceName.set(true);
   }
 
   updateRenameDeviceName(value: string | null | undefined): void {
-    this.renameDeviceName.set(value ?? '');
+    this.renameDeviceName.set((value ?? '').slice(0, 8));
     this.renameDeviceError.set(null);
   }
 
-  renameDeviceByteCount(): number {
-    return new TextEncoder().encode(this.renameDeviceName().trim()).length;
+  renameDeviceCharacterCount(): number {
+    return this.renameDeviceName().trim().length;
   }
 
   renameDeviceCanSave(): boolean {
     const name = this.renameDeviceName().trim();
     const currentName = this.hband.status().device?.name ?? '';
-    const byteCount = this.renameDeviceByteCount();
+    const characterCount = this.renameDeviceCharacterCount();
     return !this.renamingDevice()
       && name !== currentName
-      && byteCount > 0
-      && byteCount <= 8;
+      && characterCount > 0
+      && characterCount <= 8
+      && this.deviceNameCharactersValid();
   }
 
-  closeRenameDevice(): void {
-    if (this.renamingDevice()) {
+  deviceNameCharactersValid(): boolean {
+    const name = this.renameDeviceName().trim();
+    return name.length === 0 || /^[A-Za-z0-9 _-]+$/.test(name);
+  }
+
+  closeDeviceDetails(): void {
+    if (this.renamingDevice() || this.disconnectingDevice()) {
       return;
     }
-    this.renameDeviceOpen.set(false);
+    this.deviceDetailsOpen.set(false);
+    this.editingDeviceName.set(false);
     this.renameDeviceError.set(null);
   }
 
   /**
-   * Usa o limite comum de oito bytes UTF-8, válido também nas plataformas que
-   * não suportam o limite alargado de dezoito bytes previsto pelo SDK.
+   * O conjunto ASCII imposto pela interface garante que o limite visual de
+   * oito caracteres respeita também o limite nativo de oito bytes.
    */
   async submitDeviceRename(): Promise<void> {
     const name = this.renameDeviceName().trim();
-    const byteCount = new TextEncoder().encode(name).length;
-    if (byteCount === 0) {
+    const characterCount = name.length;
+    if (characterCount === 0) {
       this.renameDeviceError.set('empty');
       return;
     }
-    if (byteCount > 8) {
+    if (characterCount > 8) {
       this.renameDeviceError.set('tooLong');
+      return;
+    }
+    if (!this.deviceNameCharactersValid()) {
+      this.renameDeviceError.set('invalid');
       return;
     }
     this.renamingDevice.set(true);
     this.renameDeviceError.set(null);
     try {
       await this.hband.renameDevice(name);
-      this.renameDeviceOpen.set(false);
+      this.editingDeviceName.set(false);
     } catch {
       this.renameDeviceError.set('failed');
     } finally {
@@ -181,6 +199,25 @@ export class HomePage implements OnInit {
   renameDeviceErrorLabel(): string {
     const error = this.renameDeviceError();
     return error ? this.i18n.translate(`device.rename.errors.${error}`) : '';
+  }
+
+  deviceModelName(): string {
+    return this.hband.status().device?.model?.trim()
+      || this.i18n.translate('device.details.modelUnknown');
+  }
+
+  async disconnectFromDeviceDetails(): Promise<void> {
+    if (this.disconnectingDevice()) {
+      return;
+    }
+    this.disconnectingDevice.set(true);
+    try {
+      await this.hband.disconnect();
+      this.deviceDetailsOpen.set(false);
+      this.editingDeviceName.set(false);
+    } finally {
+      this.disconnectingDevice.set(false);
+    }
   }
 
   /**

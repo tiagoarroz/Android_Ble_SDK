@@ -47,19 +47,29 @@
     "unknown": "Appareil sans nom",
     "battery": "Batterie",
     "lowBattery": "Batterie faible",
+    "details": {
+      "open": "Voir les détails du bracelet",
+      "title": "Détails du bracelet",
+      "model": "Nom du modèle",
+      "modelUnknown": "Modèle non identifié",
+      "name": "Nom du bracelet",
+      "address": "Adresse MAC"
+    },
     "rename": {
       "open": "Modifier le nom du bracelet",
       "title": "Nom du bracelet",
       "heading": "Modifier le nom Bluetooth",
       "description": "Le nouveau nom sera enregistré sur le bracelet et utilisé lors des prochaines recherches Bluetooth.",
       "label": "Nouveau nom",
-      "limit": "Maximum de 8 octets",
+      "limit": "Maximum de 8 caractères",
+      "allowed": "Utilisez des lettres sans accent, des chiffres, des espaces, - et _.",
       "cancel": "Annuler",
       "save": "Enregistrer le nom",
       "saving": "Enregistrement",
       "errors": {
         "empty": "Saisissez un nom pour le bracelet.",
-        "tooLong": "Le nom ne peut pas dépasser 8 octets.",
+        "invalid": "Utilisez des lettres sans accent, des chiffres, des espaces, - et _.",
+        "tooLong": "Le nom ne peut pas dépasser 8 caractères.",
         "failed": "Le bracelet n’a pas accepté le changement de nom."
       }
     }

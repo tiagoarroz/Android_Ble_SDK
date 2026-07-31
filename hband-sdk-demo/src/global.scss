@@ -250,38 +250,6 @@ ion-content {
   }
 }
 
-.device-rename-button {
-  align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 0;
-  border-radius: 8px;
-  color: #9fe9d6;
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 28px;
-  height: 28px;
-  justify-content: center;
-  padding: 0;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
-  width: 28px;
-
-  ion-icon {
-    font-size: 16px;
-  }
-
-  &:hover,
-  &:focus-visible {
-    background: rgba(53, 224, 182, 0.18);
-    color: #d4fff4;
-    outline: 2px solid rgba(53, 224, 182, 0.28);
-    outline-offset: 1px;
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
-}
-
 .device-meta {
   align-items: center;
   display: flex;
@@ -341,6 +309,12 @@ ion-content {
   }
 }
 
+.connection-card__open {
+  color: #8eabb6;
+  font-size: 22px;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
 .connection-action--primary {
   --background: linear-gradient(135deg, #35e0b6, var(--app-mint));
   --background-activated: #22cda3;
@@ -359,10 +333,14 @@ ion-content {
   --color: #e3edf1;
 }
 
-.device-rename-modal {
+.device-details-modal {
   --border-radius: 22px;
-  --height: min(480px, 86vh);
+  --height: min(425px, 88vh);
   --width: min(430px, calc(100vw - 28px));
+
+  &.device-details-modal--editing {
+    --height: min(500px, 88vh);
+  }
 
   ion-toolbar {
     --background: #fff;
@@ -374,56 +352,142 @@ ion-content {
   }
 }
 
-.device-rename-content {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+.device-details-content {
   margin: 0 auto;
   max-width: 430px;
-  padding: 28px 24px calc(28px + env(safe-area-inset-bottom));
-  text-align: center;
-
-  > h2 {
-    color: var(--app-ink);
-    font-size: 22px;
-    letter-spacing: -0.03em;
-    margin: 14px 0 7px;
-  }
-
-  > p {
-    color: var(--app-ink-soft);
-    font-size: 12px;
-    line-height: 1.55;
-    margin: 0 0 20px;
-  }
+  padding: 24px 22px calc(24px + env(safe-area-inset-bottom));
 }
 
-.device-rename-content__icon {
+.device-details-hero {
   align-items: center;
-  background: linear-gradient(135deg, #dff7ee, #edf9f5);
-  border: 1px solid #cceade;
-  border-radius: 16px;
-  color: #087662;
-  display: inline-flex;
-  height: 54px;
-  justify-content: center;
-  width: 54px;
+  background: linear-gradient(135deg, #0b2732, #123e46);
+  border-radius: 18px;
+  box-shadow: 0 16px 30px rgb(9 38 48 / 14%);
+  color: #fff;
+  display: flex;
+  gap: 15px;
+  padding: 18px;
+
+  > span {
+    align-items: center;
+    background: rgb(53 224 182 / 13%);
+    border: 1px solid rgb(114 235 204 / 24%);
+    border-radius: 14px;
+    color: #72ebcc;
+    display: inline-flex;
+    flex: 0 0 52px;
+    height: 52px;
+    justify-content: center;
+  }
 
   ion-icon {
-    font-size: 26px;
+    font-size: 28px;
+  }
+
+  > div {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  small {
+    color: #a9c1ca;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    font-size: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
-.device-rename-field {
-  --background: #fff;
-  --border-radius: 14px;
-  --inner-padding-bottom: 7px;
-  --inner-padding-end: 13px;
-  --inner-padding-start: 13px;
-  --inner-padding-top: 7px;
+.device-details-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.device-details-field {
+  align-items: center;
+  background: #fff;
   border: 1px solid var(--app-border);
   border-radius: 14px;
-  width: 100%;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 70px;
+  padding: 13px 14px;
+}
+
+.device-details-field__content {
+  display: grid;
+  flex: 1;
+  gap: 5px;
+  min-width: 0;
+
+  > small {
+    color: var(--app-ink-soft);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  > strong {
+    color: var(--app-ink);
+    font-size: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.device-details-name-input {
+  --color: var(--app-ink);
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  font-size: 15px;
+  font-weight: 750;
+  min-height: 24px;
+}
+
+.device-name-action {
+  align-items: center;
+  background: #e7f7f1;
+  border: 0;
+  border-radius: 11px;
+  color: #087662;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 40px;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+
+  ion-icon,
+  ion-spinner {
+    font-size: 19px;
+    height: 19px;
+    width: 19px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #d4f0e7;
+    outline: 2px solid rgb(8 118 98 / 18%);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.42;
+  }
 }
 
 .device-rename-limit {
@@ -438,6 +502,12 @@ ion-content {
   &.is-invalid strong {
     color: var(--app-danger);
   }
+}
+
+.device-rename-allowed {
+  color: var(--app-ink-soft);
+  font-size: 9px;
+  line-height: 1.35;
 }
 
 .device-rename-error {
@@ -460,13 +530,20 @@ ion-content {
   }
 }
 
-.device-rename-submit {
-  --background: linear-gradient(135deg, #087662, #22b98f);
+.device-details-address {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.025em;
+}
+
+.device-details-disconnect {
+  --background: #fff;
   --border-radius: 14px;
-  --box-shadow: 0 12px 24px rgb(8 118 98 / 18%);
+  --border-color: #eabfc3;
+  --color: #b02b3a;
+  --box-shadow: none;
   font-size: 13px;
   font-weight: 780;
-  margin: 20px 0 0;
+  margin: 18px 0 0;
   min-height: 48px;
   width: 100%;
 }
@@ -1536,6 +1613,31 @@ ion-content {
     min-height: 0;
     padding: 8px;
     text-align: left;
+  }
+
+  .connection-card--interactive {
+    cursor: pointer;
+    transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+
+    &:hover {
+      background: rgb(255 255 255 / 4%);
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 7%);
+
+      .connection-card__open {
+        color: #72ebcc;
+        transform: translateX(2px);
+      }
+    }
+
+    &:focus-visible {
+      background: rgb(255 255 255 / 4%);
+      outline: 2px solid rgb(114 235 204 / 55%);
+      outline-offset: 3px;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
   }
 
   .connection-card__body {
@@ -3222,7 +3324,7 @@ ion-content {
 
     .connection-card {
       column-gap: 13px;
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: auto minmax(0, 1fr) auto;
       justify-items: start;
       text-align: left;
     }

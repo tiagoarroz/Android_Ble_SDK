@@ -27,6 +27,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     private var devices: [String: VPPeripheralModel] = [:]
     private var connectionState = "idle"
     private var connectedDevice: VPPeripheralModel?
+    private var connectedModelName: String?
     private var autoMonitoringSettings: [String: VPAutoMonitTestModel] = [:]
     private var legacyMonitoringStates: [String: Bool] = [:]
     private var pendingConnectCall: CAPPluginCall?
@@ -94,6 +95,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         pendingConnectCall = call
         pendingPassword = call.getString("password") ?? "0000"
         connectedDevice = device
+        // Conserva o nome anunciado no scan como identificação do modelo da sessão.
+        connectedModelName = device.deviceName
         setConnectionState("connecting")
 
         manager.veepooSDKConnectDevice(device) { [weak self] state in
@@ -104,6 +107,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc public func disconnect(_ call: CAPPluginCall) {
         manager.veepooSDKDisconnectDevice()
         connectedDevice = nil
+        connectedModelName = nil
         setConnectionState("disconnected")
         call.resolve()
     }
@@ -1268,7 +1272,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         var payload: [String: Any] = [
             "id": device.deviceAddress ?? "",
             "name": device.deviceName ?? "",
-            "model": device.deviceName ?? ""
+            "model": connectedModelName ?? device.deviceName ?? ""
         ]
         if let rssi = device.rssi {
             payload["rssi"] = rssi.intValue

@@ -47,19 +47,29 @@
     "unknown": "Dispositivo sem nome",
     "battery": "Bateria",
     "lowBattery": "Bateria fraca",
+    "details": {
+      "open": "Ver detalhes da pulseira",
+      "title": "Detalhes da pulseira",
+      "model": "Nome do modelo",
+      "modelUnknown": "Modelo não identificado",
+      "name": "Nome da pulseira",
+      "address": "MAC Address"
+    },
     "rename": {
       "open": "Alterar nome da pulseira",
       "title": "Nome da pulseira",
       "heading": "Alterar nome Bluetooth",
       "description": "O novo nome será guardado na pulseira e usado nas próximas pesquisas Bluetooth.",
       "label": "Novo nome",
-      "limit": "Máximo de 8 bytes",
+      "limit": "Máximo de 8 caracteres",
+      "allowed": "Use letras sem acentos, números, espaços, - e _.",
       "cancel": "Cancelar",
       "save": "Guardar nome",
       "saving": "A guardar",
       "errors": {
         "empty": "Introduza um nome para a pulseira.",
-        "tooLong": "O nome não pode ultrapassar 8 bytes.",
+        "invalid": "Use letras sem acentos, números, espaços, - e _.",
+        "tooLong": "O nome não pode ultrapassar 8 caracteres.",
         "failed": "A pulseira não aceitou a alteração do nome."
       }
     }

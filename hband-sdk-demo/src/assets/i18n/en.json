@@ -47,19 +47,29 @@
     "unknown": "Unnamed device",
     "battery": "Battery",
     "lowBattery": "Low battery",
+    "details": {
+      "open": "View band details",
+      "title": "Band details",
+      "model": "Model name",
+      "modelUnknown": "Unidentified model",
+      "name": "Band name",
+      "address": "MAC address"
+    },
     "rename": {
       "open": "Change band name",
       "title": "Band name",
       "heading": "Change Bluetooth name",
       "description": "The new name will be saved on the band and used in future Bluetooth searches.",
       "label": "New name",
-      "limit": "Maximum of 8 bytes",
+      "limit": "Maximum of 8 characters",
+      "allowed": "Use unaccented letters, numbers, spaces, - and _.",
       "cancel": "Cancel",
       "save": "Save name",
       "saving": "Saving",
       "errors": {
         "empty": "Enter a name for the band.",
-        "tooLong": "The name cannot exceed 8 bytes.",
+        "invalid": "Use unaccented letters, numbers, spaces, - and _.",
+        "tooLong": "The name cannot exceed 8 characters.",
         "failed": "The band did not accept the name change."
       }
     }

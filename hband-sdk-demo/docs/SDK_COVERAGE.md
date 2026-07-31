@@ -78,16 +78,23 @@ real da MF91 continua dependente de ensaio físico.
 
 ## Nome Bluetooth da pulseira
 
-O botão de lápis junto ao nome executa `device.rename` apenas numa sessão
-ligada. A bridge espera pelo callback final antes de atualizar a interface:
+O botão de lápis junto ao nome, dentro da modal de detalhes, executa
+`device.rename` apenas numa sessão ligada. A bridge espera pelo callback final
+antes de atualizar a interface:
 
 - Android: `VPOperateManager.bleDeviceRename` e `IDeviceRenameListener`;
 - iOS: `veepooSDKSettingDeviceNameWithString:resultBlock:`.
 
-O nome é validado em bytes UTF-8 e limitado conservadoramente a oito bytes, o
-valor suportado em todas as plataformas descritas pelo SDK. Alguns dispositivos
-JL aceitam dezoito bytes, mas esse limite não é usado sem confirmação explícita
-do hardware. O SDK pode aceitar a escrita e o sistema operativo continuar a
+O nome visível é limitado a oito caracteres e ao conjunto `A-Z`, `a-z`, `0-9`,
+espaço, `-` e `_`. A interface rejeita acentos e outros símbolos, garantindo que cada
+carácter corresponde a um byte e respeita o limite nativo comum de oito bytes. Alguns
+dispositivos JL aceitam dezoito bytes, mas esse limite não é usado sem confirmação
+explícita do hardware. O SDK pode aceitar a escrita e o sistema operativo continuar a
 mostrar temporariamente o nome antigo durante uma nova pesquisa devido à cache
 Bluetooth. A compilação confirma o contrato; a aceitação pelo firmware da MF91
 é confirmada apenas pelo callback numa pulseira física.
+
+O campo de modelo na modal conserva separadamente a identificação anunciada no
+scan que iniciou a sessão. O SDK não fornece uma designação comercial adicional;
+num restauro direto sem novo scan, a aplicação apresenta o modelo como não
+identificado em vez de usar o MAC como se fosse um nome de modelo.

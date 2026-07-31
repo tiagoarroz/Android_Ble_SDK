@@ -218,37 +218,60 @@ describe('HomePage', () => {
     expect(component.batteryPercent()).toBe(75);
   });
 
-  it('should rename the connected band only after the operation succeeds', async () => {
+  it('should open the connected band details and save its edited name', async () => {
     component.hband.status.update((status) => ({
       ...status,
       state: 'connected',
-      device: { id: 'MF91-TEST', name: 'MF91' },
+      device: { id: 'MF91-TEST', name: 'MF91', model: 'MF91' },
     }));
 
-    component.openRenameDevice();
+    component.openDeviceDetails();
+    component.startDeviceNameEdit();
     component.updateRenameDeviceName('Saude');
     await component.submitDeviceRename();
 
     expect(component.hband.status().device?.name).toBe('Saude');
-    expect(component.renameDeviceOpen()).toBeFalse();
+    expect(component.deviceDetailsOpen()).toBeTrue();
+    expect(component.editingDeviceName()).toBeFalse();
     expect(component.renameDeviceError()).toBeNull();
+    expect(component.deviceModelName()).toBe('MF91');
   });
 
-  it('should validate the band name using UTF-8 bytes', async () => {
+  it('should limit the band name to eight ASCII-safe characters', async () => {
     component.hband.status.update((status) => ({
       ...status,
       state: 'connected',
       device: { id: 'MF91-TEST', name: 'MF91' },
     }));
-    component.openRenameDevice();
-    component.updateRenameDeviceName('Saúde123');
+    component.openDeviceDetails();
+    component.startDeviceNameEdit();
+    component.updateRenameDeviceName('Saúde!1234');
 
-    expect(component.renameDeviceByteCount()).toBe(9);
+    expect(component.renameDeviceName()).toBe('Saúde!12');
+    expect(component.renameDeviceCharacterCount()).toBe(8);
+    expect(component.deviceNameCharactersValid()).toBeFalse();
     expect(component.renameDeviceCanSave()).toBeFalse();
 
     await component.submitDeviceRename();
-    expect(component.renameDeviceError()).toBe('tooLong');
-    expect(component.hband.status().device?.name).toBe('MF91');
+    expect(component.renameDeviceError()).toBe('invalid');
+
+    component.updateRenameDeviceName('Saude 12');
+    expect(component.deviceNameCharactersValid()).toBeTrue();
+    expect(component.renameDeviceCanSave()).toBeTrue();
+  });
+
+  it('should disconnect from the details modal and close it', async () => {
+    component.hband.status.update((status) => ({
+      ...status,
+      state: 'connected',
+      device: { id: 'MF91-TEST', name: 'MF91', model: 'MF91' },
+    }));
+    component.openDeviceDetails();
+
+    await component.disconnectFromDeviceDetails();
+
+    expect(component.deviceDetailsOpen()).toBeFalse();
+    expect(component.hband.connected()).toBeFalse();
   });
 
   it('should highlight every date stored for the current band', () => {

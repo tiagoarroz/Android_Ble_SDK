@@ -176,6 +176,7 @@ public class HBandPlugin extends Plugin {
     private String connectionState = "idle";
     private String currentAddress;
     private String currentName;
+    private String currentModelName;
     private String currentPassword = "0000";
     private String firmwareVersion;
     private String hardwareVersion;
@@ -331,6 +332,12 @@ public class HBandPlugin extends Plugin {
         currentName = discovered != null && discovered.getName() != null
             ? discovered.getName()
             : deviceId;
+        /*
+         * Conserva separadamente o nome anunciado no primeiro scan. O nome
+         * Bluetooth pode ser alterado depois, mas continua a identificar o
+         * modelo durante a sessão atual.
+         */
+        currentModelName = discovered != null ? discovered.getName() : null;
         currentPassword = call.getString("password", "0000");
         pendingConnectCall = call;
         intentionalDisconnect = false;
@@ -2330,6 +2337,7 @@ public class HBandPlugin extends Plugin {
             JSObject device = new JSObject();
             device.put("id", currentAddress);
             device.put("name", currentName == null ? currentAddress : currentName);
+            device.put("model", currentModelName);
             device.put("firmware", firmwareVersion);
             device.put("hardware", hardwareVersion);
             SearchResult result = discoveredDevices.get(currentAddress);
