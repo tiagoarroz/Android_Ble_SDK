@@ -53,7 +53,23 @@
     "eyebrow": "Daily health",
     "title": "Measurements",
     "noResults": "No results",
-    "noResultsDescription": "Try another term or select a different category."
+    "noResultsDescription": "Try another term or select a different category.",
+    "summary": {
+      "noDataToday": "No data today",
+      "latest": "Updated at {{time}}",
+      "steps": "steps",
+      "activity": "{{distance}} km · {{calories}} kcal",
+      "bpm": "bpm",
+      "mmHg": "mmHg",
+      "pulse": "Pulse {{value}} bpm",
+      "percent": "%",
+      "celsius": "°C",
+      "mmolL": "mmol/L",
+      "recorded": "Recorded",
+      "bmi": "BMI",
+      "bodyFat": "{{value}}% body fat",
+      "points": "points"
+    }
   },
   "activity": {
     "eyebrow": "Information",

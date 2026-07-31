@@ -136,6 +136,57 @@ describe('HomePage', () => {
     expect(component.todayHistoryFor('heartRate')).toBeUndefined();
   });
 
+  it('should summarise daily activity and the latest clinical reading on home cards', () => {
+    component.hband.history.set({
+      steps: {
+        type: 'history',
+        metric: 'steps',
+        date: component.today,
+        timestamp: new Date().toISOString(),
+        values: { records: 2 },
+        records: [
+          {
+            timestamp: `${component.today}T08:00:00`,
+            values: { steps: 700, distanceKm: 0.5, caloriesKcal: 30 },
+          },
+          {
+            timestamp: `${component.today}T11:00:00`,
+            values: { steps: 800, distanceKm: 0.6, caloriesKcal: 35 },
+          },
+        ],
+      },
+      bloodPressure: {
+        type: 'history',
+        metric: 'bloodPressure',
+        date: component.today,
+        timestamp: new Date().toISOString(),
+        values: { records: 2 },
+        records: [
+          {
+            timestamp: `${component.today}T12:00:00`,
+            values: { systolic: 121, diastolic: 79, pulseBpm: 73 },
+          },
+          {
+            timestamp: `${component.today}T09:00:00`,
+            values: { systolic: 118, diastolic: 76 },
+          },
+        ],
+      },
+    });
+
+    const steps = component.homeMetricSummary(
+      component.features.find((feature) => feature.metric === 'steps')!,
+    );
+    const bloodPressure = component.homeMetricSummary(
+      component.features.find((feature) => feature.metric === 'bloodPressure')!,
+    );
+
+    expect(steps?.primary.replace(/\D/g, '')).toBe('1500');
+    expect(steps?.secondary).toContain('65 kcal');
+    expect(bloodPressure?.primary).toBe('121/79');
+    expect(bloodPressure?.timestamp).toContain('T12:00:00');
+  });
+
   it('should expose and toggle only monitoring settings returned by the device', async () => {
     const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
     component.hband.status.update((status) => ({

@@ -90,11 +90,26 @@
             <ion-icon class="feature-card__open" name="chevron-forward-outline"></ion-icon>
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
-          <p>{{ i18n.translate(feature.descriptionKey) }}</p>
-          @if (todayHistoryFor(feature.metric); as event) {
-            <app-data-visualizer [event]="event" [type]="feature.visualization" [compact]="true"></app-data-visualizer>
+          @if (homeMetricSummary(feature); as summary) {
+            <div class="feature-card-summary">
+              <div class="feature-card-summary__value">
+                <strong>{{ summary.primary }}</strong>
+                @if (summary.unit) {
+                  <span>{{ summary.unit }}</span>
+                }
+              </div>
+              @if (summary.secondary) {
+                <small>{{ summary.secondary }}</small>
+              }
+              <time [attr.datetime]="summary.timestamp">
+                {{ i18n.translate('catalog.summary.latest', { time: homeSummaryTime(summary.timestamp) }) }}
+              </time>
+            </div>
           } @else {
-            <div class="feature-placeholder"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="feature-card-summary feature-card-summary--empty">
+              <strong>—</strong>
+              <span>{{ i18n.translate('catalog.summary.noDataToday') }}</span>
+            </div>
           }
         </article>
       }

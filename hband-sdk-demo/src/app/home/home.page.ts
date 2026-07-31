@@ -26,6 +26,13 @@ import type {
 } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
+interface HomeMetricSummary {
+  primary: string;
+  unit?: string;
+  secondary?: string;
+  timestamp: string;
+}
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -158,6 +165,134 @@ export class HomePage implements OnInit {
   todayHistoryFor(metric: MetricId): HBandDataEvent | undefined {
     const history = this.hband.historyFor(metric);
     return history?.date === this.today && history.records?.length ? history : undefined;
+  }
+
+  /**
+   * Constrói a síntese diária usada apenas no painel inicial. A atividade é
+   * acumulada; nas métricas fisiológicas usa-se a leitura mais recente, tal
+   * como numa vista de acompanhamento diário, sem repetir os gráficos internos.
+   */
+  homeMetricSummary(feature: FeatureDefinition): HomeMetricSummary | null {
+    const event = this.todayHistoryFor(feature.metric);
+    const records = event?.records ?? [];
+    const latest = [...records].sort(
+      (left, right) => new Date(right.timestamp).getTime() - new Date(left.timestamp).getTime(),
+    )[0];
+    if (!latest) {
+      return null;
+    }
+
+    const value = (field: string) => this.numericDataValue(latest.values[field]);
+    const summary = (
+      primary: number | null,
+      unitKey: string,
+      options: Pick<HomeMetricSummary, 'secondary'> = {},
+    ): HomeMetricSummary | null => primary === null ? null : {
+      primary: this.formatHomeMetricValue(primary, feature.metric),
+      unit: this.i18n.translate(unitKey),
+      timestamp: latest.timestamp,
+      ...options,
+    };
+
+    switch (feature.metric) {
+      case 'steps': {
+        const total = (field: string) => records.reduce(
+          (sum, record) => sum + (this.numericDataValue(record.values[field]) ?? 0),
+          0,
+        );
+        return {
+          primary: this.formatHomeMetricValue(total('steps'), 'steps'),
+          unit: this.i18n.translate('catalog.summary.steps'),
+          secondary: this.i18n.translate('catalog.summary.activity', {
+            distance: this.formatHomeMetricValue(total('distanceKm'), 'steps', 1),
+            calories: this.formatHomeMetricValue(total('caloriesKcal'), 'steps', 0),
+          }),
+          timestamp: latest.timestamp,
+        };
+      }
+      case 'heartRate':
+        return summary(value('bpm'), 'catalog.summary.bpm');
+      case 'bloodPressure': {
+        const systolic = value('systolic');
+        const diastolic = value('diastolic');
+        if (systolic === null || diastolic === null) {
+          return null;
+        }
+        const pulse = value('pulseBpm');
+        return {
+          primary: `${this.formatHomeMetricValue(systolic, feature.metric, 0)}/${this.formatHomeMetricValue(diastolic, feature.metric, 0)}`,
+          unit: this.i18n.translate('catalog.summary.mmHg'),
+          secondary: pulse === null ? undefined : this.i18n.translate('catalog.summary.pulse', {
+            value: this.formatHomeMetricValue(pulse, feature.metric, 0),
+          }),
+          timestamp: latest.timestamp,
+        };
+      }
+      case 'oxygen':
+        return summary(value('percent'), 'catalog.summary.percent');
+      case 'temperature':
+        return summary(value('celsius') ?? value('baselineCelsius'), 'catalog.summary.celsius');
+      case 'bloodGlucose':
+        return summary(value('mmolL'), 'catalog.summary.mmolL');
+      case 'ecg': {
+        const bpm = value('bpm');
+        return bpm === null ? {
+          primary: this.i18n.translate('catalog.summary.recorded'),
+          timestamp: latest.timestamp,
+        } : summary(bpm, 'catalog.summary.bpm');
+      }
+      case 'bodyComposition': {
+        const bmi = value('bmi');
+        const bodyFat = value('bodyFatPercent');
+        if (bmi === null && bodyFat === null) {
+          return null;
+        }
+        return {
+          primary: this.formatHomeMetricValue(bmi ?? bodyFat!, feature.metric, 1),
+          unit: this.i18n.translate(bmi === null
+            ? 'catalog.summary.percent'
+            : 'catalog.summary.bmi'),
+          secondary: bodyFat === null || bmi === null
+            ? undefined
+            : this.i18n.translate('catalog.summary.bodyFat', {
+              value: this.formatHomeMetricValue(bodyFat, feature.metric, 1),
+            }),
+          timestamp: latest.timestamp,
+        };
+      }
+      case 'stress':
+        return summary(value('score'), 'catalog.summary.points');
+    }
+    return null;
+  }
+
+  private numericDataValue(value: DataValue): number | null {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
+  private formatHomeMetricValue(
+    value: number,
+    metric: MetricId,
+    maximumFractionDigits = metric === 'bloodGlucose' ? 2 : 1,
+  ): string {
+    return new Intl.NumberFormat(this.locale(), {
+      minimumFractionDigits: metric === 'temperature' ? 1 : 0,
+      maximumFractionDigits,
+    }).format(value);
+  }
+
+  /**
+   * Formata a hora do resumo sem propagar um timestamp inválido para o texto
+   * traduzido do cartão.
+   */
+  homeSummaryTime(timestamp: string): string {
+    const date = new Date(timestamp);
+    return Number.isNaN(date.getTime())
+      ? '—'
+      : new Intl.DateTimeFormat(this.locale(), {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date);
   }
 
   /**
