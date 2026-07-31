@@ -212,6 +212,19 @@
     "records": "{{count}} registros",
     "updatedAt": "atualizado em {{date}}",
     "retention": "A MF91 disponibiliza hoje e até {{days}} dias anteriores.",
+    "allData": {
+      "title": "Todos os dados",
+      "open": "Ver todos os dados",
+      "back": "Voltar ao resumo",
+      "automatic": "Monitoramento automático",
+      "automaticDescription": "Leituras registradas automaticamente pela pulseira.",
+      "manual": "Medições manuais",
+      "manualDescription": "Medições iniciadas e salvas manualmente.",
+      "emptyAutomatic": "Sem leituras automáticas neste dia.",
+      "emptyManual": "Sem medições manuais neste dia.",
+      "records": "{{count}} leituras",
+      "samples": "{{count}} amostras"
+    },
     "sources": {
       "local": "Arquivo local",
       "device": "Dados da pulseira",

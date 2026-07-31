@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import type {
-  HBandDataEvent, HBandHistoryRecord, MetricId,
+  HBandDataEvent, HBandHistoryRecord, HBandReadingSource, MetricId,
 } from './hband.types';
 
 const DATABASE_NAME = 'hband-history';
@@ -213,7 +213,13 @@ export class HistoryRepositoryService {
     previous: HBandDataEvent | undefined,
     incoming: HBandDataEvent,
   ): HBandDataEvent {
-    const records = this.mergeRecords(previous?.records ?? [], incoming.records ?? []);
+    const defaultSource: HBandReadingSource = incoming.metric === 'ecg'
+      || incoming.metric === 'bodyComposition' ? 'manual' : 'automatic';
+    const records = this.mergeRecords(
+      previous?.records ?? [],
+      incoming.records ?? [],
+      incoming.readingSource ?? defaultSource,
+    );
     return {
       ...previous,
       ...incoming,
@@ -230,13 +236,17 @@ export class HistoryRepositoryService {
   private mergeRecords(
     previous: HBandHistoryRecord[],
     incoming: HBandHistoryRecord[],
+    defaultSource: HBandReadingSource,
   ): HBandHistoryRecord[] {
     const records = new Map<string, HBandHistoryRecord>();
     for (const record of [...previous, ...incoming]) {
-      const current = records.get(record.timestamp);
-      records.set(record.timestamp, {
+      const source = record.source ?? defaultSource;
+      const key = `${record.timestamp}|${source}`;
+      const current = records.get(key);
+      records.set(key, {
         ...current,
         ...record,
+        source,
         values: { ...(current?.values ?? {}), ...record.values },
         samples: record.samples?.length ? record.samples : current?.samples,
       });

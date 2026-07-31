@@ -34,6 +34,7 @@ export class DataVisualizerComponent {
   @Input({ required: true }) event!: HBandDataEvent;
   @Input({ required: true }) type!: VisualizationType;
   @Input() compact = false;
+  @Input() showRecords = true;
   temperatureHistoryField: 'celsius' | 'baselineCelsius' = 'celsius';
 
   entries(): Array<[string, string | number | boolean | null]> {

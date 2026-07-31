@@ -9,6 +9,7 @@ export type MetricId =
   | 'ecg' | 'bodyComposition' | 'stress' | 'steps';
 export type VisualizationType = 'gauge' | 'line' | 'bars' | 'ecg' | 'composition' | 'activity';
 export type DataValue = string | number | boolean | null;
+export type HBandReadingSource = 'automatic' | 'manual';
 
 export interface HBandDevice {
   id: string;
@@ -77,6 +78,7 @@ export interface HBandHistoryRecord {
   timestamp: string;
   values: Record<string, DataValue>;
   samples?: number[];
+  source?: HBandReadingSource;
 }
 
 export interface HBandDataEvent {
@@ -87,6 +89,7 @@ export interface HBandDataEvent {
   values: Record<string, DataValue>;
   samples?: number[];
   records?: HBandHistoryRecord[];
+  readingSource?: HBandReadingSource;
   raw?: string;
 }
 

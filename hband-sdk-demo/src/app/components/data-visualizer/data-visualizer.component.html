@@ -307,7 +307,7 @@
       <span>{{ i18n.translate('data.measurementProgress') }}</span>
     </div>
   }
-  @if (!compact && historyRecords().length) {
+  @if (!compact && showRecords && historyRecords().length) {
     <div class="history-record-list">
       @for (record of historyRecords(); track record.timestamp) {
         <div>

@@ -1445,7 +1445,7 @@ public class HBandPlugin extends Plugin {
                     @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
                     @Override public void onReadOriginProgress(float progress) {}
                     @Override public void onReadOriginComplete() {
-                        emitHistory(metric, date.toString(), records);
+                        emitHistory(metric, date.toString(), records, "automatic");
                         accept(call, "history.metric");
                     }
                 },
@@ -1464,7 +1464,7 @@ public class HBandPlugin extends Plugin {
                     @Override public void onReadOriginProgressDetail(int day, String value, int total, int current) {}
                     @Override public void onReadOriginProgress(float progress) {}
                     @Override public void onReadOriginComplete() {
-                        emitHistory(metric, date.toString(), records);
+                        emitHistory(metric, date.toString(), records, "automatic");
                         accept(call, "history.metric");
                     }
                 },
@@ -1712,13 +1712,13 @@ public class HBandPlugin extends Plugin {
         JSArray stress
     ) {
         String day = date.toString();
-        emitHistory("steps", day, steps);
-        emitHistory("heartRate", day, heartRate);
-        emitHistory("bloodPressure", day, bloodPressure);
-        emitHistory("oxygen", day, oxygen);
-        emitHistory("temperature", day, temperature);
-        emitHistory("bloodGlucose", day, bloodGlucose);
-        emitHistory("stress", day, stress);
+        emitHistory("steps", day, steps, "automatic");
+        emitHistory("heartRate", day, heartRate, "automatic");
+        emitHistory("bloodPressure", day, bloodPressure, "automatic");
+        emitHistory("oxygen", day, oxygen, "automatic");
+        emitHistory("temperature", day, temperature, "automatic");
+        emitHistory("bloodGlucose", day, bloodGlucose, "automatic");
+        emitHistory("stress", day, stress, "automatic");
     }
 
     private DeviceManualDataType manualType(String metric) {
@@ -1915,12 +1915,12 @@ public class HBandPlugin extends Plugin {
         JSArray stress
     ) {
         String day = date.toString();
-        emitHistory("heartRate", day, heartRate);
-        emitHistory("bloodPressure", day, bloodPressure);
-        emitHistory("oxygen", day, oxygen);
-        emitHistory("temperature", day, temperature);
-        emitHistory("bloodGlucose", day, bloodGlucose);
-        emitHistory("stress", day, stress);
+        emitHistory("heartRate", day, heartRate, "manual");
+        emitHistory("bloodPressure", day, bloodPressure, "manual");
+        emitHistory("oxygen", day, oxygen, "manual");
+        emitHistory("temperature", day, temperature, "manual");
+        emitHistory("bloodGlucose", day, bloodGlucose, "manual");
+        emitHistory("stress", day, stress, "manual");
     }
 
     private void readManualMetricHistory(
@@ -2003,13 +2003,13 @@ public class HBandPlugin extends Plugin {
                 }
 
                 @Override public void onReadComplete() {
-                    emitHistory(metric, date.toString(), records);
+                    emitHistory(metric, date.toString(), records, "manual");
                     accept(call, "history.metric");
                 }
 
                 @Override public void onReadFail() {
                     emitLog("error", "Manual history read failed", "history.metric");
-                    emitHistory(metric, date.toString(), records);
+                    emitHistory(metric, date.toString(), records, "manual");
                     accept(call, "history.metric");
                 }
             }
@@ -2027,7 +2027,7 @@ public class HBandPlugin extends Plugin {
         manager.readECGId(directWriteResponse, allDates, EEcgDataType.ALL, new IECGReadIdListener() {
             @Override public void readIdFinish(int[] ids) {
                 if (ids == null || ids.length == 0) {
-                    emitHistory(metric, date.toString(), new JSArray());
+                    emitHistory(metric, date.toString(), new JSArray(), "manual");
                     accept(call, "history.metric");
                     return;
                 }
@@ -2057,7 +2057,7 @@ public class HBandPlugin extends Plugin {
                         ));
                     }
                 }
-                emitHistory(metric, date.toString(), records);
+                emitHistory(metric, date.toString(), records, "manual");
                 accept(call, "history.metric");
             }
 
@@ -2073,7 +2073,7 @@ public class HBandPlugin extends Plugin {
                     records.put(historyRecord(item.getTimeBean(), bodyComponentValues(item), null));
                 }
             }
-            emitHistory(metric, date.toString(), records);
+            emitHistory(metric, date.toString(), records, "manual");
             accept(call, "history.metric");
         });
     }
@@ -2155,7 +2155,11 @@ public class HBandPlugin extends Plugin {
         return result;
     }
 
-    private void emitHistory(String metric, String date, JSArray records) {
+    /**
+     * Identifica a origem antes de atravessar a bridge. Depois de persistidos,
+     * dois registos iguais no mesmo instante continuam separados por origem.
+     */
+    private void emitHistory(String metric, String date, JSArray records, String readingSource) {
         JSObject event = new JSObject();
         event.put("type", "history");
         event.put("metric", metric);
@@ -2163,6 +2167,7 @@ public class HBandPlugin extends Plugin {
         event.put("timestamp", Instant.now().toString());
         event.put("values", new JSObject().put("records", records.length()));
         event.put("records", records);
+        event.put("readingSource", readingSource);
         notifyListeners("data", event, true);
     }
 

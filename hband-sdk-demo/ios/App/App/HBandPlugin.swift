@@ -756,7 +756,11 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         runHistoryReaders(readers, index: 0) { [weak self] in
             guard let self else { return }
             self.historyMetrics().forEach {
-                self.queryHistory(metric: $0, date: date)
+                self.queryHistory(
+                    metric: $0,
+                    date: date,
+                    readingSource: self.historyReadingSource(metric: $0)
+                )
             }
             self.accept(call, operation: operation)
         }
@@ -775,7 +779,13 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("HISTORY_DATE_REQUIRED")
             return
         }
-        historyMetrics().forEach { queryHistory(metric: $0, date: date) }
+        historyMetrics().forEach {
+            queryHistory(
+                metric: $0,
+                date: date,
+                readingSource: historyReadingSource(metric: $0)
+            )
+        }
         accept(call, operation: operation)
     }
 
@@ -830,7 +840,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         let completion: (VPReadDeviceBaseDataState, UInt, UInt, UInt) -> Void = {
             [weak self] state, _, _, _ in
             guard state == .complete else { return }
-            self?.queryHistory(metric: metric, date: date)
+            self?.queryHistory(metric: metric, date: date, readingSource: "manual")
             self?.accept(call, operation: operation)
         }
 
@@ -879,7 +889,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                 records: [[
                     "timestamp": "\(date)T23:59:59",
                     "values": values
-                ]]
+                ]],
+                readingSource: "automatic"
             )
             self.accept(call, operation: operation)
         }
@@ -898,7 +909,7 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
      * Converte os formatos heterogéneos da base Veepoo num contrato único de
      * registos temporais consumido pelas visualizações Angular.
      */
-    private func queryHistory(metric: String, date: String) {
+    private func queryHistory(metric: String, date: String, readingSource: String) {
         guard let tableID = manager.peripheralModel?.deviceAddress, !tableID.isEmpty else {
             emitLog(level: "error", message: "DEVICE_ADDRESS_UNAVAILABLE", operation: "history.metric")
             return
@@ -1033,7 +1044,20 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         default:
             records = []
         }
-        emitHistory(metric: metric, date: date, records: records)
+        emitHistory(
+            metric: metric,
+            date: date,
+            records: records,
+            readingSource: readingSource
+        )
+    }
+
+    /**
+     * Os blocos diários pertencem à monitorização. ECG e composição corporal
+     * são medições dedicadas e, por isso, surgem no grupo manual.
+     */
+    private func historyReadingSource(metric: String) -> String {
+        metric == "ecg" || metric == "bodyComposition" ? "manual" : "automatic"
     }
 
     private func ecgHistoryRecord(_ model: VPECGTestDataModel, date: String) -> [String: Any] {
@@ -1085,7 +1109,12 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
         return record
     }
 
-    private func emitHistory(metric: String, date: String, records: [[String: Any]]) {
+    private func emitHistory(
+        metric: String,
+        date: String,
+        records: [[String: Any]],
+        readingSource: String
+    ) {
         let samples = records.flatMap { ($0["samples"] as? [Double]) ?? [] }
         var payload: [String: Any] = [
             "type": "history",
@@ -1093,7 +1122,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             "date": date,
             "timestamp": isoFormatter.string(from: Date()),
             "values": ["records": records.count],
-            "records": records
+            "records": records,
+            "readingSource": readingSource
         ]
         if !samples.isEmpty {
             payload["samples"] = samples

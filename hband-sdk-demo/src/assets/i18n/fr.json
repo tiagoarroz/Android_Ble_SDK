@@ -211,7 +211,20 @@
     "noData": "Aucune donnée n'a été reçue pour cette date.",
     "records": "{{count}} enregistrements",
     "updatedAt": "mis à jour le {{date}}",
-    "retention": "Le MF91 fournit aujourd'hui et jusqu'à {{days}} jours précédents.",
+    "retention": "Le MF91 fournit aujourd’hui et jusqu’à {{days}} jours précédents.",
+    "allData": {
+      "title": "Toutes les données",
+      "open": "Voir toutes les données",
+      "back": "Retour au résumé",
+      "automatic": "Suivi automatique",
+      "automaticDescription": "Mesures enregistrées automatiquement par le bracelet.",
+      "manual": "Mesures manuelles",
+      "manualDescription": "Mesures démarrées et enregistrées manuellement.",
+      "emptyAutomatic": "Aucune mesure automatique ce jour-là.",
+      "emptyManual": "Aucune mesure manuelle ce jour-là.",
+      "records": "{{count}} mesures",
+      "samples": "{{count}} échantillons"
+    },
     "sources": {
       "local": "Archive locale",
       "device": "Données du bracelet",

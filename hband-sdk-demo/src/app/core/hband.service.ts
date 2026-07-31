@@ -5,7 +5,8 @@ import { HBand } from './hband.plugin';
 import { HistoryRepositoryService } from './history-repository.service';
 import type {
   HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
-  HBandHistoryState, HBandMonitoringSetting, HBandStatus, HBandSyncStatus, MetricId,
+  HBandHistoryState, HBandMonitoringSetting, HBandReadingSource, HBandStatus,
+  HBandSyncStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -558,6 +559,7 @@ export class HBandService {
         timestamp,
         values: { ...event.values },
         samples: event.samples?.length ? [...event.samples] : undefined,
+        source: 'manual',
       }],
       samples: event.samples?.length ? [...event.samples] : undefined,
       raw: event.raw,
@@ -848,15 +850,30 @@ export class HBandService {
       if (!event.date || !event.records?.length) {
         return;
       }
+      /*
+       * A origem é emitida pela bridge porque só a operação nativa sabe se o
+       * bloco veio da monitorização ou de uma tabela de medições manuais.
+       */
+      const readingSource = event.readingSource
+        ?? (metric === 'ecg' || metric === 'bodyComposition' ? 'manual' : 'automatic');
+      const sourcedEvent: HBandDataEvent = {
+        ...event,
+        metric,
+        readingSource,
+        records: event.records.map((record) => ({
+          ...record,
+          source: record.source ?? readingSource,
+        })),
+      };
       if (event.date === this.selectedHistoryDate) {
         this.history.update((history) => ({
           ...history,
-          [metric]: this.mergeHistoryEvents(history[metric], event),
+          [metric]: this.mergeHistoryEvents(history[metric], sourcedEvent),
         }));
       }
       const deviceId = this.historyDeviceId;
       if (deviceId) {
-        void this.historyRepository.mergeEvent(deviceId, { ...event, metric }).then((merged) => {
+        void this.historyRepository.mergeEvent(deviceId, sourcedEvent).then((merged) => {
           this.historyDates.update((dates) =>
             [...new Set([...dates, event.date as string])].sort());
           if (event.date !== this.selectedHistoryDate) {
@@ -1244,13 +1261,17 @@ export class HBandService {
   private mergeHistoryRecords(
     previous: HBandHistoryRecord[],
     incoming: HBandHistoryRecord[],
+    defaultSource: HBandReadingSource,
   ): HBandHistoryRecord[] {
     const records = new Map<string, HBandHistoryRecord>();
     for (const record of [...previous, ...incoming]) {
-      const current = records.get(record.timestamp);
-      records.set(record.timestamp, {
+      const source = record.source ?? defaultSource;
+      const key = `${record.timestamp}|${source}`;
+      const current = records.get(key);
+      records.set(key, {
         ...current,
         ...record,
+        source,
         values: { ...(current?.values ?? {}), ...record.values },
         samples: record.samples?.length ? record.samples : current?.samples,
       });
@@ -1264,7 +1285,13 @@ export class HBandService {
     previous: HBandDataEvent | undefined,
     incoming: HBandDataEvent,
   ): HBandDataEvent {
-    const records = this.mergeHistoryRecords(previous?.records ?? [], incoming.records ?? []);
+    const defaultSource: HBandReadingSource = incoming.metric === 'ecg'
+      || incoming.metric === 'bodyComposition' ? 'manual' : 'automatic';
+    const records = this.mergeHistoryRecords(
+      previous?.records ?? [],
+      incoming.records ?? [],
+      incoming.readingSource ?? defaultSource,
+    );
     return {
       ...previous,
       ...incoming,

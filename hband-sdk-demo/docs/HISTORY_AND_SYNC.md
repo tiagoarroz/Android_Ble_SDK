@@ -99,7 +99,7 @@ O evento integral é conservado, incluindo:
 
 Dentro da mesma pulseira, métrica e data:
 
-1. o timestamp identifica o registo;
+1. o timestamp e a origem identificam o registo;
 2. um callback posterior atualiza os valores desse timestamp;
 3. amostras novas substituem as anteriores quando estão presentes;
 4. timestamps diferentes são mantidos e ordenados cronologicamente;
@@ -107,6 +107,27 @@ Dentro da mesma pulseira, métrica e data:
 
 Esta estratégia corresponde ao comportamento de upsert observado na G Band e
 permite juntar dados automáticos e medições manuais.
+
+### Origem das leituras
+
+Cada registo persistido conserva `source: automatic | manual`. A classificação
+é atribuída antes de os dados atravessarem a bridge Capacitor:
+
+- `history.daily` e a atividade por passos são blocos da monitorização
+  automática;
+- os leitores dedicados de ECG e composição corporal são medições manuais;
+- uma medição em tempo real só recebe a origem manual depois de a pessoa
+  confirmar que a quer guardar.
+
+O campo faz parte da chave de deduplicação. Por isso, uma leitura automática e
+uma medição manual com o mesmo timestamp não se substituem. Registos locais
+criados por versões anteriores, sem origem, são apresentados como automáticos,
+exceto ECG e composição corporal, que pertencem às tabelas manuais do SDK.
+
+Na interface, o seletor de dia existe apenas dentro da métrica. A vista
+`Todos os dados` conserva o dia escolhido e apresenta listas separadas para
+monitorização automática e medições manuais. Fechar a métrica repõe o dia atual
+no estado da aplicação.
 
 ### Medições manuais confirmadas
 

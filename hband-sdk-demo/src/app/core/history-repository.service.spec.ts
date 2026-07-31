@@ -24,6 +24,21 @@ describe('HistoryRepositoryService', () => {
     expect(snapshot.events.heartRate?.records?.[0].values['bpm']).toBe(71);
   });
 
+  it('should preserve manual and automatic readings with the same timestamp', async () => {
+    const deviceId = `MF91-SOURCES-${Date.now()}`;
+    const date = '2026-06-08';
+    const timestamp = `${date}T14:30:00`;
+
+    await repository.mergeEvent(deviceId, historyEvent(date, timestamp, 69, 'automatic'));
+    await repository.mergeEvent(deviceId, historyEvent(date, timestamp, 71, 'manual'));
+    const snapshot = await repository.loadDate(deviceId, date);
+
+    expect(snapshot.recordCount).toBe(2);
+    expect(snapshot.events.heartRate?.records?.map((record) => record.source)).toEqual([
+      'automatic', 'manual',
+    ]);
+  });
+
   it('should keep archives from different bands isolated', async () => {
     const date = '2026-06-11';
     await repository.mergeEvent('MF91-A', historyEvent(date, `${date}T08:00:00`, 64));
@@ -54,14 +69,20 @@ describe('HistoryRepositoryService', () => {
     expect(await repository.listDates(deviceId)).toEqual(['2026-06-08', '2026-06-11']);
   });
 
-  function historyEvent(date: string, timestamp: string, bpm: number): HBandDataEvent {
+  function historyEvent(
+    date: string,
+    timestamp: string,
+    bpm: number,
+    readingSource: 'automatic' | 'manual' = 'automatic',
+  ): HBandDataEvent {
     return {
       type: 'history',
       metric: 'heartRate',
       date,
       timestamp: new Date().toISOString(),
       values: { records: 1 },
-      records: [{ timestamp, values: { bpm } }],
+      readingSource,
+      records: [{ timestamp, values: { bpm }, source: readingSource }],
     };
   }
 });

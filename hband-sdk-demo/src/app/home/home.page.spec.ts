@@ -171,6 +171,53 @@ describe('HomePage', () => {
     await selection;
   });
 
+  it('should reset the selected day when returning to the home page', () => {
+    const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
+    component.selectedFeature.set(heartRate);
+    component.featureView.set('allData');
+    component.selectedDate.set('2026-06-08');
+    const syncDate = spyOn(component.hband, 'synchroniseDate').and.resolveTo();
+
+    component.closeFeature();
+
+    expect(component.selectedFeature()).toBeNull();
+    expect(component.featureView()).toBe('summary');
+    expect(component.selectedDate()).toBe(component.today);
+    expect(syncDate).toHaveBeenCalledOnceWith(component.today);
+  });
+
+  it('should separate automatic readings from manual measurements', () => {
+    const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
+    component.hband.history.set({
+      heartRate: {
+        type: 'history',
+        metric: 'heartRate',
+        date: component.today,
+        timestamp: new Date().toISOString(),
+        values: { records: 2 },
+        records: [
+          {
+            timestamp: `${component.today}T08:00:00`,
+            values: { bpm: 68 },
+            source: 'automatic',
+          },
+          {
+            timestamp: `${component.today}T08:30:00`,
+            values: { bpm: 74 },
+            source: 'manual',
+          },
+        ],
+      },
+    });
+
+    expect(component.historyRecordsBySource(heartRate, 'automatic').map(
+      (record) => record.values['bpm'],
+    )).toEqual([68]);
+    expect(component.historyRecordsBySource(heartRate, 'manual').map(
+      (record) => record.values['bpm'],
+    )).toEqual([74]);
+  });
+
   it('should open a focused live view and ask to save after stopping', async () => {
     const feature = component.features.find((item) => item.metric === 'heartRate')!;
     component.selectedFeature.set(feature);
@@ -209,6 +256,7 @@ describe('HomePage', () => {
     expect(component.savePromptOpen()).toBeFalse();
     expect(component.selectedDate()).toBe(component.today);
     expect(archived?.records?.some((record) => record.values['bpm'] === 74)).toBeTrue();
+    expect(archived?.records?.some((record) => record.source === 'manual')).toBeTrue();
     expect(component.hband.historyDates()).toContain(component.today);
   });
 

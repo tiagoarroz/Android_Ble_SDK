@@ -212,6 +212,19 @@
     "records": "{{count}} records",
     "updatedAt": "updated on {{date}}",
     "retention": "The MF91 provides today and up to {{days}} previous days.",
+    "allData": {
+      "title": "All data",
+      "open": "View all data",
+      "back": "Back to summary",
+      "automatic": "Automatic monitoring",
+      "automaticDescription": "Readings recorded automatically by the band.",
+      "manual": "Manual measurements",
+      "manualDescription": "Measurements started and saved manually.",
+      "emptyAutomatic": "No automatic readings on this day.",
+      "emptyManual": "No manual measurements on this day.",
+      "records": "{{count}} readings",
+      "samples": "{{count}} samples"
+    },
     "sources": {
       "local": "Local archive",
       "device": "Band data",

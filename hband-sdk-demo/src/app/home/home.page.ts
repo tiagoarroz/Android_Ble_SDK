@@ -21,7 +21,8 @@ import { DataVisualizerComponent } from '../components/data-visualizer/data-visu
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
 import type {
-  FeatureAction, FeatureDefinition, HBandDataEvent, HBandLogEntry, HBandMonitoringSetting,
+  DataValue, FeatureAction, FeatureDefinition, HBandDataEvent, HBandHistoryRecord,
+  HBandLogEntry, HBandMonitoringSetting, HBandReadingSource,
 } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
@@ -40,6 +41,7 @@ export class HomePage implements OnInit {
   readonly i18n = inject(I18nService);
   readonly features = FEATURE_CATALOG;
   readonly selectedFeature = signal<FeatureDefinition | null>(null);
+  readonly featureView = signal<'summary' | 'allData'>('summary');
   readonly measurementFeature = signal<FeatureDefinition | null>(null);
   readonly savePromptOpen = signal(false);
   readonly savingMeasurement = signal(false);
@@ -97,16 +99,94 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Abre o histórico e consulta os interruptores automáticos em segundo plano.
-   * O controlo só surge se o SDK devolver uma configuração para esta métrica.
+   * Abre sempre a métrica no dia atual. Assim, a data pertence à navegação da
+   * métrica e nunca se propaga de volta para o painel inicial.
    */
   async openFeature(feature: FeatureDefinition): Promise<void> {
+    const needsToday = this.selectedDate() !== this.today;
+    if (needsToday) {
+      this.selectedDate.set(this.today);
+    }
+    this.featureView.set('summary');
     this.selectedFeature.set(feature);
     try {
+      if (needsToday) {
+        await this.hband.synchroniseDate(this.today);
+      }
       await this.hband.refreshMonitoringSettings();
     } catch {
       // O serviço conserva a falha técnica no registo de atividade.
     }
+  }
+
+  /**
+   * Fecha a área da métrica e repõe o dia atual, incluindo o arquivo carregado
+   * no serviço, para que a página inicial nunca conserve um contexto antigo.
+   */
+  closeFeature(): void {
+    this.selectedFeature.set(null);
+    this.featureView.set('summary');
+    this.historyCalendarOpen.set(false);
+    if (this.selectedDate() === this.today) {
+      return;
+    }
+    this.selectedDate.set(this.today);
+    void this.hband.synchroniseDate(this.today);
+  }
+
+  openAllData(): void {
+    this.featureView.set('allData');
+  }
+
+  closeAllData(): void {
+    this.featureView.set('summary');
+  }
+
+  /**
+   * Ordena as leituras mais recentes primeiro e aplica uma classificação
+   * compatível aos registos anteriores à introdução do campo `source`.
+   */
+  historyRecordsBySource(
+    feature: FeatureDefinition,
+    source: HBandReadingSource,
+  ): HBandHistoryRecord[] {
+    return [...(this.hband.historyFor(feature.metric)?.records ?? [])]
+      .filter((record) => this.readingSource(record, feature) === source)
+      .sort((left, right) =>
+        new Date(right.timestamp).getTime() - new Date(left.timestamp).getTime());
+  }
+
+  historyRecordEntries(record: HBandHistoryRecord): Array<[string, DataValue]> {
+    const controlFields = new Set([
+      'progress', 'state', 'success', 'enabled', 'synchronised', 'lead',
+    ]);
+    return Object.entries(record.values).filter(([field]) => !controlFields.has(field));
+  }
+
+  historyFieldLabel(field: string): string {
+    return this.i18n.translate(`data.fields.${field}`);
+  }
+
+  historyRecordValue(value: DataValue): string {
+    if (typeof value === 'boolean') {
+      return this.i18n.translate(value ? 'common.yes' : 'common.no');
+    }
+    if (typeof value === 'number') {
+      return new Intl.NumberFormat(this.locale(), { maximumFractionDigits: 2 }).format(value);
+    }
+    return value === null ? '—' : String(value);
+  }
+
+  private readingSource(
+    record: HBandHistoryRecord,
+    feature: FeatureDefinition,
+  ): HBandReadingSource {
+    if (record.source) {
+      return record.source;
+    }
+    return feature.metric === 'ecg' || feature.metric === 'bodyComposition'
+      ? 'manual'
+      : 'automatic';
   }
 
   async toggleMonitoring(setting: HBandMonitoringSetting): Promise<void> {
