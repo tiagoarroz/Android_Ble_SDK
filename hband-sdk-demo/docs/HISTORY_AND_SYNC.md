@@ -124,10 +124,12 @@ uma medição manual com o mesmo timestamp não se substituem. Registos locais
 criados por versões anteriores, sem origem, são apresentados como automáticos,
 exceto ECG e composição corporal, que pertencem às tabelas manuais do SDK.
 
-Na interface, o seletor de dia existe apenas dentro da métrica. A vista
-`Todos os dados` conserva o dia escolhido e apresenta listas separadas para
-monitorização automática e medições manuais. Fechar a métrica repõe o dia atual
-no estado da aplicação.
+Na interface, o seletor de dia existe apenas dentro da métrica e ocupa o topo
+da página. A vista `Todos os dados` conserva o dia escolhido e apresenta tabs
+separadas para medições manuais e monitorização automática, abrindo sempre na
+tab manual. Fechar a métrica repõe o dia atual no estado da aplicação. Os
+cartões iniciais só apresentam históricos cujo campo `date` corresponde ao dia
+atual; uma leitura em tempo real ainda não guardada não altera esse resumo.
 
 ### Medições manuais confirmadas
 

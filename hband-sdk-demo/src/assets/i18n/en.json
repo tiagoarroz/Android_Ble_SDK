@@ -216,6 +216,7 @@
       "title": "All data",
       "open": "View all data",
       "back": "Back to summary",
+      "tabsLabel": "Reading source",
       "automatic": "Automatic monitoring",
       "automaticDescription": "Readings recorded automatically by the band.",
       "manual": "Manual measurements",

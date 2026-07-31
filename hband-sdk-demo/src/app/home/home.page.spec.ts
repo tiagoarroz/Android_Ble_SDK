@@ -110,6 +110,32 @@ describe('HomePage', () => {
     expect(feature.actions).toEqual([]);
   });
 
+  it('should expose only history from today on the home cards', () => {
+    component.hband.history.set({
+      heartRate: {
+        type: 'history',
+        metric: 'heartRate',
+        date: component.today,
+        timestamp: new Date().toISOString(),
+        values: { records: 1 },
+        records: [{
+          timestamp: `${component.today}T08:00:00`,
+          values: { bpm: 68 },
+          source: 'automatic',
+        }],
+      },
+    });
+
+    expect(component.todayHistoryFor('heartRate')?.records?.length).toBe(1);
+
+    component.hband.history.update((history) => ({
+      ...history,
+      heartRate: { ...history.heartRate!, date: '2026-06-08' },
+    }));
+
+    expect(component.todayHistoryFor('heartRate')).toBeUndefined();
+  });
+
   it('should expose and toggle only monitoring settings returned by the device', async () => {
     const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
     component.hband.status.update((status) => ({
@@ -216,6 +242,18 @@ describe('HomePage', () => {
     expect(component.historyRecordsBySource(heartRate, 'manual').map(
       (record) => record.values['bpm'],
     )).toEqual([74]);
+  });
+
+  it('should open all data on the manual measurements tab', () => {
+    component.allDataSource.set('automatic');
+
+    component.openAllData();
+
+    expect(component.featureView()).toBe('allData');
+    expect(component.allDataSource()).toBe('manual');
+
+    component.selectAllDataSource('automatic');
+    expect(component.allDataSource()).toBe('automatic');
   });
 
   it('should open a focused live view and ask to save after stopping', async () => {

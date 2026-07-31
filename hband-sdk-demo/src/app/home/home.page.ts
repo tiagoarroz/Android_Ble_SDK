@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonIcon,
+  IonBadge, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon,
   IonDatetime, IonInput, IonItem, IonLabel, IonList, IonModal, IonNote, IonProgressBar,
   IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
@@ -22,7 +22,7 @@ import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
 import type {
   DataValue, FeatureAction, FeatureDefinition, HBandDataEvent, HBandHistoryRecord,
-  HBandLogEntry, HBandMonitoringSetting, HBandReadingSource,
+  HBandLogEntry, HBandMonitoringSetting, HBandReadingSource, MetricId,
 } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
@@ -31,7 +31,7 @@ import { I18nService } from '../core/i18n.service';
   templateUrl: 'home.page.html',
   imports: [
     CommonModule, FormsModule, DataVisualizerComponent, IonBadge, IonButton,
-    IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem,
+    IonButtons, IonCheckbox, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem,
     IonLabel, IonList, IonModal, IonNote, IonProgressBar, IonSelect,
     IonSelectOption, IonSpinner, IonTitle, IonToolbar,
   ],
@@ -42,6 +42,7 @@ export class HomePage implements OnInit {
   readonly features = FEATURE_CATALOG;
   readonly selectedFeature = signal<FeatureDefinition | null>(null);
   readonly featureView = signal<'summary' | 'allData'>('summary');
+  readonly allDataSource = signal<HBandReadingSource>('manual');
   readonly measurementFeature = signal<FeatureDefinition | null>(null);
   readonly savePromptOpen = signal(false);
   readonly savingMeasurement = signal(false);
@@ -108,6 +109,7 @@ export class HomePage implements OnInit {
       this.selectedDate.set(this.today);
     }
     this.featureView.set('summary');
+    this.allDataSource.set('manual');
     this.selectedFeature.set(feature);
     try {
       if (needsToday) {
@@ -126,6 +128,7 @@ export class HomePage implements OnInit {
   closeFeature(): void {
     this.selectedFeature.set(null);
     this.featureView.set('summary');
+    this.allDataSource.set('manual');
     this.historyCalendarOpen.set(false);
     if (this.selectedDate() === this.today) {
       return;
@@ -135,11 +138,26 @@ export class HomePage implements OnInit {
   }
 
   openAllData(): void {
+    this.allDataSource.set('manual');
     this.featureView.set('allData');
   }
 
   closeAllData(): void {
     this.featureView.set('summary');
+  }
+
+  selectAllDataSource(source: HBandReadingSource): void {
+    this.allDataSource.set(source);
+  }
+
+  /**
+   * Os cartões iniciais apresentam apenas registos já guardados para hoje.
+   * Leituras antigas ou medições em tempo real ainda não confirmadas não são
+   * promovidas para o resumo diário.
+   */
+  todayHistoryFor(metric: MetricId): HBandDataEvent | undefined {
+    const history = this.hband.historyFor(metric);
+    return history?.date === this.today && history.records?.length ? history : undefined;
   }
 
   /**
@@ -189,30 +207,18 @@ export class HomePage implements OnInit {
       : 'automatic';
   }
 
-  async toggleMonitoring(setting: HBandMonitoringSetting): Promise<void> {
+  async toggleMonitoring(
+    setting: HBandMonitoringSetting,
+    enabled = !setting.enabled,
+  ): Promise<void> {
+    if (enabled === setting.enabled) {
+      return;
+    }
     try {
-      await this.hband.setMonitoring(setting.metric, !setting.enabled);
+      await this.hband.setMonitoring(setting.metric, enabled);
     } catch {
       // Mantém o estado confirmado pela pulseira quando a escrita falha.
     }
-  }
-
-  monitoringSchedule(setting: HBandMonitoringSetting): string {
-    if (!setting.scheduleAvailable) {
-      return this.i18n.translate('monitoring.deviceSchedule');
-    }
-    return this.i18n.translate('monitoring.schedule', {
-      interval: setting.intervalMinutes,
-      start: this.formatMinuteOfDay(setting.startMinute),
-      end: this.formatMinuteOfDay(setting.endMinute),
-    });
-  }
-
-  private formatMinuteOfDay(value: number): string {
-    const minute = Math.max(0, Math.min(1440, Math.round(value)));
-    const hours = Math.floor(minute / 60);
-    const minutes = minute % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   }
 
   syncPercent(): number {

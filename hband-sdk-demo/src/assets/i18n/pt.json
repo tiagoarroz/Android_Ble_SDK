@@ -216,6 +216,7 @@
       "title": "Todos os dados",
       "open": "Ver todos os dados",
       "back": "Voltar ao resumo",
+      "tabsLabel": "Origem das leituras",
       "automatic": "Monitorização automática",
       "automaticDescription": "Leituras registadas automaticamente pela pulseira.",
       "manual": "Medições manuais",

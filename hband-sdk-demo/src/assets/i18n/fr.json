@@ -216,6 +216,7 @@
       "title": "Toutes les données",
       "open": "Voir toutes les données",
       "back": "Retour au résumé",
+      "tabsLabel": "Origine des mesures",
       "automatic": "Suivi automatique",
       "automaticDescription": "Mesures enregistrées automatiquement par le bracelet.",
       "manual": "Mesures manuelles",

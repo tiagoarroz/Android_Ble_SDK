@@ -91,7 +91,7 @@
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
           <p>{{ i18n.translate(feature.descriptionKey) }}</p>
-          @if (hband.latestFor(feature.metric); as event) {
+          @if (todayHistoryFor(feature.metric); as event) {
             <app-data-visualizer [event]="event" [type]="feature.visualization" [compact]="true"></app-data-visualizer>
           } @else {
             <div class="feature-placeholder"><span></span><span></span><span></span><span></span><span></span></div>
@@ -170,32 +170,38 @@
             {{ i18n.translate(featureView() === 'allData' ? 'history.allData.title' : feature.titleKey) }}
           </ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeFeature()">{{ i18n.translate('actions.close') }}</ion-button>
+            <ion-button
+              [attr.aria-label]="i18n.translate('actions.close')"
+              (click)="closeFeature()"
+            >
+              <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content>
         @if (featureView() === 'summary') {
           <div class="feature-detail feature-history-page">
+            <button
+              class="metric-history-date-trigger feature-page__date"
+              type="button"
+              [attr.aria-label]="i18n.translate('history.openCalendar')"
+              (click)="historyCalendarOpen.set(true)"
+            >
+              @if (historyLoading()) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else {
+                <ion-icon name="calendar-outline"></ion-icon>
+              }
+              <span>
+                <small>{{ i18n.translate('history.date') }}</small>
+                <strong>{{ formattedSelectedDate() }}</strong>
+              </span>
+            </button>
+
             <section class="metric-data-section feature-history-page__data">
               <div class="metric-data-section__heading">
                 <h3>{{ i18n.translate('data.history') }}</h3>
-                <button
-                  class="metric-history-date-trigger"
-                  type="button"
-                  [attr.aria-label]="i18n.translate('history.openCalendar')"
-                  (click)="historyCalendarOpen.set(true)"
-                >
-                  @if (historyLoading()) {
-                    <ion-spinner name="crescent"></ion-spinner>
-                  } @else {
-                    <ion-icon name="calendar-outline"></ion-icon>
-                  }
-                  <span>
-                    <small>{{ i18n.translate('history.date') }}</small>
-                    <strong>{{ formattedSelectedDate() }}</strong>
-                  </span>
-                </button>
               </div>
               @if (hband.historyFor(feature.metric); as history) {
                 <app-data-visualizer
@@ -209,65 +215,7 @@
                   <span>{{ i18n.translate('history.noData') }}</span>
                 </div>
               }
-              <button class="feature-history-page__all-data" type="button" (click)="openAllData()">
-                <span>
-                  <ion-icon name="albums-outline"></ion-icon>
-                  <strong>{{ i18n.translate('history.allData.open') }}</strong>
-                </span>
-                <ion-icon name="chevron-forward-outline"></ion-icon>
-              </button>
             </section>
-
-            @if (capability(feature) === 'unsupported') {
-              <div class="support-warning">
-                <ion-icon name="information-circle-outline"></ion-icon>
-                <span>{{ i18n.translate('capabilities.unsupportedDescription') }}</span>
-              </div>
-            }
-
-            @if (hband.monitoringFor(feature.metric); as monitoring) {
-              <section
-                class="automatic-monitoring-card"
-                [class.is-enabled]="monitoring.enabled"
-              >
-                <div class="automatic-monitoring-card__status">
-                  <span class="automatic-monitoring-card__icon">
-                    <ion-icon name="pulse-outline"></ion-icon>
-                  </span>
-                  <div>
-                    <small>{{ i18n.translate('monitoring.title') }}</small>
-                    <strong>
-                      {{ i18n.translate(monitoring.enabled ? 'monitoring.enabled' : 'monitoring.disabled') }}
-                    </strong>
-                  </div>
-                </div>
-                <p>{{ i18n.translate('monitoring.description') }}</p>
-                <div class="automatic-monitoring-card__schedule">
-                  <ion-icon name="refresh-outline"></ion-icon>
-                  <span>{{ monitoringSchedule(monitoring) }}</span>
-                </div>
-                <ion-button
-                  class="automatic-monitoring-card__button"
-                  expand="block"
-                  [fill]="monitoring.enabled ? 'outline' : 'solid'"
-                  [color]="monitoring.enabled ? 'danger' : 'primary'"
-                  [disabled]="hband.busyOperation() !== null"
-                  (click)="toggleMonitoring(monitoring)"
-                >
-                  @if (hband.busyOperation() === 'monitoring.set') {
-                    <ion-spinner slot="start" name="crescent"></ion-spinner>
-                  } @else {
-                    <ion-icon slot="start" [name]="monitoring.enabled ? 'stop-outline' : 'play-outline'"></ion-icon>
-                  }
-                  {{ i18n.translate(monitoring.enabled ? 'monitoring.disable' : 'monitoring.enable') }}
-                </ion-button>
-              </section>
-            } @else if (hband.busyOperation() === 'monitoring.read') {
-              <section class="automatic-monitoring-card automatic-monitoring-card--loading">
-                <ion-spinner name="crescent"></ion-spinner>
-                <span>{{ i18n.translate('monitoring.loading') }}</span>
-              </section>
-            }
 
             @if (feature.actions.length) {
               <div class="feature-history-page__actions">
@@ -300,11 +248,49 @@
                 }
               </div>
             }
+
+            <button class="feature-history-page__all-data" type="button" (click)="openAllData()">
+              <span>
+                <ion-icon name="albums-outline"></ion-icon>
+                <strong>{{ i18n.translate('history.allData.open') }}</strong>
+              </span>
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+
+            @if (hband.monitoringFor(feature.metric); as monitoring) {
+              <section class="automatic-monitoring-row">
+                <span>{{ i18n.translate('monitoring.title') }}</span>
+                @if (hband.busyOperation() === 'monitoring.set') {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-checkbox
+                    labelPlacement="start"
+                    justify="space-between"
+                    [checked]="monitoring.enabled"
+                    [disabled]="hband.busyOperation() !== null"
+                    [attr.aria-label]="i18n.translate('monitoring.title')"
+                    (ionChange)="toggleMonitoring(monitoring, $event.detail.checked)"
+                  ></ion-checkbox>
+                }
+              </section>
+            } @else if (hband.busyOperation() === 'monitoring.read') {
+              <section class="automatic-monitoring-row automatic-monitoring-row--loading">
+                <span>{{ i18n.translate('monitoring.loading') }}</span>
+                <ion-spinner name="crescent"></ion-spinner>
+              </section>
+            }
+
+            @if (capability(feature) === 'unsupported') {
+              <div class="support-warning">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <span>{{ i18n.translate('capabilities.unsupportedDescription') }}</span>
+              </div>
+            }
           </div>
         } @else {
           <div class="feature-detail feature-all-data-page">
             <button
-              class="metric-history-date-trigger feature-all-data-page__date"
+              class="metric-history-date-trigger feature-page__date"
               type="button"
               [attr.aria-label]="i18n.translate('history.openCalendar')"
               (click)="historyCalendarOpen.set(true)"
@@ -320,89 +306,90 @@
               </span>
             </button>
 
-            <section class="all-data-group" data-source="automatic">
-              <header>
-                <span class="all-data-group__icon"><ion-icon name="sync-outline"></ion-icon></span>
-                <div>
-                  <h2>{{ i18n.translate('history.allData.automatic') }}</h2>
-                  <p>{{ i18n.translate('history.allData.automaticDescription') }}</p>
-                </div>
-                <ion-badge color="light">
-                  {{ i18n.translate('history.allData.records', {
-                    count: historyRecordsBySource(feature, 'automatic').length
-                  }) }}
-                </ion-badge>
-              </header>
-              @if (historyRecordsBySource(feature, 'automatic').length) {
-                <div class="all-data-records">
-                  @for (record of historyRecordsBySource(feature, 'automatic'); track $index) {
-                    <article class="all-data-record">
-                      <time [attr.datetime]="record.timestamp">{{ record.timestamp | date:'shortTime' }}</time>
-                      <div class="all-data-record__values">
-                        @for (entry of historyRecordEntries(record); track entry[0]) {
-                          <span>
-                            <small>{{ historyFieldLabel(entry[0]) }}</small>
-                            <strong>{{ historyRecordValue(entry[1]) }}</strong>
-                          </span>
-                        }
-                      </div>
-                      @if (record.samples?.length) {
-                        <small class="all-data-record__samples">
-                          {{ i18n.translate('history.allData.samples', { count: record.samples!.length }) }}
-                        </small>
-                      }
-                    </article>
-                  }
-                </div>
-              } @else {
-                <div class="all-data-empty">
-                  <ion-icon name="cloud-offline-outline"></ion-icon>
-                  <span>{{ i18n.translate('history.allData.emptyAutomatic') }}</span>
-                </div>
-              }
-            </section>
+            <div
+              class="all-data-tabs"
+              role="tablist"
+              [attr.aria-label]="i18n.translate('history.allData.tabsLabel')"
+            >
+              <button
+                type="button"
+                role="tab"
+                [class.is-active]="allDataSource() === 'manual'"
+                [attr.aria-selected]="allDataSource() === 'manual'"
+                (click)="selectAllDataSource('manual')"
+              >
+                <span>{{ i18n.translate('history.allData.manual') }}</span>
+                <small>{{ historyRecordsBySource(feature, 'manual').length }}</small>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                [class.is-active]="allDataSource() === 'automatic'"
+                [attr.aria-selected]="allDataSource() === 'automatic'"
+                (click)="selectAllDataSource('automatic')"
+              >
+                <span>{{ i18n.translate('history.allData.automatic') }}</span>
+                <small>{{ historyRecordsBySource(feature, 'automatic').length }}</small>
+              </button>
+            </div>
 
-            <section class="all-data-group" data-source="manual">
-              <header>
-                <span class="all-data-group__icon"><ion-icon name="pulse-outline"></ion-icon></span>
-                <div>
-                  <h2>{{ i18n.translate('history.allData.manual') }}</h2>
-                  <p>{{ i18n.translate('history.allData.manualDescription') }}</p>
-                </div>
-                <ion-badge color="light">
-                  {{ i18n.translate('history.allData.records', {
-                    count: historyRecordsBySource(feature, 'manual').length
-                  }) }}
-                </ion-badge>
-              </header>
-              @if (historyRecordsBySource(feature, 'manual').length) {
-                <div class="all-data-records">
-                  @for (record of historyRecordsBySource(feature, 'manual'); track $index) {
-                    <article class="all-data-record">
-                      <time [attr.datetime]="record.timestamp">{{ record.timestamp | date:'shortTime' }}</time>
-                      <div class="all-data-record__values">
-                        @for (entry of historyRecordEntries(record); track entry[0]) {
-                          <span>
-                            <small>{{ historyFieldLabel(entry[0]) }}</small>
-                            <strong>{{ historyRecordValue(entry[1]) }}</strong>
-                          </span>
+            @if (allDataSource(); as source) {
+              <section class="all-data-group" [attr.data-source]="source">
+                <header>
+                  <span class="all-data-group__icon">
+                    <ion-icon [name]="source === 'manual' ? 'pulse-outline' : 'sync-outline'"></ion-icon>
+                  </span>
+                  <div>
+                    <h2>
+                      {{ i18n.translate(source === 'manual'
+                        ? 'history.allData.manual'
+                        : 'history.allData.automatic') }}
+                    </h2>
+                    <p>
+                      {{ i18n.translate(source === 'manual'
+                        ? 'history.allData.manualDescription'
+                        : 'history.allData.automaticDescription') }}
+                    </p>
+                  </div>
+                  <ion-badge color="light">
+                    {{ i18n.translate('history.allData.records', {
+                      count: historyRecordsBySource(feature, source).length
+                    }) }}
+                  </ion-badge>
+                </header>
+                @if (historyRecordsBySource(feature, source).length) {
+                  <div class="all-data-records">
+                    @for (record of historyRecordsBySource(feature, source); track $index) {
+                      <article class="all-data-record">
+                        <time [attr.datetime]="record.timestamp">{{ record.timestamp | date:'shortTime' }}</time>
+                        <div class="all-data-record__values">
+                          @for (entry of historyRecordEntries(record); track entry[0]) {
+                            <span>
+                              <small>{{ historyFieldLabel(entry[0]) }}</small>
+                              <strong>{{ historyRecordValue(entry[1]) }}</strong>
+                            </span>
+                          }
+                        </div>
+                        @if (record.samples?.length) {
+                          <small class="all-data-record__samples">
+                            {{ i18n.translate('history.allData.samples', { count: record.samples!.length }) }}
+                          </small>
                         }
-                      </div>
-                      @if (record.samples?.length) {
-                        <small class="all-data-record__samples">
-                          {{ i18n.translate('history.allData.samples', { count: record.samples!.length }) }}
-                        </small>
-                      }
-                    </article>
-                  }
-                </div>
-              } @else {
-                <div class="all-data-empty">
-                  <ion-icon name="pulse-outline"></ion-icon>
-                  <span>{{ i18n.translate('history.allData.emptyManual') }}</span>
-                </div>
-              }
-            </section>
+                      </article>
+                    }
+                  </div>
+                } @else {
+                  <div class="all-data-empty">
+                    <ion-icon [name]="source === 'manual' ? 'pulse-outline' : 'cloud-offline-outline'"></ion-icon>
+                    <span>
+                      {{ i18n.translate(source === 'manual'
+                        ? 'history.allData.emptyManual'
+                        : 'history.allData.emptyAutomatic') }}
+                    </span>
+                  </div>
+                }
+              </section>
+            }
           </div>
         }
       </ion-content>
