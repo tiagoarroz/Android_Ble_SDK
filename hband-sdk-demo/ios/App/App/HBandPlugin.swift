@@ -138,6 +138,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             authenticateCurrentDevice(call: call, operation: operation)
         case "device.profile":
             syncProfile(call, operation: operation)
+        case "device.rename":
+            renameDevice(call, operation: operation)
         case "monitoring.read":
             readMonitoringSettings(call, operation: operation)
         case "monitoring.set":
@@ -202,6 +204,39 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             readCachedHistory(call, operation: operation)
         default:
             call.reject("OPERATION_NOT_IMPLEMENTED:\(operation)")
+        }
+    }
+
+    /**
+     * Altera o nome BLE usando o callback final do SDK. O limite conservador
+     * de oito bytes UTF-8 funciona tanto nas plataformas comuns como JL.
+     */
+    private func renameDevice(_ call: CAPPluginCall, operation: String) {
+        let requestedName = call.getObject("params")?["name"] as? String
+        let name = requestedName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let byteCount = name.lengthOfBytes(using: .utf8)
+        guard byteCount > 0 else {
+            call.reject("DEVICE_NAME_REQUIRED")
+            return
+        }
+        guard byteCount <= 8 else {
+            call.reject("DEVICE_NAME_TOO_LONG")
+            return
+        }
+        manager.peripheralManage.veepooSDKSettingDeviceName(with: name) {
+            [weak self] state in
+            guard let self else { return }
+            switch state {
+            case 0:
+                self.emitStatus()
+                self.accept(call, operation: operation)
+            case 2:
+                call.reject("DEVICE_NAME_TOO_LONG")
+            case 3:
+                call.reject("DEVICE_NAME_REQUIRED")
+            default:
+                call.reject("DEVICE_RENAME_FAILED")
+            }
         }
     }
 

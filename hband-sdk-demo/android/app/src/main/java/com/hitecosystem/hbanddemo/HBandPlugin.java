@@ -41,6 +41,7 @@ import com.veepoo.protocol.listener.data.IAllSetDataListener;
 import com.veepoo.protocol.listener.data.ICustomSettingDataListener;
 import com.veepoo.protocol.listener.data.IBreathDataListener;
 import com.veepoo.protocol.listener.data.IDeviceFuctionDataListener;
+import com.veepoo.protocol.listener.data.IDeviceRenameListener;
 import com.veepoo.protocol.listener.data.AbsDeviceManualDetectDataListener;
 import com.veepoo.protocol.listener.data.IECGDetectListener;
 import com.veepoo.protocol.listener.data.IECGReadDataListener;
@@ -106,6 +107,7 @@ import com.veepoo.protocol.model.enums.EAutoMeasureType;
 import com.veepoo.protocol.model.enums.EAllSetStatus;
 import com.veepoo.protocol.model.enums.EAllSetType;
 import com.veepoo.protocol.model.enums.ECustomStatus;
+import com.veepoo.protocol.model.enums.ERenameError;
 import com.veepoo.protocol.model.enums.DeviceManualDataType;
 import com.veepoo.protocol.model.enums.EBPDetectModel;
 import com.veepoo.protocol.model.enums.EBloodGlucoseRiskLevel;
@@ -127,6 +129,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -488,6 +491,9 @@ public class HBandPlugin extends Plugin {
             case "device.profile":
                 syncProfile(call);
                 return;
+            case "device.rename":
+                renameDevice(call);
+                return;
             case "monitoring.read":
                 readMonitoringSettings(call);
                 return;
@@ -613,6 +619,38 @@ public class HBandPlugin extends Plugin {
             emitLog("error", "SDK operation failed: " + error, operation);
             call.reject("SDK_OPERATION_FAILED: " + operation, error);
         }
+    }
+
+    /**
+     * Altera o nome BLE e só conclui a Promise depois do callback específico
+     * do SDK. Usa oito bytes UTF-8, o limite comum a todas as plataformas.
+     */
+    private void renameDevice(PluginCall call) {
+        JSObject params = call.getObject("params");
+        String requestedName = params == null ? null : params.getString("name");
+        String name = requestedName == null ? "" : requestedName.trim();
+        int byteCount = name.getBytes(StandardCharsets.UTF_8).length;
+        if (byteCount == 0) {
+            call.reject("DEVICE_NAME_REQUIRED");
+            return;
+        }
+        if (byteCount > 8) {
+            call.reject("DEVICE_NAME_TOO_LONG");
+            return;
+        }
+        manager.bleDeviceRename(name, new IDeviceRenameListener() {
+            @Override
+            public void onDeviceRenameSuccess(@NonNull String deviceName) {
+                currentName = deviceName;
+                emitStatus();
+                accept(call, "device.rename");
+            }
+
+            @Override
+            public void onDeviceRenameFail(ERenameError error, @NonNull String deviceName) {
+                call.reject("DEVICE_RENAME_FAILED: " + error.name());
+            }
+        }, writeResponse);
     }
 
     private void authenticateCurrentDevice() {

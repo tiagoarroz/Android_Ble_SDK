@@ -59,6 +59,7 @@ const METRIC_OPERATIONS = new Set([
   'history.manual.daily',
   'history.cached',
   'device.battery',
+  'device.rename',
   'monitoring.read',
   'monitoring.set',
 ]);
@@ -181,6 +182,18 @@ export class HBandService {
 
   async refreshBattery(): Promise<void> {
     await this.execute('device.battery');
+  }
+
+  /**
+   * Atualiza o nome visível apenas depois de a bridge receber o callback de
+   * sucesso do dispositivo. O identificador MAC e o arquivo não são alterados.
+   */
+  async renameDevice(name: string): Promise<void> {
+    await this.execute('device.rename', { name });
+    this.status.update((status) => status.device ? {
+      ...status,
+      device: { ...status.device, name },
+    } : status);
   }
 
   /**

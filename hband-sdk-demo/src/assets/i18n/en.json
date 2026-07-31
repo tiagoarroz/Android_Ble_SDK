@@ -46,7 +46,23 @@
     "firmware": "Firmware {{version}}",
     "unknown": "Unnamed device",
     "battery": "Battery",
-    "lowBattery": "Low battery"
+    "lowBattery": "Low battery",
+    "rename": {
+      "open": "Change band name",
+      "title": "Band name",
+      "heading": "Change Bluetooth name",
+      "description": "The new name will be saved on the band and used in future Bluetooth searches.",
+      "label": "New name",
+      "limit": "Maximum of 8 bytes",
+      "cancel": "Cancel",
+      "save": "Save name",
+      "saving": "Saving",
+      "errors": {
+        "empty": "Enter a name for the band.",
+        "tooLong": "The name cannot exceed 8 bytes.",
+        "failed": "The band did not accept the name change."
+      }
+    }
   },
   "catalog": {
     "search": "Search for a feature",

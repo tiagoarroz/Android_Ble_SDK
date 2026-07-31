@@ -11,7 +11,7 @@ import { addIcons } from 'ionicons';
 import {
   albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
   bodyOutline, calendarOutline, chevronForwardOutline,
-  closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
+  closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
@@ -54,6 +54,10 @@ export class HomePage implements OnInit {
   readonly savePromptOpen = signal(false);
   readonly savingMeasurement = signal(false);
   readonly scanOpen = signal(false);
+  readonly renameDeviceOpen = signal(false);
+  readonly renameDeviceName = signal('');
+  readonly renamingDevice = signal(false);
+  readonly renameDeviceError = signal<'empty' | 'tooLong' | 'failed' | null>(null);
   readonly historyCalendarOpen = signal(false);
   readonly password = signal('0000');
   readonly selectedDate = signal(this.localDate(new Date()));
@@ -64,7 +68,7 @@ export class HomePage implements OnInit {
     addIcons({
       albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
       bodyOutline, calendarOutline, chevronForwardOutline,
-      closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
+      closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
@@ -104,6 +108,79 @@ export class HomePage implements OnInit {
   async connect(deviceId: string): Promise<void> {
     await this.hband.connect(deviceId, this.password());
     this.scanOpen.set(false);
+  }
+
+  /**
+   * Abre o editor com o nome confirmado pela sessão atual. O valor só é
+   * refletido no painel depois de a pulseira aceitar a escrita BLE.
+   */
+  openRenameDevice(): void {
+    const device = this.hband.status().device;
+    if (!this.hband.connected() || !device) {
+      return;
+    }
+    this.renameDeviceName.set(device.name ?? '');
+    this.renameDeviceError.set(null);
+    this.renameDeviceOpen.set(true);
+  }
+
+  updateRenameDeviceName(value: string | null | undefined): void {
+    this.renameDeviceName.set(value ?? '');
+    this.renameDeviceError.set(null);
+  }
+
+  renameDeviceByteCount(): number {
+    return new TextEncoder().encode(this.renameDeviceName().trim()).length;
+  }
+
+  renameDeviceCanSave(): boolean {
+    const name = this.renameDeviceName().trim();
+    const currentName = this.hband.status().device?.name ?? '';
+    const byteCount = this.renameDeviceByteCount();
+    return !this.renamingDevice()
+      && name !== currentName
+      && byteCount > 0
+      && byteCount <= 8;
+  }
+
+  closeRenameDevice(): void {
+    if (this.renamingDevice()) {
+      return;
+    }
+    this.renameDeviceOpen.set(false);
+    this.renameDeviceError.set(null);
+  }
+
+  /**
+   * Usa o limite comum de oito bytes UTF-8, válido também nas plataformas que
+   * não suportam o limite alargado de dezoito bytes previsto pelo SDK.
+   */
+  async submitDeviceRename(): Promise<void> {
+    const name = this.renameDeviceName().trim();
+    const byteCount = new TextEncoder().encode(name).length;
+    if (byteCount === 0) {
+      this.renameDeviceError.set('empty');
+      return;
+    }
+    if (byteCount > 8) {
+      this.renameDeviceError.set('tooLong');
+      return;
+    }
+    this.renamingDevice.set(true);
+    this.renameDeviceError.set(null);
+    try {
+      await this.hband.renameDevice(name);
+      this.renameDeviceOpen.set(false);
+    } catch {
+      this.renameDeviceError.set('failed');
+    } finally {
+      this.renamingDevice.set(false);
+    }
+  }
+
+  renameDeviceErrorLabel(): string {
+    const error = this.renameDeviceError();
+    return error ? this.i18n.translate(`device.rename.errors.${error}`) : '';
   }
 
   /**

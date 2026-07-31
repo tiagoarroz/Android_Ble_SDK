@@ -46,7 +46,23 @@
     "firmware": "Micrologiciel {{version}}",
     "unknown": "Appareil sans nom",
     "battery": "Batterie",
-    "lowBattery": "Batterie faible"
+    "lowBattery": "Batterie faible",
+    "rename": {
+      "open": "Modifier le nom du bracelet",
+      "title": "Nom du bracelet",
+      "heading": "Modifier le nom Bluetooth",
+      "description": "Le nouveau nom sera enregistré sur le bracelet et utilisé lors des prochaines recherches Bluetooth.",
+      "label": "Nouveau nom",
+      "limit": "Maximum de 8 octets",
+      "cancel": "Annuler",
+      "save": "Enregistrer le nom",
+      "saving": "Enregistrement",
+      "errors": {
+        "empty": "Saisissez un nom pour le bracelet.",
+        "tooLong": "Le nom ne peut pas dépasser 8 octets.",
+        "failed": "Le bracelet n’a pas accepté le changement de nom."
+      }
+    }
   },
   "catalog": {
     "search": "Rechercher une fonctionnalité",

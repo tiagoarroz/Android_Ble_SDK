@@ -46,7 +46,23 @@
     "firmware": "Firmware {{version}}",
     "unknown": "Dispositivo sin nombre",
     "battery": "Batería",
-    "lowBattery": "Batería baja"
+    "lowBattery": "Batería baja",
+    "rename": {
+      "open": "Cambiar el nombre de la pulsera",
+      "title": "Nombre de la pulsera",
+      "heading": "Cambiar nombre Bluetooth",
+      "description": "El nuevo nombre se guardará en la pulsera y se usará en futuras búsquedas Bluetooth.",
+      "label": "Nuevo nombre",
+      "limit": "Máximo de 8 bytes",
+      "cancel": "Cancelar",
+      "save": "Guardar nombre",
+      "saving": "Guardando",
+      "errors": {
+        "empty": "Introduzca un nombre para la pulsera.",
+        "tooLong": "El nombre no puede superar los 8 bytes.",
+        "failed": "La pulsera no aceptó el cambio de nombre."
+      }
+    }
   },
   "catalog": {
     "search": "Buscar una función",

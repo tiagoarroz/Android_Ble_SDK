@@ -75,3 +75,19 @@ O estado `supported`, `unsupported` ou `unknown` é calculado depois da
 autenticação a partir das capacidades do dispositivo. A compilação das bridges
 confirma apenas a compatibilidade com as versões de SDK incluídas; a cobertura
 real da MF91 continua dependente de ensaio físico.
+
+## Nome Bluetooth da pulseira
+
+O botão de lápis junto ao nome executa `device.rename` apenas numa sessão
+ligada. A bridge espera pelo callback final antes de atualizar a interface:
+
+- Android: `VPOperateManager.bleDeviceRename` e `IDeviceRenameListener`;
+- iOS: `veepooSDKSettingDeviceNameWithString:resultBlock:`.
+
+O nome é validado em bytes UTF-8 e limitado conservadoramente a oito bytes, o
+valor suportado em todas as plataformas descritas pelo SDK. Alguns dispositivos
+JL aceitam dezoito bytes, mas esse limite não é usado sem confirmação explícita
+do hardware. O SDK pode aceitar a escrita e o sistema operativo continuar a
+mostrar temporariamente o nome antigo durante uma nova pesquisa devido à cache
+Bluetooth. A compilação confirma o contrato; a aceitação pelo firmware da MF91
+é confirmada apenas pelo callback numa pulseira física.

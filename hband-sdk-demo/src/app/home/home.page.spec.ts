@@ -218,6 +218,39 @@ describe('HomePage', () => {
     expect(component.batteryPercent()).toBe(75);
   });
 
+  it('should rename the connected band only after the operation succeeds', async () => {
+    component.hband.status.update((status) => ({
+      ...status,
+      state: 'connected',
+      device: { id: 'MF91-TEST', name: 'MF91' },
+    }));
+
+    component.openRenameDevice();
+    component.updateRenameDeviceName('Saude');
+    await component.submitDeviceRename();
+
+    expect(component.hband.status().device?.name).toBe('Saude');
+    expect(component.renameDeviceOpen()).toBeFalse();
+    expect(component.renameDeviceError()).toBeNull();
+  });
+
+  it('should validate the band name using UTF-8 bytes', async () => {
+    component.hband.status.update((status) => ({
+      ...status,
+      state: 'connected',
+      device: { id: 'MF91-TEST', name: 'MF91' },
+    }));
+    component.openRenameDevice();
+    component.updateRenameDeviceName('Saúde123');
+
+    expect(component.renameDeviceByteCount()).toBe(9);
+    expect(component.renameDeviceCanSave()).toBeFalse();
+
+    await component.submitDeviceRename();
+    expect(component.renameDeviceError()).toBe('tooLong');
+    expect(component.hband.status().device?.name).toBe('MF91');
+  });
+
   it('should highlight every date stored for the current band', () => {
     component.hband.historyDates.set(['2026-06-08', '2026-06-11']);
 

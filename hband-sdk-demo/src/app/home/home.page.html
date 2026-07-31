@@ -33,7 +33,19 @@
         </span>
         <div class="connection-card__body">
           <div class="device-identity">
-            <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
+            <div class="device-name-row">
+              <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
+              @if (hband.connected()) {
+                <button
+                  class="device-rename-button"
+                  type="button"
+                  [attr.aria-label]="i18n.translate('device.rename.open')"
+                  (click)="openRenameDevice()"
+                >
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+              }
+            </div>
             <div class="device-meta">
               <span class="status-row">
                 <span class="status-dot" [class.is-connected]="hband.connected()"></span>
@@ -160,6 +172,68 @@
         <ion-button expand="block" fill="outline" (click)="openScan()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
           {{ i18n.translate('actions.scanAgain') }}
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="device-rename-modal"
+  [isOpen]="renameDeviceOpen()"
+  [backdropDismiss]="!renamingDevice()"
+  (didDismiss)="closeRenameDevice()"
+>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ i18n.translate('device.rename.title') }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button [disabled]="renamingDevice()" (click)="closeRenameDevice()">
+            {{ i18n.translate('device.rename.cancel') }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="device-rename-content">
+        <span class="device-rename-content__icon">
+          <ion-icon name="create-outline"></ion-icon>
+        </span>
+        <h2>{{ i18n.translate('device.rename.heading') }}</h2>
+        <p>{{ i18n.translate('device.rename.description') }}</p>
+        <ion-item lines="none" class="device-rename-field">
+          <ion-input
+            type="text"
+            enterkeyhint="done"
+            [label]="i18n.translate('device.rename.label')"
+            labelPlacement="stacked"
+            [value]="renameDeviceName()"
+            (ionInput)="updateRenameDeviceName($event.detail.value)"
+          ></ion-input>
+        </ion-item>
+        <div class="device-rename-limit" [class.is-invalid]="renameDeviceByteCount() > 8">
+          <span>{{ i18n.translate('device.rename.limit') }}</span>
+          <strong>{{ renameDeviceByteCount() }}/8</strong>
+        </div>
+        @if (renameDeviceError()) {
+          <div class="device-rename-error" role="alert">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>{{ renameDeviceErrorLabel() }}</span>
+          </div>
+        }
+        <ion-button
+          class="device-rename-submit"
+          expand="block"
+          [disabled]="!renameDeviceCanSave()"
+          (click)="submitDeviceRename()"
+        >
+          @if (renamingDevice()) {
+            <ion-spinner slot="start" name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+          }
+          {{ i18n.translate(renamingDevice() ? 'device.rename.saving' : 'device.rename.save') }}
         </ion-button>
       </div>
     </ion-content>
