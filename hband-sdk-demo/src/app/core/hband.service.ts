@@ -19,6 +19,8 @@ const INITIAL_STATUS: HBandStatus = {
 const DEVICE_SESSION_KEY = 'hband-device-session';
 const HISTORY_DEVICE_KEY = 'hband-history-device';
 const BATTERY_REFRESH_INTERVAL_MS = 60_000;
+const CONTROL_OPERATION_TIMEOUT_MS = 10_000;
+const HISTORY_OPERATION_TIMEOUT_MS = 45_000;
 const CATALOG_METRICS: MetricId[] = [
   'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
   'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
@@ -27,6 +29,18 @@ const CATALOG_METRICS: MetricId[] = [
 interface RememberedDeviceSession {
   deviceId: string;
   password: string;
+}
+
+class HBandOperationTimeoutError extends Error {
+  readonly code = 'SDK_OPERATION_TIMEOUT';
+
+  constructor(
+    readonly operation: string,
+    readonly timeoutMs: number,
+  ) {
+    super(`SDK_OPERATION_TIMEOUT: ${operation} (${timeoutMs}ms)`);
+    this.name = 'HBandOperationTimeoutError';
+  }
 }
 
 const METRIC_OPERATIONS = new Set([
@@ -81,6 +95,12 @@ export class HBandService {
   private selectedHistoryDate = this.localDate(new Date());
   private historyDeviceId = this.rememberedDeviceId();
   private batteryRefreshTimer: ReturnType<typeof setInterval> | null = null;
+  /*
+   * O adaptador mantém o proxy Capacitor substituível nos testes de timeout,
+   * sem alterar o contrato público usado pela aplicação.
+   */
+  private nativeExecute = (operation: string, params: Record<string, unknown>) =>
+    HBand.execute({ operation, params });
 
   /**
    * Liga os eventos uma única vez e recupera o estado da bridge nativa.
@@ -182,7 +202,11 @@ export class HBandService {
     while (this.pendingSyncDate) {
       const date = this.pendingSyncDate;
       this.pendingSyncDate = null;
-      await this.synchroniseRequestedDate(date);
+      const canContinue = await this.synchroniseRequestedDate(date);
+      if (!canContinue) {
+        this.pendingSyncDate = null;
+        break;
+      }
     }
   }
 
@@ -195,7 +219,7 @@ export class HBandService {
     includeSessionOperations = true,
     reportProgress = true,
     forceCachedIOSRead = false,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const daysAgo = this.daysBetween(date, this.localDate(new Date()));
     const retentionDays = this.historyRetentionDays();
     const outsideRetention = daysAgo < 0 || daysAgo > retentionDays;
@@ -205,13 +229,12 @@ export class HBandService {
       if (date === this.selectedHistoryDate) {
         this.setHistoryPhase('outsideRetention');
       }
-      return;
+      return true;
     }
     const historyOperations: Array<{ operation: string; params: Record<string, unknown> }> =
       this.status().platform === 'android'
         ? [
           { operation: 'history.daily', params: { date } },
-          { operation: 'history.manual.daily', params: { date } },
           ...(['ecg', 'bodyComposition'] as MetricId[])
             .filter((metric) => this.metricSupported(metric))
             .map((metric) => ({
@@ -236,6 +259,9 @@ export class HBandService {
 
     let completed = 0;
     let failed = 0;
+    let operationTimedOut = false;
+    let failedOperation: string | undefined;
+    let failureReason: HBandSyncStatus['failureReason'];
     if (reportProgress) {
       this.setHistoryPhase('syncing');
       this.syncStatus.set({
@@ -248,12 +274,24 @@ export class HBandService {
       }
       try {
         await this.execute(item.operation, item.params ?? {});
-      } catch {
+      } catch (error) {
         failed += 1;
+        operationTimedOut = this.isOperationTimeout(error);
+        failedOperation ??= item.operation === 'history.metric' && typeof item.params?.['metric'] === 'string'
+          ? `${item.operation}.${item.params['metric']}`
+          : item.operation;
+        failureReason ??= operationTimedOut ? 'timeout' : 'error';
       }
       completed += 1;
       if (reportProgress) {
         this.syncStatus.update((status) => ({ ...status, completed, failed }));
+      }
+      /*
+       * Um timeout significa que o SDK não confirmou o fim do comando. Não são
+       * enviados mais comandos BLE nessa sincronização para evitar sobreposição.
+       */
+      if (operationTimedOut) {
+        break;
       }
     }
     if (date === this.selectedHistoryDate) {
@@ -264,6 +302,8 @@ export class HBandService {
         ...status,
         state: failed > 0 ? 'partial' : 'complete',
         current: undefined,
+        failedOperation,
+        failureReason,
       }));
       this.setHistoryPhase(
         failed > 0
@@ -271,6 +311,7 @@ export class HBandService {
           : this.historyState().recordCount > 0 ? 'ready' : 'empty',
       );
     }
+    return !operationTimedOut;
   }
 
   /**
@@ -313,7 +354,7 @@ export class HBandService {
         if (this.simulation()) {
           this.simulateOperation(operation, params);
         } else {
-          await HBand.execute({ operation, params });
+          await this.executeNativeWithTimeout(operation, params);
         }
         this.appendLog({
           id: this.nextLogId(operation),
@@ -333,6 +374,53 @@ export class HBandService {
     };
     this.queue = this.queue.then(task, task);
     return this.queue.then(() => undefined);
+  }
+
+  /**
+   * Impõe um limite à Promise da bridge. O resultado tardio continua a poder
+   * chegar ao SDK nativo, mas deixa de alterar o estado desta operação e não
+   * mantém a fila Angular bloqueada indefinidamente.
+   */
+  private executeNativeWithTimeout(
+    operation: string,
+    params: Record<string, unknown>,
+  ): Promise<void> {
+    const timeoutMs = operation.startsWith('history.')
+      ? HISTORY_OPERATION_TIMEOUT_MS
+      : CONTROL_OPERATION_TIMEOUT_MS;
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const timeout = setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        reject(new HBandOperationTimeoutError(operation, timeoutMs));
+      }, timeoutMs);
+      void this.nativeExecute(operation, params).then(
+        () => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          clearTimeout(timeout);
+          resolve();
+        },
+        (error) => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          clearTimeout(timeout);
+          reject(error);
+        },
+      );
+    });
+  }
+
+  private isOperationTimeout(error: unknown): boolean {
+    return error instanceof HBandOperationTimeoutError
+      || (error instanceof Error && error.message.includes('SDK_OPERATION_TIMEOUT'));
   }
 
   capability(name: string): 'supported' | 'unsupported' | 'unknown' {
@@ -466,19 +554,28 @@ export class HBandService {
     this.backgroundSyncPromise = (async () => {
       const today = this.localDate(new Date());
       const retentionDays = this.historyRetentionDays();
+      let completedWithoutTimeout = true;
       for (let offset = 0; offset <= retentionDays; offset += 1) {
         if (!this.connected()) {
           break;
         }
         const date = this.dateWithOffset(today, -offset);
-        await this.synchroniseRequestedDate(
+        const canContinue = await this.synchroniseRequestedDate(
           date,
           offset === 0,
           date === this.selectedHistoryDate,
           this.status().platform === 'ios' && offset > 0,
         );
+        if (!canContinue) {
+          completedWithoutTimeout = false;
+          break;
+        }
       }
-      if (this.selectedHistoryDate) {
+      /*
+       * Não volta a carregar o arquivo depois de um timeout: isso substituiria
+       * o estado de erro por "sem dados" e esconderia a causa ao utilizador.
+       */
+      if (this.selectedHistoryDate && completedWithoutTimeout) {
         await this.loadStoredDate(this.selectedHistoryDate, true);
       }
     })()

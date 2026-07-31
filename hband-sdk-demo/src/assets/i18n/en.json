@@ -208,7 +208,21 @@
   "sync": {
     "action": "Sync day",
     "inProgress": "Synchronising",
-    "progress": "{{completed}} of {{total}} readings"
+    "progress": "{{completed}} of {{total}} readings",
+    "partialProgress": "{{completed}} of {{total}} readings processed",
+    "timeout": "The band did not complete {{operation}} within the expected time",
+    "failed": "Could not complete {{operation}}",
+    "operations": {
+      "battery": "the battery reading",
+      "time": "the time synchronisation",
+      "activity": "the current activity reading",
+      "daily": "the daily history",
+      "manual": "the manual measurement history",
+      "ecg": "the ECG history",
+      "bodyComposition": "the body composition history",
+      "dedicated": "the dedicated history",
+      "unknown": "a reading"
+    }
   },
   "profile": {
     "title": "Personal data synchronization",

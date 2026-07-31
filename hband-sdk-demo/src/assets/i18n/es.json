@@ -208,7 +208,21 @@
   "sync": {
     "action": "Sincronizar día",
     "inProgress": "Sincronizando",
-    "progress": "{{completed}} de {{total}} lecturas"
+    "progress": "{{completed}} de {{total}} lecturas",
+    "partialProgress": "{{completed}} de {{total}} lecturas procesadas",
+    "timeout": "La pulsera no completó {{operation}} dentro del tiempo esperado",
+    "failed": "No se pudo completar {{operation}}",
+    "operations": {
+      "battery": "la lectura de la batería",
+      "time": "la sincronización de la hora",
+      "activity": "la lectura de la actividad actual",
+      "daily": "el historial diario",
+      "manual": "el historial de mediciones manuales",
+      "ecg": "el historial de ECG",
+      "bodyComposition": "el historial de composición corporal",
+      "dedicated": "el historial dedicado",
+      "unknown": "una lectura"
+    }
   },
   "profile": {
     "title": "Datos personales para sincronizar",

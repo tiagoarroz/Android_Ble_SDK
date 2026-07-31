@@ -40,6 +40,8 @@ export interface HBandSyncStatus {
   state: 'idle' | 'syncing' | 'complete' | 'partial';
   date?: string;
   current?: string;
+  failedOperation?: string;
+  failureReason?: 'timeout' | 'error';
   completed: number;
   total: number;
   failed: number;

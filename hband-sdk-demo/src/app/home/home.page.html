@@ -93,7 +93,7 @@
         </span>
         <ion-icon name="calendar-outline"></ion-icon>
       </button>
-      @if (hband.syncStatus().state !== 'idle') {
+      @if (hband.syncStatus().state === 'syncing') {
         <div class="history-sync-control">
           <span>
             {{ i18n.translate('sync.progress', {

@@ -131,10 +131,15 @@ Todos os comandos BLE passam pela mesma fila. Ao ligar e autenticar:
 1. lê a bateria;
 2. sincroniza a hora;
 3. lê a atividade atual;
-4. percorre hoje e cada deslocamento até `historyRetentionDays`;
-5. executa `history.daily` para os blocos automáticos;
-6. executa `history.manual.daily` para as medições manuais suportadas;
-7. usa leitores dedicados para ECG e composição corporal.
+4. executa `history.daily` para os blocos automáticos do dia;
+5. usa o leitor dedicado de ECG, quando suportado;
+6. usa o leitor dedicado de composição corporal, quando suportado;
+7. repete apenas as leituras históricas para os restantes dias dentro de
+   `historyRetentionDays`.
+
+Na interface, a sincronização de hoje tem seis operações quando ECG e
+composição corporal são suportados. A repetição dos dias anteriores é executada
+em segundo plano e não volta a enviar bateria, hora ou atividade atual.
 
 `history.daily` descarrega uma vez `readOriginDataSingleDay` e distribui os
 blocos pelas métricas:
@@ -147,13 +152,74 @@ blocos pelas métricas:
 - glicemia;
 - stress.
 
-`history.manual.daily` pede numa única operação as tabelas manuais suportadas e
-volta a distribuir os resultados pelas mesmas métricas. ECG e composição
-corporal permanecem separados porque não fazem parte do bloco diário comum.
+ECG e composição corporal permanecem separados porque não fazem parte do bloco
+diário comum.
+
+### Incidente do quinto passo anterior
+
+A primeira implementação apresentava sete leituras individuais: bateria, hora,
+atividade atual, histórico diário, histórico manual, ECG e composição corporal.
+No ensaio físico de 31 de julho de 2026, a quinta operação
+`history.manual.daily` recebeu a confirmação de escrita BLE, mas o SDK não
+chamou `onReadComplete` nem `onReadFail`. A fila só foi libertada pelo timeout de
+45 segundos.
+
+Este comportamento coincide com a documentação oficial da versão incluída:
+`readDeviceManualData` só suporta atualmente pressão arterial quando o
+dispositivo tem pressão pneumática (`isSupportBumpBp`). Os restantes tipos
+manuais ainda não são suportados por esse leitor. A MF91 estava a receber um
+pedido agrupado com frequência cardíaca, pressão, oxigénio, temperatura,
+glicemia e stress, pelo que não existia um callback final garantido.
+
+`history.manual.daily` foi retirado da sincronização geral. Os dados destas
+métricas continuam a vir de `history.daily`; um eventual leitor manual de
+pressão pneumática só deve ser ativado para um dispositivo cuja capacidade
+específica seja confirmada pelo SDK.
+
+No ensaio seguinte, o leitor dedicado de ECG também não terminou. A bridge
+estava a combinar `EEcgDataType.ALL` com a data do dia selecionado. O contrato
+documentado exige `TimeData(0, 0, 0, 0, 0, 0)` quando o tipo é `ALL`.
+
+Mesmo com o parâmetro corrigido, a MF91 respondeu `04`, que o binário desta
+versão processa como ausência de IDs e entrega internamente através de
+`readIdFinish(null)`. O método de conveniência `readECGData` não encaminha esse
+caso para `readDataFinish`, deixando o pedido pendente. A bridge passou a usar
+explicitamente `readECGId`; IDs nulos concluem com um histórico vazio e IDs
+existentes são descarregados por `readECGManuallyData`. O dia solicitado é
+filtrado depois de receber os registos.
 
 O serviço foreground Android mantém uma notificação `connectedDevice`. Perdas
 não intencionais iniciam uma tentativa de reconexão ao mesmo MAC. Uma
 desconexão pedida pelo utilizador cancela esse comportamento.
+
+### Timeouts e recuperação da fila
+
+A Promise devolvida pela bridge não pode ficar pendente indefinidamente quando
+o SDK não entrega o callback esperado:
+
+- bateria, hora, início/fim de medição e restantes comandos de controlo têm um
+  timeout de 10 segundos;
+- leituras de histórico, que transferem mais dados, têm um timeout de 45
+  segundos;
+- ao expirar, a operação falha com `SDK_OPERATION_TIMEOUT`;
+- `busyOperation` é sempre libertado, voltando a disponibilizar os controlos;
+- a sincronização é marcada como parcial/erro e não envia os comandos seguintes
+  dessa sequência;
+- uma resolução tardia da Promise nativa é ignorada pelo estado da operação que
+  já expirou.
+
+Quando isto acontece, a barra deixa de parecer ativa e o painel apresenta:
+
+- `Não foi possível atualizar este dia`, ou a variante que preserva os dados
+  locais já existentes;
+- quantas leituras foram processadas;
+- qual a leitura que falhou;
+- uma indicação explícita quando a causa foi o tempo de resposta esgotado.
+
+Parar a sequência no primeiro timeout é importante: sem confirmação de fim não
+é seguro assumir que a pulseira já está pronta para outro comando de histórico.
+Uma nova sincronização pode ser iniciada numa interação posterior ou na próxima
+ligação.
 
 ## Sequência de sincronização iOS
 

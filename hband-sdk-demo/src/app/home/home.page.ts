@@ -199,12 +199,25 @@ export class HomePage implements OnInit {
     const phase = this.hband.historyState().phase;
     return phase === 'syncing' || phase === 'loading'
       ? 'sync-outline'
-      : phase === 'offline' ? 'cloud-offline-outline' : 'albums-outline';
+      : phase === 'offline'
+        ? 'cloud-offline-outline'
+        : phase === 'error' ? 'close-circle-outline' : 'albums-outline';
   }
 
   historyMetadata(): string {
     const state = this.hband.historyState();
     const parts: string[] = [];
+    const sync = this.hband.syncStatus();
+    if (sync.state === 'partial' && sync.date === state.date) {
+      parts.push(this.i18n.translate('sync.partialProgress', {
+        completed: sync.completed,
+        total: sync.total,
+      }));
+      parts.push(this.i18n.translate(
+        sync.failureReason === 'timeout' ? 'sync.timeout' : 'sync.failed',
+        { operation: this.syncOperationLabel(sync.failedOperation) },
+      ));
+    }
     if (state.source !== 'none') {
       parts.push(this.i18n.translate(`history.sources.${state.source}`));
     }
@@ -218,6 +231,26 @@ export class HomePage implements OnInit {
       }));
     }
     return parts.join(' · ');
+  }
+
+  /**
+   * Converte o identificador interno da operação numa descrição legível, sem
+   * expor ao utilizador os nomes técnicos usados pela bridge Capacitor.
+   */
+  private syncOperationLabel(operation?: string): string {
+    const keyByOperation: Record<string, string> = {
+      'device.battery': 'sync.operations.battery',
+      'device.time': 'sync.operations.time',
+      'history.activity.current': 'sync.operations.activity',
+      'history.daily': 'sync.operations.daily',
+      'history.manual.daily': 'sync.operations.manual',
+      'history.metric.ecg': 'sync.operations.ecg',
+      'history.metric.bodyComposition': 'sync.operations.bodyComposition',
+    };
+    const key = operation?.startsWith('history.metric')
+      ? 'sync.operations.dedicated'
+      : keyByOperation[operation ?? ''] ?? 'sync.operations.unknown';
+    return this.i18n.translate(keyByOperation[operation ?? ''] ?? key);
   }
 
   historyRetentionLabel(): string {

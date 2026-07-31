@@ -1,4 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture, TestBed, fakeAsync, flushMicrotasks, tick,
+} from '@angular/core/testing';
 
 import type { HBandDataEvent } from '../core/hband.types';
 import { HomePage } from './home.page';
@@ -133,6 +135,122 @@ describe('HomePage', () => {
       jasmine.objectContaining({ date: '2026-06-08' }),
       jasmine.objectContaining({ date: '2026-06-11' }),
     ]);
+  });
+
+  it('should release the measurement controls when a native operation times out', fakeAsync(() => {
+    component.hband.simulation.set(false);
+    const testableService = component.hband as unknown as {
+      nativeExecute(
+        operation: string,
+        params: Record<string, unknown>,
+      ): Promise<{ operation: string; accepted: boolean }>;
+    };
+    testableService.nativeExecute = () => new Promise(() => undefined);
+    let rejectedError: unknown;
+
+    void component.hband.execute('device.battery').catch((error) => {
+      rejectedError = error;
+    });
+    flushMicrotasks();
+
+    expect(component.hband.busyOperation()).toBe('device.battery');
+
+    tick(10_000);
+    flushMicrotasks();
+
+    expect(component.hband.busyOperation()).toBeNull();
+    expect((rejectedError as Error).message).toContain('SDK_OPERATION_TIMEOUT');
+  }));
+
+  it('should stop the current synchronisation after its first timeout', async () => {
+    const execute = spyOn(component.hband, 'execute').and.rejectWith(
+      new Error('SDK_OPERATION_TIMEOUT: history.daily (45000ms)'),
+    );
+    component.hband.status.update((status) => ({
+      ...status,
+      historyRetentionDays: 3,
+      platform: 'android',
+    }));
+    const testableService = component.hband as unknown as {
+      synchroniseRequestedDate(
+        date: string,
+        includeSessionOperations: boolean,
+        reportProgress: boolean,
+      ): Promise<boolean>;
+    };
+    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+
+    const canContinue = await testableService.synchroniseRequestedDate(
+      yesterday,
+      false,
+      false,
+    );
+
+    expect(canContinue).toBeFalse();
+    expect(execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not request the unsupported grouped manual reader during Android sync', async () => {
+    const execute = spyOn(component.hband, 'execute').and.resolveTo();
+    component.hband.status.update((status) => ({
+      ...status,
+      platform: 'android',
+      capabilities: {
+        ...status.capabilities,
+        ecg: 'supported',
+        bodyComposition: 'supported',
+      },
+    }));
+    const testableService = component.hband as unknown as {
+      synchroniseRequestedDate(
+        date: string,
+        includeSessionOperations: boolean,
+        reportProgress: boolean,
+      ): Promise<boolean>;
+    };
+
+    await testableService.synchroniseRequestedDate(component.today, true, true);
+
+    const operations = execute.calls.allArgs().map(([operation]) => operation);
+    expect(operations).toEqual([
+      'device.battery',
+      'device.time',
+      'history.activity.current',
+      'history.daily',
+      'history.metric',
+      'history.metric',
+    ]);
+    expect(operations).not.toContain('history.manual.daily');
+    expect(component.hband.syncStatus()).toEqual(jasmine.objectContaining({
+      state: 'complete',
+      completed: 6,
+      total: 6,
+      failed: 0,
+    }));
+  });
+
+  it('should explain a timed-out reading without showing an active sync', () => {
+    component.i18n.setLanguage('pt');
+    component.hband.historyState.set({
+      date: component.today,
+      phase: 'error',
+      source: 'none',
+      recordCount: 0,
+    });
+    component.hband.syncStatus.set({
+      state: 'partial',
+      date: component.today,
+      completed: 5,
+      total: 6,
+      failed: 1,
+      failedOperation: 'history.metric.ecg',
+      failureReason: 'timeout',
+    });
+
+    expect(component.historyStatusLabel()).toBe('Não foi possível atualizar este dia');
+    expect(component.historyMetadata()).toContain('5 de 6 leituras processadas');
+    expect(component.historyMetadata()).toContain('histórico de ECG');
+    expect(component.historyStatusIcon()).toBe('close-circle-outline');
   });
 
   /**

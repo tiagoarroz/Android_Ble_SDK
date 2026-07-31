@@ -41,6 +41,7 @@ import com.veepoo.protocol.listener.data.IDeviceFuctionDataListener;
 import com.veepoo.protocol.listener.data.AbsDeviceManualDetectDataListener;
 import com.veepoo.protocol.listener.data.IECGDetectListener;
 import com.veepoo.protocol.listener.data.IECGReadDataListener;
+import com.veepoo.protocol.listener.data.IECGReadIdListener;
 import com.veepoo.protocol.listener.data.IFatigueDataListener;
 import com.veepoo.protocol.listener.data.IGsrDetectListener;
 import com.veepoo.protocol.listener.data.IHeartDataListener;
@@ -1631,19 +1632,52 @@ public class HBandPlugin extends Plugin {
     }
 
     private void readEcgHistory(PluginCall call, String metric, LocalDate date) {
-        TimeData day = new TimeData(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-        manager.readECGData(directWriteResponse, day, EEcgDataType.ALL, new IECGReadDataListener() {
+        /*
+         * Com EEcgDataType.ALL o SDK exige TimeData totalmente a zero. Enviar
+         * a data pretendida produz um pedido inválido. A leitura explícita dos
+         * IDs também contorna um defeito do método readECGData: quando não há
+         * registos, recebe IDs nulos mas não chama readDataFinish.
+         */
+        TimeData allDates = new TimeData(0, 0, 0, 0, 0, 0);
+        manager.readECGId(directWriteResponse, allDates, EEcgDataType.ALL, new IECGReadIdListener() {
+            @Override public void readIdFinish(int[] ids) {
+                if (ids == null || ids.length == 0) {
+                    emitHistory(metric, date.toString(), new JSArray());
+                    accept(call, "history.metric");
+                    return;
+                }
+                manager.readECGManuallyData(
+                    directWriteResponse,
+                    ids,
+                    ecgHistoryListener(call, metric, date)
+                );
+            }
+        });
+    }
+
+    private IECGReadDataListener ecgHistoryListener(
+        PluginCall call,
+        String metric,
+        LocalDate date
+    ) {
+        return new IECGReadDataListener() {
             @Override public void readDataFinish(List<EcgDetectResult> data) {
                 JSArray records = new JSArray();
                 for (EcgDetectResult item : data) {
-                    records.put(historyRecord(item.getTimeBean(), ecgValues(item), intArray(item.getFilterSignals())));
+                    if (sameDate(item.getTimeBean(), date)) {
+                        records.put(historyRecord(
+                            item.getTimeBean(),
+                            ecgValues(item),
+                            intArray(item.getFilterSignals())
+                        ));
+                    }
                 }
                 emitHistory(metric, date.toString(), records);
                 accept(call, "history.metric");
             }
 
             @Override public void readDiagnosisDataFinish(List<EcgDiagnosis> data) {}
-        });
+        };
     }
 
     private void readBodyComponentHistory(PluginCall call, String metric, LocalDate date) {

@@ -208,7 +208,21 @@
   "sync": {
     "action": "Synchroniser le jour",
     "inProgress": "Synchronisation",
-    "progress": "{{completed}} sur {{total}} lectures"
+    "progress": "{{completed}} sur {{total}} lectures",
+    "partialProgress": "{{completed}} sur {{total}} lectures traitées",
+    "timeout": "Le bracelet n'a pas terminé {{operation}} dans le délai prévu",
+    "failed": "Impossible de terminer {{operation}}",
+    "operations": {
+      "battery": "la lecture de la batterie",
+      "time": "la synchronisation de l'heure",
+      "activity": "la lecture de l'activité actuelle",
+      "daily": "l'historique quotidien",
+      "manual": "l'historique des mesures manuelles",
+      "ecg": "l'historique ECG",
+      "bodyComposition": "l'historique de la composition corporelle",
+      "dedicated": "l'historique dédié",
+      "unknown": "une lecture"
+    }
   },
   "profile": {
     "title": "Données personnelles à synchroniser",
