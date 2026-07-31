@@ -175,6 +175,22 @@
     "deviceData": "Données reçues de l'appareil",
     "bridge": "Réponse du bridge"
   },
+  "measurementFlow": {
+    "start": "Démarrer la mesure",
+    "live": "Mesure en temps réel",
+    "measuring": "Mesure en cours",
+    "resultReady": "Mesure terminée",
+    "preparing": "Prêt à mesurer",
+    "keepStill": "Portez correctement le bracelet et évitez de bouger pendant la mesure.",
+    "waitingData": "En attente des données du bracelet",
+    "noResult": "Aucun résultat pour le moment",
+    "retry": "Vous pouvez démarrer une nouvelle tentative.",
+    "back": "Retour à l’historique",
+    "saveQuestion": "Enregistrer cette mesure ?",
+    "saveDescription": "Le résultat sera ajouté à l’historique du {{date}}.",
+    "discard": "Ne pas enregistrer",
+    "save": "Enregistrer"
+  },
   "history": {
     "title": "Historique par date",
     "description": "Les données sont enregistrées sur ce téléphone et actualisées automatiquement depuis le bracelet.",

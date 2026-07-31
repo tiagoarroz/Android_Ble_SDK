@@ -108,6 +108,22 @@ Dentro da mesma pulseira, métrica e data:
 Esta estratégia corresponde ao comportamento de upsert observado na G Band e
 permite juntar dados automáticos e medições manuais.
 
+### Medições manuais confirmadas
+
+Uma medição em tempo real não é arquivada automaticamente. Depois de a leitura
+terminar, a aplicação pede confirmação e só então cria um registo histórico:
+
+- a pulseira e a métrica mantêm o isolamento já descrito;
+- o timestamp real do callback determina a data do arquivo;
+- valores, amostras e payload bruto disponíveis são conservados;
+- a união por timestamp impede que a mesma confirmação seja duplicada;
+- recusar a gravação não altera o histórico diário;
+- um callback que contenha apenas estado ou progresso não é tratado como um
+  resultado guardável.
+
+Esta regra impede que uma medição atual seja associada ao dia antigo que a
+pessoa pudesse estar a consultar quando iniciou a leitura.
+
 ### Isolamento e duração
 
 - Arquivos de pulseiras diferentes nunca são misturados.

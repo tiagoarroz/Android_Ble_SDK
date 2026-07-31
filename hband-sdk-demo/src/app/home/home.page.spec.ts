@@ -158,6 +158,64 @@ describe('HomePage', () => {
     await selection;
   });
 
+  it('should open a focused live view and ask to save after stopping', async () => {
+    const feature = component.features.find((item) => item.metric === 'heartRate')!;
+    component.selectedFeature.set(feature);
+
+    await component.openMeasurement(feature);
+    fixture.detectChanges();
+
+    expect(component.selectedFeature()).toBe(feature);
+    expect(component.measurementFeature()).toBe(feature);
+    expect(component.hband.measurementActive(feature.metric)).toBeTrue();
+    expect(component.hband.latestFor(feature.metric)?.values['bpm']).toBe(74);
+
+    await component.toggleLiveMeasurement(feature);
+    fixture.detectChanges();
+
+    expect(component.hband.measurementActive(feature.metric)).toBeFalse();
+    expect(component.savePromptOpen()).toBeTrue();
+  });
+
+  it('should archive the confirmed result and return to the daily history', async () => {
+    const feature = component.features.find((item) => item.metric === 'heartRate')!;
+    const testableService = component.hband as unknown as {
+      historyDeviceId: string;
+    };
+    testableService.historyDeviceId = 'MF91-TEST';
+    component.selectedDate.set('2026-06-08');
+
+    await component.openMeasurement(feature);
+    fixture.detectChanges();
+    await component.toggleLiveMeasurement(feature);
+    fixture.detectChanges();
+    await component.saveMeasurement(feature);
+
+    const archived = component.hband.historyFor(feature.metric);
+    expect(component.measurementFeature()).toBeNull();
+    expect(component.savePromptOpen()).toBeFalse();
+    expect(component.selectedDate()).toBe(component.today);
+    expect(archived?.records?.some((record) => record.values['bpm'] === 74)).toBeTrue();
+    expect(component.hband.historyDates()).toContain(component.today);
+  });
+
+  it('should ask to save when a finite measurement reaches full progress', async () => {
+    const feature = component.features.find((item) => item.metric === 'stress')!;
+
+    await component.openMeasurement(feature);
+    fixture.detectChanges();
+    feedDeviceData({
+      type: 'stress',
+      metric: 'stress',
+      timestamp: new Date().toISOString(),
+      values: { progress: 100, score: 32 },
+    });
+    fixture.detectChanges();
+
+    expect(component.hband.measurementActive(feature.metric)).toBeFalse();
+    expect(component.savePromptOpen()).toBeTrue();
+  });
+
   it('should indicate when the selected metric day is loading', () => {
     component.hband.historyState.set({
       date: component.selectedDate(),

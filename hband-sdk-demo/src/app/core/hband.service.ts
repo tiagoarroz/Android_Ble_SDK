@@ -452,27 +452,98 @@ export class HBandService {
   }
 
   /**
+   * Remove o resultado da sessão anterior antes de iniciar uma nova leitura.
+   * O histórico persistente não é alterado até existir confirmação explícita.
+   */
+  private prepareMeasurement(metric: MetricId): void {
+    this.data.update((data) => ({ ...data, [metric]: undefined }));
+    this.finalMeasurements.update((measurements) => ({
+      ...measurements,
+      [metric]: undefined,
+    }));
+  }
+
+  /**
    * Alterna a mesma ação visual entre os contratos nativos de início e fim.
-   * O estado só muda depois de a bridge aceitar a operação correspondente.
+   * Ao iniciar, o estado fica ativo antes do comando para que um callback final
+   * muito rápido não volte a deixar a interface presa numa medição terminada.
    */
   async toggleMeasurement(metric: MetricId, startOperation: string, stopOperation: string): Promise<void> {
     const active = this.measurementActive(metric);
-    if (!active && metric === 'ecg') {
-      this.data.update((data) => {
-        const current = data.ecg;
-        return current
-          ? { ...data, ecg: { ...current, samples: [] } }
-          : data;
-      });
+    if (active) {
+      await this.execute(stopOperation);
+      this.activeMeasurements.update((measurements) => ({
+        ...measurements,
+        [metric]: false,
+      }));
+      return;
     }
-    await this.execute(active ? stopOperation : startOperation);
-    if (!active && metric === 'bloodGlucose') {
-      this.finalMeasurements.update((measurements) => ({ ...measurements, bloodGlucose: undefined }));
-    }
+
+    this.prepareMeasurement(metric);
     this.activeMeasurements.update((measurements) => ({
       ...measurements,
-      [metric]: !active,
+      [metric]: true,
     }));
+    try {
+      await this.execute(startOperation);
+    } catch (error) {
+      this.activeMeasurements.update((measurements) => ({
+        ...measurements,
+        [metric]: false,
+      }));
+      throw error;
+    }
+  }
+
+  /**
+   * Guarda uma medição manual apenas depois da confirmação da pessoa. O
+   * timestamp real define o dia, impedindo que uma leitura atual seja
+   * acidentalmente associada a um dia antigo que estivesse aberto.
+   */
+  async archiveCurrentMeasurement(metric: MetricId): Promise<string | null> {
+    const event = this.finalFor(metric) ?? this.latestFor(metric);
+    const deviceId = this.historyDeviceId;
+    if (!event || !deviceId) {
+      return null;
+    }
+    const parsedTimestamp = new Date(event.timestamp);
+    const timestamp = Number.isNaN(parsedTimestamp.getTime())
+      ? new Date().toISOString()
+      : event.timestamp;
+    const date = this.localDate(new Date(timestamp));
+    const archivedEvent: HBandDataEvent = {
+      type: 'history',
+      metric,
+      date,
+      timestamp: new Date().toISOString(),
+      values: { records: 1 },
+      records: [{
+        timestamp,
+        values: { ...event.values },
+        samples: event.samples?.length ? [...event.samples] : undefined,
+      }],
+      samples: event.samples?.length ? [...event.samples] : undefined,
+      raw: event.raw,
+    };
+    const merged = await this.historyRepository.mergeEvent(deviceId, archivedEvent);
+    this.historyDates.update((dates) => [...new Set([...dates, date])].sort());
+    /*
+     * A confirmação muda imediatamente o arquivo ativo para o dia real da
+     * leitura. Carregar o retrato completo evita misturar as outras métricas
+     * do dia anteriormente aberto com o novo resultado.
+     */
+    this.selectedHistoryDate = date;
+    const snapshot = await this.historyRepository.loadDate(deviceId, date);
+    this.history.set({ ...snapshot.events, [metric]: merged });
+    this.historyState.set({
+      date,
+      phase: 'ready',
+      source: 'local',
+      recordCount: snapshot.recordCount,
+      lastUpdatedAt: snapshot.updatedAt ?? new Date().toISOString(),
+      retentionDays: this.historyRetentionDays(),
+    });
+    return date;
   }
 
   private storeStatus(status: HBandStatus): void {

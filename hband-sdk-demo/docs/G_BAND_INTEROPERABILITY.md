@@ -60,6 +60,25 @@ temperatura e 30 minutos para frequência cardíaca, glicemia e stress. A
 identidade visual, tipografia, cores, cartões e navegação continuam a ser as da
 aplicação H Band SDK Demo.
 
+## Fluxo das medições manuais
+
+A separação funcional observada na G Band foi aplicada sem copiar a sua
+identidade visual:
+
+1. o detalhe de uma métrica abre no histórico do dia selecionado;
+2. o botão de medição abre uma superfície dedicada aos dados em tempo real;
+3. a leitura pode terminar pelo progresso final do SDK ou pelo comando de paragem;
+4. quando existe um resultado real, a interface pede confirmação antes de o
+   arquivar;
+5. ao confirmar, o timestamp do callback determina o dia correto e o resultado
+   é unido ao histórico local;
+6. ao recusar, o resultado continua visível apenas como último dado da sessão e
+   não é introduzido no arquivo.
+
+Estados isolados do protocolo, como progresso sem valores clínicos, não são
+oferecidos para gravação. Os passos também não entram neste fluxo porque o SDK
+os fornece como atividade diária acumulada, não como medição manual iniciável.
+
 ## Ensaio físico de 29 de julho de 2026
 
 A sincronização da demonstração autenticou a MF91 indicada, leu bateria a

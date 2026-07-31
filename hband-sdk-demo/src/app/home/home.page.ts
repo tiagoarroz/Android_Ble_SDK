@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonBadge, IonButton, IonButtons, IonChip, IonContent, IonHeader, IonIcon,
@@ -9,11 +9,11 @@ import {
 import type { DatetimeHighlight } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
-  albumsOutline, analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+  albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
   bodyOutline, calendarOutline, checkmarkCircle,
   closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-  refreshOutline, speedometerOutline, syncOutline, thermometerOutline, watchOutline,
+  playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
 
@@ -40,20 +40,42 @@ export class HomePage implements OnInit {
   readonly i18n = inject(I18nService);
   readonly features = FEATURE_CATALOG;
   readonly selectedFeature = signal<FeatureDefinition | null>(null);
+  readonly measurementFeature = signal<FeatureDefinition | null>(null);
+  readonly savePromptOpen = signal(false);
+  readonly savingMeasurement = signal(false);
   readonly scanOpen = signal(false);
   readonly historyCalendarOpen = signal(false);
   readonly password = signal('0000');
   readonly selectedDate = signal(this.localDate(new Date()));
   readonly today = this.localDate(new Date());
+  private measurementWasActive = false;
 
   constructor() {
     addIcons({
-      albumsOutline, analyticsOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+      albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
       bodyOutline, calendarOutline, checkmarkCircle,
       closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-      refreshOutline, speedometerOutline, syncOutline, thermometerOutline, watchOutline,
+      playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
+    });
+
+    /*
+     * Observa a transição ativa -> terminada produzida pelos callbacks nativos.
+     * Assim, medições finitas abrem a confirmação sem depender de polling.
+     */
+    effect(() => {
+      const feature = this.measurementFeature();
+      const active = feature ? this.hband.measurementActive(feature.metric) : false;
+      if (
+        feature
+        && this.measurementWasActive
+        && !active
+        && this.measurementResultAvailable(feature)
+      ) {
+        this.savePromptOpen.set(true);
+      }
+      this.measurementWasActive = active;
     });
   }
 
@@ -89,6 +111,115 @@ export class HomePage implements OnInit {
       return;
     }
     await this.hband.execute(action.operation);
+  }
+
+  measurementAction(feature: FeatureDefinition): FeatureAction | undefined {
+    return feature.actions.find((action) => action.stopOperation);
+  }
+
+  /**
+   * Abre a superfície dedicada e inicia logo a medição escolhida. Os erros
+   * permanecem visíveis nos logs e deixam o botão disponível para nova tentativa.
+   */
+  async openMeasurement(feature: FeatureDefinition): Promise<void> {
+    const action = this.measurementAction(feature);
+    if (!action) {
+      return;
+    }
+    this.measurementWasActive = false;
+    this.savePromptOpen.set(false);
+    this.measurementFeature.set(feature);
+    try {
+      await this.run(action, feature);
+    } catch {
+      // O serviço já registou o erro técnico no painel desta medição.
+    }
+  }
+
+  /**
+   * Alterna o único botão da vista de tempo real entre iniciar e parar.
+   */
+  async toggleLiveMeasurement(feature: FeatureDefinition): Promise<void> {
+    const action = this.measurementAction(feature);
+    if (!action || this.savePromptOpen()) {
+      return;
+    }
+    try {
+      await this.run(action, feature);
+    } catch {
+      // O serviço já registou o erro técnico no painel desta medição.
+    }
+  }
+
+  /**
+   * Ao sair de uma leitura ativa, termina primeiro o comando. Se já existirem
+   * dados reais, a transição de estado abre a confirmação de gravação.
+   */
+  async requestMeasurementExit(feature: FeatureDefinition): Promise<void> {
+    if (this.hband.measurementActive(feature.metric)) {
+      await this.toggleLiveMeasurement(feature);
+      if (this.measurementResultAvailable(feature)) {
+        this.savePromptOpen.set(true);
+        return;
+      }
+    }
+    this.closeMeasurement();
+  }
+
+  /**
+   * Aceita apenas valores clínicos ou amostras reais; progresso e estados do
+   * protocolo, isoladamente, não constituem uma medição que possa ser guardada.
+   */
+  measurementResultAvailable(feature: FeatureDefinition): boolean {
+    const event = this.hband.finalFor(feature.metric) ?? this.hband.latestFor(feature.metric);
+    const controlFields = new Set([
+      'progress', 'state', 'success', 'enabled', 'synchronised', 'lead',
+    ]);
+    return Boolean(
+      event
+      && (
+        (event.samples?.length ?? 0) > 0
+        || Object.entries(event.values).some(
+          ([field, value]) => !controlFields.has(field) && value !== null,
+        )
+      )
+    );
+  }
+
+  measurementResultDate(feature: FeatureDefinition): string {
+    const event = this.hband.finalFor(feature.metric) ?? this.hband.latestFor(feature.metric);
+    const timestamp = event?.timestamp ? new Date(event.timestamp) : new Date();
+    const validDate = Number.isNaN(timestamp.getTime()) ? new Date() : timestamp;
+    return new Intl.DateTimeFormat(this.locale(), { dateStyle: 'long' }).format(validDate);
+  }
+
+  /**
+   * Persiste o resultado confirmado, muda para o respetivo dia real e regressa
+   * ao histórico enquanto o arquivo local é recarregado.
+   */
+  async saveMeasurement(feature: FeatureDefinition): Promise<void> {
+    this.savingMeasurement.set(true);
+    try {
+      const date = await this.hband.archiveCurrentMeasurement(feature.metric);
+      if (!date) {
+        return;
+      }
+      this.selectedDate.set(date);
+      this.closeMeasurement();
+      void this.hband.synchroniseDate(date);
+    } finally {
+      this.savingMeasurement.set(false);
+    }
+  }
+
+  discardMeasurement(): void {
+    this.closeMeasurement();
+  }
+
+  closeMeasurement(): void {
+    this.savePromptOpen.set(false);
+    this.measurementFeature.set(null);
+    this.measurementWasActive = false;
   }
 
   actionOperation(action: FeatureAction, feature: FeatureDefinition): string {

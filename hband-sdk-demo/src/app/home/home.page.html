@@ -222,7 +222,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <div class="feature-detail">
+        <div class="feature-detail feature-history-page">
           <header class="feature-detail__header">
             <span class="feature-detail__icon"><ion-icon [name]="feature.icon"></ion-icon></span>
             <div>
@@ -237,15 +237,138 @@
             </div>
           </header>
 
-          <section class="metric-data-section">
-            <h3>{{ i18n.translate('data.live') }}</h3>
+          <section class="metric-data-section feature-history-page__data">
+            <div class="metric-data-section__heading">
+              <h3>{{ i18n.translate('data.history') }}</h3>
+              <button
+                class="metric-history-date-trigger"
+                type="button"
+                [attr.aria-label]="i18n.translate('history.openCalendar')"
+                (click)="historyCalendarOpen.set(true)"
+              >
+                @if (historyLoading()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="calendar-outline"></ion-icon>
+                }
+                <span>
+                  <small>{{ i18n.translate('history.date') }}</small>
+                  <strong>{{ formattedSelectedDate() }}</strong>
+                </span>
+              </button>
+            </div>
+            @if (hband.historyFor(feature.metric); as history) {
+              <app-data-visualizer [event]="history" [type]="feature.visualization"></app-data-visualizer>
+            } @else {
+              <div class="detail-empty detail-empty--small">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ i18n.translate('history.noData') }}</span>
+              </div>
+            }
+          </section>
+
+          @if (capability(feature) === 'unsupported') {
+            <div class="support-warning">
+              <ion-icon name="information-circle-outline"></ion-icon>
+              <span>{{ i18n.translate('capabilities.unsupportedDescription') }}</span>
+            </div>
+          }
+
+          <div class="feature-history-page__actions">
+            @if (measurementAction(feature); as action) {
+              <ion-button
+                class="feature-history-page__measure"
+                expand="block"
+                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                (click)="openMeasurement(feature)"
+              >
+                <ion-icon slot="start" name="pulse-outline"></ion-icon>
+                {{ i18n.translate('measurementFlow.start') }}
+              </ion-button>
+            } @else {
+              @for (action of feature.actions; track action.id) {
+                <ion-button
+                  expand="block"
+                  fill="outline"
+                  [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                  (click)="run(action, feature)"
+                >
+                  @if (hband.busyOperation() === action.operation) {
+                    <ion-spinner slot="start" name="crescent"></ion-spinner>
+                  } @else {
+                    <ion-icon slot="start" name="refresh-outline"></ion-icon>
+                  }
+                  {{ actionLabel(action, feature) }}
+                </ion-button>
+              }
+            }
+          </div>
+        </div>
+      </ion-content>
+    }
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="measurement-modal"
+  [isOpen]="measurementFeature() !== null"
+  [backdropDismiss]="false"
+  (didDismiss)="closeMeasurement()"
+>
+  <ng-template>
+    @if (measurementFeature(); as feature) {
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button
+              [attr.aria-label]="i18n.translate('measurementFlow.back')"
+              (click)="requestMeasurementExit(feature)"
+            >
+              <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-title>{{ i18n.translate(feature.titleKey) }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="live-measurement-page" [attr.data-metric]="feature.metric">
+          <header class="live-measurement-page__hero">
+            <span
+              class="live-measurement-page__icon"
+              [class.is-measuring]="hband.measurementActive(feature.metric)"
+            >
+              <ion-icon [name]="feature.icon"></ion-icon>
+            </span>
+            <span class="live-measurement-page__eyebrow">
+              {{ i18n.translate('measurementFlow.live') }}
+            </span>
+            <h2>
+              {{
+                i18n.translate(
+                  hband.measurementActive(feature.metric)
+                    ? 'measurementFlow.measuring'
+                    : measurementResultAvailable(feature)
+                      ? 'measurementFlow.resultReady'
+                      : 'measurementFlow.preparing'
+                )
+              }}
+            </h2>
+            <p>{{ i18n.translate('measurementFlow.keepStill') }}</p>
+          </header>
+
+          <section class="live-measurement-page__result">
             @if (hband.latestFor(feature.metric); as event) {
               <app-data-visualizer [event]="event" [type]="feature.visualization"></app-data-visualizer>
             } @else {
               <div class="detail-empty">
-                <ion-icon name="analytics-outline"></ion-icon>
-                <strong>{{ i18n.translate('data.noData') }}</strong>
-                <span>{{ i18n.translate('data.runAction') }}</span>
+                @if (hband.measurementActive(feature.metric)) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                  <strong>{{ i18n.translate('measurementFlow.waitingData') }}</strong>
+                } @else {
+                  <ion-icon name="analytics-outline"></ion-icon>
+                  <strong>{{ i18n.translate('measurementFlow.noResult') }}</strong>
+                  <span>{{ i18n.translate('measurementFlow.retry') }}</span>
+                }
               </div>
             }
           </section>
@@ -284,68 +407,31 @@
                     </span>
                   </div>
                 </div>
-              } @else {
-                <div class="detail-empty detail-empty--small">
-                  <ion-icon name="medical-outline"></ion-icon>
-                  <span>{{ i18n.translate('data.glucoseTotal.waiting') }}</span>
-                </div>
               }
             </section>
           }
 
-          <section class="metric-data-section">
-            <div class="metric-data-section__heading">
-              <h3>{{ i18n.translate('data.history') }}</h3>
-              <button
-                class="metric-history-date-trigger"
-                type="button"
-                [attr.aria-label]="i18n.translate('history.openCalendar')"
-                (click)="historyCalendarOpen.set(true)"
-              >
-                @if (historyLoading()) {
-                  <ion-spinner name="crescent"></ion-spinner>
-                } @else {
-                  <ion-icon name="calendar-outline"></ion-icon>
-                }
-                <span>
-                  <small>{{ i18n.translate('history.date') }}</small>
-                  <strong>{{ formattedSelectedDate() }}</strong>
-                </span>
-              </button>
-            </div>
-            @if (hband.historyFor(feature.metric); as history) {
-              <app-data-visualizer [event]="history" [type]="feature.visualization"></app-data-visualizer>
-            } @else {
-              <div class="detail-empty detail-empty--small">
-                <ion-icon name="calendar-outline"></ion-icon>
-                <span>{{ i18n.translate('history.noData') }}</span>
-              </div>
-            }
-          </section>
-
-          @if (capability(feature) === 'unsupported') {
-            <div class="support-warning">
-              <ion-icon name="information-circle-outline"></ion-icon>
-              <span>{{ i18n.translate('capabilities.unsupportedDescription') }}</span>
-            </div>
-          }
-
-          <div class="feature-actions">
-            @for (action of feature.actions; track action.id) {
+          @if (measurementAction(feature); as action) {
+            <div class="live-measurement-page__controls">
               <ion-button
-                [fill]="action.stopOperation && hband.measurementActive(feature.metric) ? 'outline' : action.tone === 'secondary' ? 'outline' : 'solid'"
-                [color]="action.stopOperation && hband.measurementActive(feature.metric) ? 'danger' : 'primary'"
-                [attr.aria-pressed]="action.stopOperation ? hband.measurementActive(feature.metric) : null"
-                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(actionOperation(action, feature)) || hband.busyOperation() !== null"
-                (click)="run(action, feature)"
+                class="live-measurement-page__toggle"
+                [color]="hband.measurementActive(feature.metric) ? 'danger' : 'primary'"
+                [disabled]="hband.busyOperation() !== null || savePromptOpen()"
+                (click)="toggleLiveMeasurement(feature)"
               >
                 @if (hband.busyOperation() === actionOperation(action, feature)) {
                   <ion-spinner slot="start" name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon
+                    slot="start"
+                    [name]="hband.measurementActive(feature.metric) ? 'stop-outline' : 'play-outline'"
+                  ></ion-icon>
                 }
                 {{ actionLabel(action, feature) }}
               </ion-button>
-            }
-          </div>
+            </div>
+          }
+
           <section class="measurement-log-panel">
             <header class="measurement-log-panel__header">
               <div>
@@ -390,6 +476,46 @@
             }
           </section>
         </div>
+
+        @if (savePromptOpen()) {
+          <div class="measurement-save-prompt" role="dialog" aria-modal="true">
+            <span class="measurement-save-prompt__backdrop"></span>
+            <section>
+              <span class="measurement-save-prompt__icon">
+                <ion-icon name="save-outline"></ion-icon>
+              </span>
+              <h2>{{ i18n.translate('measurementFlow.saveQuestion') }}</h2>
+              <p>
+                {{
+                  i18n.translate('measurementFlow.saveDescription', {
+                    date: measurementResultDate(feature)
+                  })
+                }}
+              </p>
+              <div>
+                <ion-button
+                  fill="outline"
+                  [disabled]="savingMeasurement()"
+                  (click)="discardMeasurement()"
+                >
+                  <ion-icon slot="start" name="trash-outline"></ion-icon>
+                  {{ i18n.translate('measurementFlow.discard') }}
+                </ion-button>
+                <ion-button
+                  [disabled]="savingMeasurement()"
+                  (click)="saveMeasurement(feature)"
+                >
+                  @if (savingMeasurement()) {
+                    <ion-spinner slot="start" name="crescent"></ion-spinner>
+                  } @else {
+                    <ion-icon slot="start" name="save-outline"></ion-icon>
+                  }
+                  {{ i18n.translate('measurementFlow.save') }}
+                </ion-button>
+              </div>
+            </section>
+          </div>
+        }
       </ion-content>
     }
   </ng-template>
@@ -397,7 +523,7 @@
 
 <!--
   O calendário fica depois das restantes modais para receber o nível visual
-  superior quando é aberto a partir do detalhe de uma métrica.
+  superior quando é aberto a partir do detalhe histórico de uma métrica.
 -->
 <ion-modal
   class="history-calendar-modal"

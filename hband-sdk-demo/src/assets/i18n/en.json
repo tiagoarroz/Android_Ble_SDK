@@ -175,6 +175,22 @@
     "deviceData": "Data received from device",
     "bridge": "Bridge response"
   },
+  "measurementFlow": {
+    "start": "Start measurement",
+    "live": "Real-time measurement",
+    "measuring": "Measurement in progress",
+    "resultReady": "Measurement completed",
+    "preparing": "Ready to measure",
+    "keepStill": "Wear the band correctly and avoid moving during the reading.",
+    "waitingData": "Waiting for data from the band",
+    "noResult": "There is no result yet",
+    "retry": "You can start a new attempt.",
+    "back": "Back to history",
+    "saveQuestion": "Save this measurement?",
+    "saveDescription": "The result will be added to the history for {{date}}.",
+    "discard": "Do not save",
+    "save": "Save"
+  },
   "history": {
     "title": "History by date",
     "description": "Data is saved on this phone and refreshed automatically from the band.",

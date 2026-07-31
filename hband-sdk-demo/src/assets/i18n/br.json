@@ -175,6 +175,22 @@
     "deviceData": "Dados recebidos do dispositivo",
     "bridge": "Resposta da bridge"
   },
+  "measurementFlow": {
+    "start": "Iniciar medição",
+    "live": "Medição em tempo real",
+    "measuring": "Medição em andamento",
+    "resultReady": "Medição concluída",
+    "preparing": "Pronto para medir",
+    "keepStill": "Mantenha a pulseira colocada corretamente e evite movimentos durante a leitura.",
+    "waitingData": "Aguardando dados da pulseira",
+    "noResult": "Ainda não há um resultado",
+    "retry": "Você pode iniciar uma nova tentativa.",
+    "back": "Voltar ao histórico",
+    "saveQuestion": "Salvar esta medição?",
+    "saveDescription": "O resultado será adicionado ao histórico de {{date}}.",
+    "discard": "Não salvar",
+    "save": "Salvar"
+  },
   "history": {
     "title": "Histórico por data",
     "description": "Os dados ficam salvos neste celular e são atualizados automaticamente pela pulseira.",
