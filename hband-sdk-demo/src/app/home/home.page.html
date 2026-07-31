@@ -161,43 +161,6 @@
   </main>
 </ion-content>
 
-<ion-modal
-  class="history-calendar-modal"
-  [isOpen]="historyCalendarOpen()"
-  (didDismiss)="historyCalendarOpen.set(false)"
->
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ i18n.translate('history.calendarTitle') }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="historyCalendarOpen.set(false)">
-            {{ i18n.translate('actions.close') }}
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <div class="history-calendar-content">
-        <ion-datetime
-          presentation="date"
-          [locale]="locale()"
-          [firstDayOfWeek]="1"
-          [max]="today"
-          [value]="selectedDate()"
-          [highlightedDates]="historyHighlightedDates()"
-          [showDefaultButtons]="false"
-          (ionChange)="selectCalendarDate($event.detail.value)"
-        ></ion-datetime>
-        <div class="history-calendar-legend">
-          <span></span>
-          {{ i18n.translate('history.hasMeasurements') }}
-        </div>
-      </div>
-    </ion-content>
-  </ng-template>
-</ion-modal>
-
 <ion-modal class="scan-modal" [isOpen]="scanOpen()" (didDismiss)="scanOpen.set(false)">
   <ng-template>
     <ion-header>
@@ -333,7 +296,22 @@
           <section class="metric-data-section">
             <div class="metric-data-section__heading">
               <h3>{{ i18n.translate('data.history') }}</h3>
-              <span>{{ selectedDate() }}</span>
+              <button
+                class="metric-history-date-trigger"
+                type="button"
+                [attr.aria-label]="i18n.translate('history.openCalendar')"
+                (click)="historyCalendarOpen.set(true)"
+              >
+                @if (historyLoading()) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="calendar-outline"></ion-icon>
+                }
+                <span>
+                  <small>{{ i18n.translate('history.date') }}</small>
+                  <strong>{{ formattedSelectedDate() }}</strong>
+                </span>
+              </button>
             </div>
             @if (hband.historyFor(feature.metric); as history) {
               <app-data-visualizer [event]="history" [type]="feature.visualization"></app-data-visualizer>
@@ -414,5 +392,46 @@
         </div>
       </ion-content>
     }
+  </ng-template>
+</ion-modal>
+
+<!--
+  O calendário fica depois das restantes modais para receber o nível visual
+  superior quando é aberto a partir do detalhe de uma métrica.
+-->
+<ion-modal
+  class="history-calendar-modal"
+  [isOpen]="historyCalendarOpen()"
+  (didDismiss)="historyCalendarOpen.set(false)"
+>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ i18n.translate('history.calendarTitle') }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="historyCalendarOpen.set(false)">
+            {{ i18n.translate('actions.close') }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="history-calendar-content">
+        <ion-datetime
+          presentation="date"
+          [locale]="locale()"
+          [firstDayOfWeek]="1"
+          [max]="today"
+          [value]="selectedDate()"
+          [highlightedDates]="historyHighlightedDates()"
+          [showDefaultButtons]="false"
+          (ionChange)="selectCalendarDate($event.detail.value)"
+        ></ion-datetime>
+        <div class="history-calendar-legend">
+          <span></span>
+          {{ i18n.translate('history.hasMeasurements') }}
+        </div>
+      </div>
+    </ion-content>
   </ng-template>
 </ion-modal>

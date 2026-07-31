@@ -137,6 +137,41 @@ describe('HomePage', () => {
     ]);
   });
 
+  it('should change the history day from an open measurement modal', async () => {
+    const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
+    component.selectedFeature.set(heartRate);
+    component.historyCalendarOpen.set(true);
+    let finishSynchronisation!: () => void;
+    const synchronisation = new Promise<void>((resolve) => {
+      finishSynchronisation = resolve;
+    });
+    const syncDate = spyOn(component.hband, 'synchroniseDate').and.returnValue(synchronisation);
+
+    const selection = component.selectCalendarDate('2026-06-08');
+
+    expect(component.historyCalendarOpen()).toBeFalse();
+    expect(component.selectedDate()).toBe('2026-06-08');
+    expect(component.selectedFeature()).toBe(heartRate);
+    expect(syncDate).toHaveBeenCalledOnceWith('2026-06-08');
+
+    finishSynchronisation();
+    await selection;
+  });
+
+  it('should indicate when the selected metric day is loading', () => {
+    component.hband.historyState.set({
+      date: component.selectedDate(),
+      phase: 'syncing',
+      source: 'local',
+      recordCount: 2,
+    });
+
+    expect(component.historyLoading()).toBeTrue();
+
+    component.hband.historyState.update((state) => ({ ...state, phase: 'ready' }));
+    expect(component.historyLoading()).toBeFalse();
+  });
+
   it('should release the measurement controls when a native operation times out', fakeAsync(() => {
     component.hband.simulation.set(false);
     const testableService = component.hband as unknown as {

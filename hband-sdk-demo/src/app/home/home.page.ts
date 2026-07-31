@@ -151,13 +151,17 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Fecha o calendário depois de selecionar um dia e reutiliza o mesmo fluxo
-   * de carregamento local e atualização BLE do seletor anterior.
+   * Ao selecionar um dia, fecha o calendário e reutiliza o mesmo fluxo de
+   * carregamento local e atualização BLE do seletor principal.
    */
   async selectCalendarDate(value: string | string[] | null | undefined): Promise<void> {
     const selected = Array.isArray(value) ? value[0] : value;
-    await this.setDate(selected);
+    /*
+     * Fecha primeiro o calendário para que a pessoa volte imediatamente à
+     * métrica aberta e acompanhe aí o carregamento do novo dia.
+     */
     this.historyCalendarOpen.set(false);
+    await this.setDate(selected);
   }
 
   /**
@@ -176,6 +180,16 @@ export class HomePage implements OnInit {
   formattedSelectedDate(): string {
     return new Intl.DateTimeFormat(this.locale(), { dateStyle: 'medium' })
       .format(new Date(`${this.selectedDate()}T12:00:00`));
+  }
+
+  /**
+   * Indica no seletor da modal que o arquivo do dia escolhido está a ser
+   * carregado ou atualizado pela pulseira.
+   */
+  historyLoading(): boolean {
+    const state = this.hband.historyState();
+    return state.date === this.selectedDate()
+      && (state.phase === 'loading' || state.phase === 'syncing');
   }
 
   /**

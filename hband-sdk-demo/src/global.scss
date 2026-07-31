@@ -1599,12 +1599,64 @@ ion-content {
 .metric-data-section__heading {
   align-items: center;
   display: flex;
+  gap: 14px;
   justify-content: space-between;
 
-  span {
+  h3 {
+    margin-bottom: 0 !important;
+  }
+}
+
+.metric-history-date-trigger {
+  align-items: center;
+  background: #edf8f3;
+  border: 1px solid #cce8dc;
+  border-radius: 12px;
+  color: #087662;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 9px;
+  min-height: 42px;
+  padding: 6px 11px;
+  text-align: left;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+
+  ion-icon,
+  ion-spinner {
+    flex: 0 0 auto;
+    font-size: 19px;
+    height: 19px;
+    width: 19px;
+  }
+
+  > span {
+    display: grid;
+    gap: 1px;
+  }
+
+  small {
     color: var(--app-ink-soft);
-    font-size: 12px;
+    font-size: 9px;
     font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: var(--app-ink);
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #e4f5ed;
+    border-color: #99d2ba;
+    box-shadow: 0 0 0 3px rgb(46 196 145 / 12%);
+    outline: none;
   }
 }
 
