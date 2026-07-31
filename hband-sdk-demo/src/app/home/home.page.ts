@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonBadge, IonButton, IonButtons, IonChip, IonContent, IonHeader, IonIcon,
+  IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonIcon,
   IonDatetime, IonInput, IonItem, IonLabel, IonList, IonModal, IonNote, IonProgressBar,
   IonSelect, IonSelectOption, IonSpinner, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
@@ -10,9 +10,9 @@ import type { DatetimeHighlight } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
   albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
-  bodyOutline, calendarOutline, checkmarkCircle,
+  bodyOutline, calendarOutline, chevronForwardOutline,
   closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
-  footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
+  footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
@@ -21,7 +21,7 @@ import { DataVisualizerComponent } from '../components/data-visualizer/data-visu
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
 import type {
-  FeatureAction, FeatureDefinition, HBandDataEvent, HBandLogEntry,
+  FeatureAction, FeatureDefinition, HBandDataEvent, HBandLogEntry, HBandMonitoringSetting,
 } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
@@ -30,7 +30,7 @@ import { I18nService } from '../core/i18n.service';
   templateUrl: 'home.page.html',
   imports: [
     CommonModule, FormsModule, DataVisualizerComponent, IonBadge, IonButton,
-    IonButtons, IonChip, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem,
+    IonButtons, IonContent, IonDatetime, IonHeader, IonIcon, IonInput, IonItem,
     IonLabel, IonList, IonModal, IonNote, IonProgressBar, IonSelect,
     IonSelectOption, IonSpinner, IonTitle, IonToolbar,
   ],
@@ -53,9 +53,9 @@ export class HomePage implements OnInit {
   constructor() {
     addIcons({
       albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
-      bodyOutline, calendarOutline, checkmarkCircle,
+      bodyOutline, calendarOutline, chevronForwardOutline,
       closeCircleOutline, cloudOfflineOutline, fitnessOutline, flashOutline, heartOutline,
-      footstepsOutline, helpCircleOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
+      footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
     });
@@ -94,6 +94,45 @@ export class HomePage implements OnInit {
   async connect(deviceId: string): Promise<void> {
     await this.hband.connect(deviceId, this.password());
     this.scanOpen.set(false);
+  }
+
+  /**
+   * Abre o histórico e consulta os interruptores automáticos em segundo plano.
+   * O controlo só surge se o SDK devolver uma configuração para esta métrica.
+   */
+  async openFeature(feature: FeatureDefinition): Promise<void> {
+    this.selectedFeature.set(feature);
+    try {
+      await this.hband.refreshMonitoringSettings();
+    } catch {
+      // O serviço conserva a falha técnica no registo de atividade.
+    }
+  }
+
+  async toggleMonitoring(setting: HBandMonitoringSetting): Promise<void> {
+    try {
+      await this.hband.setMonitoring(setting.metric, !setting.enabled);
+    } catch {
+      // Mantém o estado confirmado pela pulseira quando a escrita falha.
+    }
+  }
+
+  monitoringSchedule(setting: HBandMonitoringSetting): string {
+    if (!setting.scheduleAvailable) {
+      return this.i18n.translate('monitoring.deviceSchedule');
+    }
+    return this.i18n.translate('monitoring.schedule', {
+      interval: setting.intervalMinutes,
+      start: this.formatMinuteOfDay(setting.startMinute),
+      end: this.formatMinuteOfDay(setting.endMinute),
+    });
+  }
+
+  private formatMinuteOfDay(value: number): string {
+    const minute = Math.max(0, Math.min(1440, Math.round(value)));
+    const hours = Math.floor(minute / 60);
+    const minutes = minute % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   }
 
   syncPercent(): number {
@@ -429,13 +468,6 @@ export class HomePage implements OnInit {
 
   statusLabel(): string {
     return this.i18n.translate(`connectionStates.${this.hband.status().state}`);
-  }
-
-  statusIcon(feature: FeatureDefinition): string {
-    const state = this.capability(feature);
-    return state === 'supported'
-      ? 'checkmark-circle'
-      : state === 'unsupported' ? 'close-circle-outline' : 'help-circle-outline';
   }
 
   batteryPercent(): number {

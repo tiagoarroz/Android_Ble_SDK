@@ -36,6 +36,9 @@ import com.veepoo.protocol.listener.data.IBatteryDataListener;
 import com.veepoo.protocol.listener.data.IBodyComponentDetectListener;
 import com.veepoo.protocol.listener.data.IBodyComponentReadDataListener;
 import com.veepoo.protocol.listener.data.IBloodGlucoseChangeListener;
+import com.veepoo.protocol.listener.data.IAutoMeasureSettingDataListener;
+import com.veepoo.protocol.listener.data.IAllSetDataListener;
+import com.veepoo.protocol.listener.data.ICustomSettingDataListener;
 import com.veepoo.protocol.listener.data.IBreathDataListener;
 import com.veepoo.protocol.listener.data.IDeviceFuctionDataListener;
 import com.veepoo.protocol.listener.data.AbsDeviceManualDetectDataListener;
@@ -58,6 +61,8 @@ import com.veepoo.protocol.listener.data.ISportDataListener;
 import com.veepoo.protocol.listener.data.ITemptureDataListener;
 import com.veepoo.protocol.listener.data.ITemptureDetectDataListener;
 import com.veepoo.protocol.model.datas.BatteryData;
+import com.veepoo.protocol.model.datas.AutoMeasureData;
+import com.veepoo.protocol.model.datas.AllSetData;
 import com.veepoo.protocol.model.datas.BloodGlucoseManualData;
 import com.veepoo.protocol.model.datas.BloodOxygenManualData;
 import com.veepoo.protocol.model.datas.BloodPressureManualData;
@@ -97,6 +102,10 @@ import com.veepoo.protocol.model.datas.TemptureData;
 import com.veepoo.protocol.model.datas.TemptureDetectData;
 import com.veepoo.protocol.model.datas.TimeData;
 import com.veepoo.protocol.model.enums.DetectState;
+import com.veepoo.protocol.model.enums.EAutoMeasureType;
+import com.veepoo.protocol.model.enums.EAllSetStatus;
+import com.veepoo.protocol.model.enums.EAllSetType;
+import com.veepoo.protocol.model.enums.ECustomStatus;
 import com.veepoo.protocol.model.enums.DeviceManualDataType;
 import com.veepoo.protocol.model.enums.EBPDetectModel;
 import com.veepoo.protocol.model.enums.EBloodGlucoseRiskLevel;
@@ -109,6 +118,9 @@ import com.veepoo.protocol.model.enums.ETimeMode;
 import com.veepoo.protocol.model.enums.GsrDetectAck;
 import com.veepoo.protocol.model.enums.PressureDetectState;
 import com.veepoo.protocol.model.settings.DeviceTimeSetting;
+import com.veepoo.protocol.model.settings.AllSetSetting;
+import com.veepoo.protocol.model.settings.CustomSetting;
+import com.veepoo.protocol.model.settings.CustomSettingData;
 import com.veepoo.protocol.model.settings.ReadOriginSetting;
 
 import java.time.Instant;
@@ -121,6 +133,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @CapacitorPlugin(
     name = "HBand",
@@ -141,6 +154,9 @@ import java.util.Map;
 public class HBandPlugin extends Plugin {
     private final VPOperateManager manager = VPOperateManager.getInstance();
     private final Map<String, SearchResult> discoveredDevices = new LinkedHashMap<>();
+    private final Map<String, AutoMeasureData> autoMeasureSettings = new LinkedHashMap<>();
+    private CustomSettingData legacyMonitoringSettings;
+    private AllSetData legacyOxygenMonitoringSetting;
     private final JSObject capabilities = new JSObject();
     private int watchDataDays = 3;
     private int originProtocolVersion = 1;
@@ -472,6 +488,12 @@ public class HBandPlugin extends Plugin {
             case "device.profile":
                 syncProfile(call);
                 return;
+            case "monitoring.read":
+                readMonitoringSettings(call);
+                return;
+            case "monitoring.set":
+                setMonitoringSetting(call);
+                return;
             case "measure.heartRate.start":
                 startHeartRate(call);
                 return;
@@ -710,6 +732,369 @@ public class HBandPlugin extends Plugin {
             emitData("battery", values, null, data.toString());
             accept(call, "device.battery");
         });
+    }
+
+    /**
+     * Lê do dispositivo as medições que suportam monitorização automática.
+     * A lista devolvida é também guardada para uma alteração posterior poder
+     * conservar o intervalo e a janela horária definidos no firmware.
+     */
+    private void readMonitoringSettings(PluginCall call) {
+        if ("supported".equals(capabilities.optString("autoMeasure", "unknown"))) {
+            readDynamicMonitoringSettings(call);
+            return;
+        }
+        readLegacyMonitoringSettings(call);
+    }
+
+    private void readDynamicMonitoringSettings(PluginCall call) {
+        AtomicBoolean completed = new AtomicBoolean(false);
+        manager.readAutoMeasureSettingData(writeResponse, new IAutoMeasureSettingDataListener() {
+            @Override
+            public void onSettingDataChange(List<AutoMeasureData> settings) {
+                autoMeasureSettings.clear();
+                for (AutoMeasureData setting : settings) {
+                    String metric = metricForAutoMeasure(setting.getFunType());
+                    if (metric == null) {
+                        continue;
+                    }
+                    autoMeasureSettings.put(metric, setting);
+                    emitMonitoringSetting(metric, setting);
+                }
+                if (completed.compareAndSet(false, true)) {
+                    accept(call, "monitoring.read");
+                }
+            }
+
+            @Override
+            public void onSettingDataChangeFail() {
+                if (completed.compareAndSet(false, true)) {
+                    call.reject("MONITORING_READ_FAILED");
+                }
+            }
+
+            @Override
+            public void onSettingDataChangeSuccess() {
+                // A leitura é concluída por onSettingDataChange, que contém os dados.
+            }
+        });
+    }
+
+    /**
+     * A MF91 usa os interruptores de personalização anteriores ao protocolo
+     * dinâmico 0xB3. O oxigénio pertence a um comando próprio, pelo que é lido
+     * depois do pacote comum para manter a fila BLE estritamente sequencial.
+     */
+    private void readLegacyMonitoringSettings(PluginCall call) {
+        manager.readCustomSetting(writeResponse, data -> {
+            if (data == null || data.getStatus() == ECustomStatus.FAIL) {
+                call.reject("MONITORING_READ_FAILED");
+                return;
+            }
+            /*
+             * O SDK entrega a personalização em dois pacotes. O primeiro tem
+             * apenas frequência e pressão; avançar aí sobreporia a leitura do
+             * segundo pacote com o comando de oxigénio.
+             */
+            if (!legacyCustomMonitoringComplete(data)) {
+                return;
+            }
+            legacyMonitoringSettings = data;
+            emitLegacyCustomMonitoringSettings(data);
+            if (!capabilityUsable("bloodOxygen")) {
+                accept(call, "monitoring.read");
+                return;
+            }
+            manager.readSpo2hAutoDetect(writeResponse, oxygenData -> {
+                legacyOxygenMonitoringSetting = oxygenData;
+                if (oxygenData != null
+                    && oxygenData.getOprateResult() != EAllSetStatus.UNSUPPORT
+                    && oxygenData.getOprateResult() != EAllSetStatus.READ_FAIL) {
+                    emitLegacyMonitoringSetting(
+                        "oxygen",
+                        oxygenData.getIsOpen() == 1 || oxygenData.getOpenState() == 1,
+                        oxygenData.getStartHour() * 60 + oxygenData.getStartMinute(),
+                        oxygenData.getEndHour() * 60 + oxygenData.getEndMinute(),
+                        true,
+                        oxygenData.toString()
+                    );
+                }
+                accept(call, "monitoring.read");
+            });
+        });
+    }
+
+    /**
+     * Altera apenas o interruptor de uma configuração previamente lida. Não
+     * são criados valores por defeito que possam substituir os parâmetros do
+     * utilizador ou uma restrição específica da pulseira.
+     */
+    private void setMonitoringSetting(PluginCall call) {
+        JSObject params = call.getObject("params");
+        String metric = params == null ? null : params.optString("metric", null);
+        if (metric == null || params == null || !params.has("enabled")) {
+            call.reject("MONITORING_PARAMS_REQUIRED");
+            return;
+        }
+        AutoMeasureData setting = autoMeasureSettings.get(metric);
+        if (setting == null) {
+            setLegacyMonitoringSetting(call, metric, params.optBoolean("enabled", false));
+            return;
+        }
+
+        boolean previous = setting.isSwitchOpen();
+        boolean enabled = params.optBoolean("enabled", previous);
+        setting.setSwitchOpen(enabled);
+        AtomicBoolean completed = new AtomicBoolean(false);
+        manager.setAutoMeasureSettingData(writeResponse, setting, new IAutoMeasureSettingDataListener() {
+            @Override
+            public void onSettingDataChange(List<AutoMeasureData> settings) {
+                // A confirmação de escrita é entregue por onSettingDataChangeSuccess.
+            }
+
+            @Override
+            public void onSettingDataChangeFail() {
+                setting.setSwitchOpen(previous);
+                if (completed.compareAndSet(false, true)) {
+                    call.reject("MONITORING_SET_FAILED: " + metric);
+                }
+            }
+
+            @Override
+            public void onSettingDataChangeSuccess() {
+                if (completed.compareAndSet(false, true)) {
+                    emitMonitoringSetting(metric, setting);
+                    accept(call, "monitoring.set");
+                }
+            }
+        });
+    }
+
+    private void setLegacyMonitoringSetting(PluginCall call, String metric, boolean enabled) {
+        if ("oxygen".equals(metric)) {
+            setLegacyOxygenMonitoringSetting(call, enabled);
+            return;
+        }
+        if (legacyMonitoringSettings == null || !legacyMetricSupported(metric, legacyMonitoringSettings)) {
+            call.reject("MONITORING_SETTING_NOT_AVAILABLE: " + metric);
+            return;
+        }
+
+        CustomSetting setting = customSettingFromData(legacyMonitoringSettings);
+        EFunctionStatus state = enabled ? EFunctionStatus.SUPPORT_OPEN : EFunctionStatus.SUPPORT_CLOSE;
+        switch (metric) {
+        case "heartRate":
+            setting.setOpenAutoHeartDetect(enabled);
+            break;
+        case "bloodPressure":
+            setting.setOpenAutoBpDetect(enabled);
+            break;
+        case "temperature":
+            setting.setIsOpenAutoTemperatureDetect(state);
+            break;
+        case "bloodGlucose":
+            setting.setIsOpenBloodGlucoseDetect(state);
+            break;
+        case "stress":
+            setting.setStressDetect(state);
+            break;
+        default:
+            call.reject("MONITORING_SETTING_NOT_AVAILABLE: " + metric);
+            return;
+        }
+
+        manager.changeCustomSetting(writeResponse, data -> {
+            if (data == null || data.getStatus() == ECustomStatus.FAIL) {
+                call.reject("MONITORING_SET_FAILED: " + metric);
+                return;
+            }
+            if (!legacyCustomMonitoringComplete(data)) {
+                return;
+            }
+            legacyMonitoringSettings = data;
+            emitLegacyCustomMonitoringSettings(data);
+            accept(call, "monitoring.set");
+        }, setting);
+    }
+
+    private void setLegacyOxygenMonitoringSetting(PluginCall call, boolean enabled) {
+        AllSetData previous = legacyOxygenMonitoringSetting;
+        if (previous == null) {
+            call.reject("MONITORING_SETTING_NOT_AVAILABLE: oxygen");
+            return;
+        }
+        AllSetSetting setting = new AllSetSetting(
+            EAllSetType.SPO2H_NIGHT_AUTO_DETECT,
+            previous.getStartHour(),
+            previous.getStartMinute(),
+            previous.getEndHour(),
+            previous.getEndMinute(),
+            0,
+            enabled ? 1 : 0
+        );
+        manager.settingSpo2hAutoDetect(writeResponse, data -> {
+            if (data == null
+                || data.getOprateResult() == EAllSetStatus.OPEN_FAIL
+                || data.getOprateResult() == EAllSetStatus.CLOSE_FAIL
+                || data.getOprateResult() == EAllSetStatus.SETTING_FAIL) {
+                call.reject("MONITORING_SET_FAILED: oxygen");
+                return;
+            }
+            legacyOxygenMonitoringSetting = data;
+            emitLegacyMonitoringSetting(
+                "oxygen",
+                data.getIsOpen() == 1 || data.getOpenState() == 1,
+                data.getStartHour() * 60 + data.getStartMinute(),
+                data.getEndHour() * 60 + data.getEndMinute(),
+                true,
+                data.toString()
+            );
+            accept(call, "monitoring.set");
+        }, setting);
+    }
+
+    private void emitLegacyCustomMonitoringSettings(CustomSettingData data) {
+        emitLegacyMonitoringStatus("heartRate", data.getAutoHeartDetect(), data.toString());
+        emitLegacyMonitoringStatus("bloodPressure", data.getAutoBpDetect(), data.toString());
+        emitLegacyMonitoringStatus("temperature", data.getAutoTemperatureDetect(), data.toString());
+        emitLegacyMonitoringStatus("bloodGlucose", data.getBloodGlucoseDetection(), data.toString());
+        emitLegacyMonitoringStatus("stress", data.getStressDetect(), data.toString());
+    }
+
+    private void emitLegacyMonitoringStatus(String metric, EFunctionStatus status, String raw) {
+        if (!monitoringStatusSupported(status)) {
+            return;
+        }
+        emitLegacyMonitoringSetting(
+            metric,
+            status == EFunctionStatus.SUPPORT_OPEN,
+            0,
+            0,
+            false,
+            raw
+        );
+    }
+
+    private void emitLegacyMonitoringSetting(
+        String metric,
+        boolean enabled,
+        int startMinute,
+        int endMinute,
+        boolean scheduleAvailable,
+        String raw
+    ) {
+        JSObject values = new JSObject();
+        values.put("metric", metric);
+        values.put("enabled", enabled);
+        values.put("intervalMinutes", 0);
+        values.put("startMinute", startMinute);
+        values.put("endMinute", endMinute);
+        values.put("intervalEditable", false);
+        values.put("windowEditable", false);
+        values.put("minimumStepMinutes", 0);
+        values.put("scheduleAvailable", scheduleAvailable);
+        emitData("monitoring", values, null, raw);
+    }
+
+    private boolean legacyMetricSupported(String metric, CustomSettingData data) {
+        switch (metric) {
+        case "heartRate": return monitoringStatusSupported(data.getAutoHeartDetect());
+        case "bloodPressure": return monitoringStatusSupported(data.getAutoBpDetect());
+        case "temperature": return monitoringStatusSupported(data.getAutoTemperatureDetect());
+        case "bloodGlucose": return monitoringStatusSupported(data.getBloodGlucoseDetection());
+        case "stress": return monitoringStatusSupported(data.getStressDetect());
+        default: return false;
+        }
+    }
+
+    private boolean monitoringStatusSupported(EFunctionStatus status) {
+        return status == EFunctionStatus.SUPPORT_OPEN || status == EFunctionStatus.SUPPORT_CLOSE;
+    }
+
+    private boolean legacyCustomMonitoringComplete(CustomSettingData data) {
+        return (!capabilityUsable("heartRate") || monitoringStatusSupported(data.getAutoHeartDetect()))
+            && (!capabilityUsable("bloodPressure") || monitoringStatusSupported(data.getAutoBpDetect()))
+            && (!capabilityUsable("temperature") || monitoringStatusSupported(data.getAutoTemperatureDetect()))
+            && (!capabilityUsable("bloodGlucose") || monitoringStatusSupported(data.getBloodGlucoseDetection()))
+            && (!capabilityUsable("stress") || monitoringStatusSupported(data.getStressDetect()));
+    }
+
+    /**
+     * Reconstrói todos os campos recebidos antes de mudar um único interruptor.
+     * O protocolo de personalização escreve o pacote completo, não só a métrica.
+     */
+    private CustomSetting customSettingFromData(CustomSettingData data) {
+        CustomSetting setting = new CustomSetting(
+            data.isHaveMetricSystem(),
+            data.isMetricSystemValue(),
+            data.is24Hour(),
+            data.isOpenAutoHeartDetect(),
+            data.isOpenAutoBpDetect(),
+            data.getSportOverRemain(),
+            data.getVoiceBpHeart(),
+            data.getFindPhoneUi(),
+            data.getSecondsWatch(),
+            data.getLowSpo2hRemain(),
+            data.getSkin(),
+            data.getAutoIncall(),
+            data.getAutoHrv(),
+            data.getDisconnectRemind()
+        );
+        setting.setIsOpenSOS(data.getSOS());
+        setting.setIsOpenPPG(data.getPpg());
+        setting.setIsOpenMusicControl(data.getMusicControl());
+        setting.setIsOpenLongClickLockScreen(data.getLongClickLockScreen());
+        setting.setIsOpenMessageScreenLight(data.getMessageScreenLight());
+        setting.setIsOpenAutoTemperatureDetect(data.getAutoTemperatureDetect());
+        setting.setTemperatureUnit(data.getTemperatureUnit());
+        setting.setEcgAlwaysOpen(data.getEcgAlwaysOpen());
+        setting.setIsOpenBloodGlucoseDetect(data.getBloodGlucoseDetection());
+        setting.setMETDetect(data.getMETDetect());
+        setting.setStressDetect(data.getStressDetect());
+        setting.setBloodGlucoseUnit(data.getBloodGlucoseUnit());
+        setting.setIsOpenBloodComponentDetect(data.getBloodComponentDetect());
+        setting.setUricAcidUnit(data.getUricAcidUnit());
+        setting.setBloodFatUnit(data.getBloodFatUnit());
+        setting.setSkinType(data.getSkinLevel());
+        setting.setFallDetection(data.getFallDetection());
+        setting.setGsrUnit(data.getGsrUnit());
+        return setting;
+    }
+
+    private String metricForAutoMeasure(EAutoMeasureType type) {
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
+        case PULSE_RATE:
+            return "heartRate";
+        case BLOOD_PRESSURE:
+            return "bloodPressure";
+        case BLOOD_GLUCOSE:
+            return "bloodGlucose";
+        case STRESS:
+            return "stress";
+        case BLOOD_OXYGEN:
+            return "oxygen";
+        case BODY_TEMPERATURE:
+            return "temperature";
+        default:
+            return null;
+        }
+    }
+
+    private void emitMonitoringSetting(String metric, AutoMeasureData setting) {
+        JSObject values = new JSObject();
+        values.put("metric", metric);
+        values.put("enabled", setting.isSwitchOpen());
+        values.put("intervalMinutes", setting.getMeasureInterval());
+        values.put("startMinute", setting.getCurrentStartMinute());
+        values.put("endMinute", setting.getCurrentEndMinute());
+        values.put("intervalEditable", setting.isIntervalModify());
+        values.put("windowEditable", setting.isSlotModify());
+        values.put("minimumStepMinutes", setting.getStepUnit());
+        values.put("scheduleAvailable", true);
+        emitData("monitoring", values, null, setting.toString());
     }
 
     private void readRssi(PluginCall call) {

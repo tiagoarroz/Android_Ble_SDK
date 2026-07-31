@@ -5,7 +5,7 @@ import { HBand } from './hband.plugin';
 import { HistoryRepositoryService } from './history-repository.service';
 import type {
   HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
-  HBandHistoryState, HBandStatus, HBandSyncStatus, MetricId,
+  HBandHistoryState, HBandMonitoringSetting, HBandStatus, HBandSyncStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -58,6 +58,8 @@ const METRIC_OPERATIONS = new Set([
   'history.manual.daily',
   'history.cached',
   'device.battery',
+  'monitoring.read',
+  'monitoring.set',
 ]);
 
 @Injectable({ providedIn: 'root' })
@@ -66,6 +68,7 @@ export class HBandService {
   readonly isNative = Capacitor.isNativePlatform();
   readonly status = signal<HBandStatus>(INITIAL_STATUS);
   readonly battery = signal<HBandBatteryStatus | null>(null);
+  readonly monitoringSettings = signal<Partial<Record<MetricId, HBandMonitoringSetting>>>({});
   readonly devices = signal<HBandDevice[]>([]);
   readonly data = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
   readonly finalMeasurements = signal<Partial<Record<MetricId, HBandDataEvent>>>({});
@@ -92,6 +95,7 @@ export class HBandService {
   private pendingSyncDate: string | null = null;
   private backgroundSyncPromise: Promise<void> | null = null;
   private backgroundSyncRequested = false;
+  private monitoringRefreshPromise: Promise<void> | null = null;
   private selectedHistoryDate = this.localDate(new Date());
   private historyDeviceId = this.rememberedDeviceId();
   private batteryRefreshTimer: ReturnType<typeof setInterval> | null = null;
@@ -164,16 +168,49 @@ export class HBandService {
       this.status.update((status) => ({ ...status, state: 'disconnected', device: undefined }));
       this.activeMeasurements.set({});
       this.battery.set(null);
+      this.monitoringSettings.set({});
       return;
     }
     localStorage.removeItem(DEVICE_SESSION_KEY);
     await HBand.disconnect();
     this.activeMeasurements.set({});
     this.battery.set(null);
+    this.monitoringSettings.set({});
   }
 
   async refreshBattery(): Promise<void> {
     await this.execute('device.battery');
+  }
+
+  /**
+   * Obtém uma única vez em simultâneo a configuração das métricas automáticas.
+   * A bridge publica cada modelo real através do evento `monitoring`.
+   */
+  refreshMonitoringSettings(): Promise<void> {
+    if (!this.connected()) {
+      return Promise.resolve();
+    }
+    if (!this.monitoringRefreshPromise) {
+      this.monitoringRefreshPromise = this.execute('monitoring.read').finally(() => {
+        this.monitoringRefreshPromise = null;
+      });
+    }
+    return this.monitoringRefreshPromise;
+  }
+
+  monitoringFor(metric: MetricId): HBandMonitoringSetting | undefined {
+    return this.monitoringSettings()[metric];
+  }
+
+  /**
+   * A alteração só é enviada para uma configuração que tenha sido realmente
+   * devolvida pela pulseira, evitando mostrar controlos sem suporte efetivo.
+   */
+  async setMonitoring(metric: MetricId, enabled: boolean): Promise<void> {
+    if (!this.monitoringFor(metric)) {
+      throw new Error(`MONITORING_SETTING_NOT_AVAILABLE: ${metric}`);
+    }
+    await this.execute('monitoring.set', { metric, enabled });
   }
 
   /**
@@ -569,6 +606,7 @@ export class HBandService {
       this.stopBatteryUpdates();
       this.activeMeasurements.set({});
       this.battery.set(null);
+      this.monitoringSettings.set({});
     }
   }
 
@@ -755,6 +793,44 @@ export class HBandService {
       }
       return;
     }
+    if (event.type === 'monitoring') {
+      const metricValue = event.values['metric'];
+      const metric = typeof metricValue === 'string'
+        ? this.metricForType(metricValue)
+        : undefined;
+      const enabled = event.values['enabled'];
+      if (!metric || typeof enabled !== 'boolean') {
+        return;
+      }
+      const numeric = (key: string): number => {
+        const value = event.values[key];
+        return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+      };
+      this.monitoringSettings.update((settings) => ({
+        ...settings,
+        [metric]: {
+          metric,
+          enabled,
+          intervalMinutes: numeric('intervalMinutes'),
+          startMinute: numeric('startMinute'),
+          endMinute: numeric('endMinute'),
+          intervalEditable: event.values['intervalEditable'] === true,
+          windowEditable: event.values['windowEditable'] === true,
+          minimumStepMinutes: numeric('minimumStepMinutes'),
+          scheduleAvailable: event.values['scheduleAvailable'] !== false,
+        },
+      }));
+      this.appendLog({
+        id: this.nextLogId(event.type),
+        timestamp: event.timestamp || new Date().toISOString(),
+        level: 'success',
+        message: event.type,
+        metric,
+        kind: 'data',
+        data: { ...event, metric },
+      });
+      return;
+    }
     const metric = event.metric ?? this.metricForType(event.type);
     if (!metric) {
       return;
@@ -930,7 +1006,7 @@ export class HBandService {
   private seedSimulation(): void {
     const capabilities = Object.fromEntries([
       'heartRate', 'bloodPressure', 'bloodOxygen', 'temperature', 'bloodGlucose',
-      'ecg', 'bodyComposition', 'stress', 'steps',
+      'ecg', 'bodyComposition', 'stress', 'steps', 'autoMeasure',
     ].map((capability) => [capability, 'supported' as const]));
     this.status.set({
       available: true,
@@ -982,6 +1058,40 @@ export class HBandService {
         timestamp: now,
         values: { percent: 82, lowBattery: false },
       });
+      return;
+    }
+    if (operation === 'monitoring.read') {
+      for (const metric of [
+        'heartRate', 'bloodPressure', 'oxygen', 'temperature', 'bloodGlucose', 'stress',
+      ] as MetricId[]) {
+        this.storeData({
+          type: 'monitoring',
+          timestamp: now,
+          values: {
+            metric,
+            enabled: metric === 'heartRate' || metric === 'oxygen',
+            intervalMinutes: 10,
+            startMinute: 0,
+            endMinute: 1439,
+            intervalEditable: true,
+            windowEditable: true,
+            minimumStepMinutes: 5,
+            scheduleAvailable: true,
+          },
+        });
+      }
+      return;
+    }
+    if (operation === 'monitoring.set') {
+      const metric = params['metric'] as MetricId;
+      const current = this.monitoringFor(metric);
+      if (current) {
+        this.storeData({
+          type: 'monitoring',
+          timestamp: now,
+          values: { ...current, enabled: params['enabled'] === true },
+        });
+      }
       return;
     }
     if (operation === 'history.metric') {

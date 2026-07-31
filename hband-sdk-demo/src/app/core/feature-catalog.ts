@@ -11,22 +11,16 @@ const liveMeasurement = (prefix: string) => [
 ];
 
 /**
- * Mantém o demonstrador limitado às métricas clínicas, fisiológicas e de
- * atividade pedidas.
+ * Reúne as métricas clínicas, fisiológicas e de atividade apresentadas pela
+ * aplicação no acompanhamento diário.
  */
 export const FEATURE_CATALOG: FeatureDefinition[] = [
   {
     id: 'steps', metric: 'steps', titleKey: 'features.steps.title',
     descriptionKey: 'features.steps.description', icon: 'footsteps-outline',
     capability: 'steps', visualization: 'activity',
-    actions: [
-      {
-        id: 'current',
-        operation: 'history.activity.current',
-        labelKey: 'actions.current',
-        metric: 'steps',
-      },
-    ],
+    // Os passos são atualizados pela sincronização diária, sem ação manual no módulo.
+    actions: [],
   },
   {
     id: 'heart-rate', metric: 'heartRate', titleKey: 'features.heartRate.title',

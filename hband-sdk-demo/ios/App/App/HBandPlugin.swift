@@ -27,6 +27,8 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     private var devices: [String: VPPeripheralModel] = [:]
     private var connectionState = "idle"
     private var connectedDevice: VPPeripheralModel?
+    private var autoMonitoringSettings: [String: VPAutoMonitTestModel] = [:]
+    private var legacyMonitoringStates: [String: Bool] = [:]
     private var pendingConnectCall: CAPPluginCall?
     private var pendingPassword = "0000"
     private var lastRSSI: Int?
@@ -136,6 +138,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             authenticateCurrentDevice(call: call, operation: operation)
         case "device.profile":
             syncProfile(call, operation: operation)
+        case "monitoring.read":
+            readMonitoringSettings(call, operation: operation)
+        case "monitoring.set":
+            setMonitoringSetting(call, operation: operation)
         case "measure.heartRate.start":
             testHeartRate(true, call: call, operation: operation)
         case "measure.heartRate.stop":
@@ -291,6 +297,198 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             self?.emitData(type: "steps", values: self?.stepValues(values ?? [:]) ?? [:])
         }
         accept(call, operation: operation)
+    }
+
+    /**
+     * Lê os interruptores de monitorização automática e conserva os próprios
+     * modelos do SDK. Assim, uma alteração mantém o intervalo e a janela
+     * horária que já estavam configurados no dispositivo.
+     */
+    private func readMonitoringSettings(_ call: CAPPluginCall, operation: String) {
+        if manager.peripheralModel?.autoMonitSwitchType ?? 0 == 0 {
+            readLegacyMonitoringSettings(call, operation: operation)
+            return
+        }
+        manager.peripheralManage.veepooSDKReadAutoMonitSwitchInfo { [weak self] models in
+            guard let self else { return }
+            self.autoMonitoringSettings.removeAll()
+            for model in models ?? [] {
+                guard let metric = self.metricForAutoMonitoring(model.type) else {
+                    continue
+                }
+                self.autoMonitoringSettings[metric] = model
+                self.emitMonitoringSetting(metric: metric, model: model)
+            }
+            self.accept(call, operation: operation)
+        }
+    }
+
+    /**
+     * Firmwares anteriores ao protocolo dinâmico expõem cada interruptor como
+     * uma função base. A leitura é sequencial para não sobrepor comandos BLE.
+     */
+    private func readLegacyMonitoringSettings(_ call: CAPPluginCall, operation: String) {
+        let settings: [(metric: String, rawType: Int)] = [
+            ("heartRate", 5),
+            ("bloodPressure", 6),
+            ("temperature", 24),
+            ("bloodGlucose", 27),
+            ("stress", 29),
+            ("oxygen", 1000)
+        ]
+        legacyMonitoringStates.removeAll()
+
+        func read(at index: Int) {
+            guard index < settings.count else {
+                accept(call, operation: operation)
+                return
+            }
+            let setting = settings[index]
+            guard
+                let type = VPSettingBaseFunctionSwitchType(rawValue: setting.rawType),
+                let readState = VPSettingFunctionState(rawValue: 0)
+            else {
+                read(at: index + 1)
+                return
+            }
+            manager.peripheralManage.veepooSDKSettingBaseFunctionType(
+                type,
+                settingState: readState
+            ) { [weak self] state in
+                guard let self else { return }
+                if state.rawValue == 1 || state.rawValue == 2 {
+                    let enabled = state.rawValue == 1
+                    self.legacyMonitoringStates[setting.metric] = enabled
+                    self.emitLegacyMonitoringSetting(metric: setting.metric, enabled: enabled)
+                }
+                read(at: index + 1)
+            }
+        }
+        read(at: 0)
+    }
+
+    /**
+     * Altera apenas o estado de uma configuração devolvida pelo dispositivo.
+     * Sem uma leitura prévia, a chamada é recusada para não inventar parâmetros.
+     */
+    private func setMonitoringSetting(_ call: CAPPluginCall, operation: String) {
+        guard
+            let params = call.getObject("params"),
+            let metric = params["metric"] as? String,
+            let enabled = params["enabled"] as? Bool
+        else {
+            call.reject("MONITORING_PARAMS_REQUIRED")
+            return
+        }
+        guard let model = autoMonitoringSettings[metric] else {
+            setLegacyMonitoringSetting(
+                call,
+                operation: operation,
+                metric: metric,
+                enabled: enabled
+            )
+            return
+        }
+
+        let previous = model.on
+        model.on = enabled
+        manager.peripheralManage.veepooSDKSetAutoMonitSwitch(with: model) {
+            [weak self] success, updatedModel in
+            guard let self else { return }
+            guard success else {
+                model.on = previous
+                call.reject("MONITORING_SET_FAILED: \(metric)")
+                return
+            }
+            let confirmed = updatedModel ?? model
+            self.autoMonitoringSettings[metric] = confirmed
+            self.emitMonitoringSetting(metric: metric, model: confirmed)
+            self.accept(call, operation: operation)
+        }
+    }
+
+    private func setLegacyMonitoringSetting(
+        _ call: CAPPluginCall,
+        operation: String,
+        metric: String,
+        enabled: Bool
+    ) {
+        let rawTypes: [String: Int] = [
+            "heartRate": 5,
+            "bloodPressure": 6,
+            "temperature": 24,
+            "bloodGlucose": 27,
+            "stress": 29,
+            "oxygen": 1000
+        ]
+        guard
+            legacyMonitoringStates[metric] != nil,
+            let rawType = rawTypes[metric],
+            let type = VPSettingBaseFunctionSwitchType(rawValue: rawType),
+            let state = VPSettingFunctionState(rawValue: enabled ? 1 : 2)
+        else {
+            call.reject("MONITORING_SETTING_NOT_AVAILABLE: \(metric)")
+            return
+        }
+        manager.peripheralManage.veepooSDKSettingBaseFunctionType(
+            type,
+            settingState: state
+        ) { [weak self] result in
+            guard let self else { return }
+            guard result.rawValue != 0 && result.rawValue != 3 else {
+                call.reject("MONITORING_SET_FAILED: \(metric)")
+                return
+            }
+            self.legacyMonitoringStates[metric] = enabled
+            self.emitLegacyMonitoringSetting(metric: metric, enabled: enabled)
+            self.accept(call, operation: operation)
+        }
+    }
+
+    private func emitLegacyMonitoringSetting(metric: String, enabled: Bool) {
+        emitData(
+            type: "monitoring",
+            values: [
+                "metric": metric,
+                "enabled": enabled,
+                "intervalMinutes": 0,
+                "startMinute": 0,
+                "endMinute": 0,
+                "intervalEditable": false,
+                "windowEditable": false,
+                "minimumStepMinutes": 0,
+                "scheduleAvailable": false
+            ]
+        )
+    }
+
+    private func metricForAutoMonitoring(_ type: VPAutoMonitTestType) -> String? {
+        switch type.rawValue {
+        case 0: return "heartRate"
+        case 1: return "bloodPressure"
+        case 2: return "bloodGlucose"
+        case 3: return "stress"
+        case 4: return "oxygen"
+        case 5: return "temperature"
+        default: return nil
+        }
+    }
+
+    private func emitMonitoringSetting(metric: String, model: VPAutoMonitTestModel) {
+        emitData(
+            type: "monitoring",
+            values: [
+                "metric": metric,
+                "enabled": model.on,
+                "intervalMinutes": Int(model.timeInterval),
+                "startMinute": Int(model.startHour) * 60 + Int(model.startMinute),
+                "endMinute": Int(model.endHour) * 60 + Int(model.endMinute),
+                "intervalEditable": model.minStepValue > 0,
+                "windowEditable": model.supportRangeTime,
+                "minimumStepMinutes": Int(model.minStepValue),
+                "scheduleAvailable": true
+            ]
+        )
     }
 
     /**

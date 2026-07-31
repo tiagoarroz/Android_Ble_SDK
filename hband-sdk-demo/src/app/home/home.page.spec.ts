@@ -104,17 +104,30 @@ describe('HomePage', () => {
     expect(component.hband.latestFor('ecg')?.samples).toEqual([1, 3, 2, 4, 2]);
   });
 
-  it('should read current daily steps with distance and calories', async () => {
+  it('should update steps through synchronisation without a manual action', () => {
     const feature = component.features.find((item) => item.metric === 'steps')!;
-    const current = feature.actions.find((action) => action.id === 'current')!;
 
-    await component.run(current, feature);
+    expect(feature.actions).toEqual([]);
+  });
 
-    expect(component.hband.latestFor('steps')?.values).toEqual({
-      steps: 6842,
-      distanceKm: 4.7,
-      caloriesKcal: 286,
-    });
+  it('should expose and toggle only monitoring settings returned by the device', async () => {
+    const heartRate = component.features.find((item) => item.metric === 'heartRate')!;
+    component.hband.status.update((status) => ({
+      ...status,
+      state: 'connected',
+      capabilities: { ...status.capabilities, autoMeasure: 'supported' },
+    }));
+
+    await component.openFeature(heartRate);
+    const initial = component.hband.monitoringFor('heartRate');
+
+    expect(initial?.enabled).toBeTrue();
+    expect(initial?.intervalMinutes).toBe(10);
+    expect(component.hband.monitoringFor('steps')).toBeUndefined();
+
+    await component.toggleMonitoring(initial!);
+
+    expect(component.hband.monitoringFor('heartRate')?.enabled).toBeFalse();
   });
 
   it('should retain the battery percentage reported outside metric events', () => {

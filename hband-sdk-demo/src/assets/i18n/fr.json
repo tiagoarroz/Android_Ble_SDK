@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "H Band SDK",
-    "subtitle": "Laboratoire MF91",
+    "title": "H Band",
+    "subtitle": "Votre santé",
     "language": "Langue",
     "languages": {
       "pt": "Portugais (Portugal)",
@@ -35,11 +35,11 @@
     "error": "Erreur"
   },
   "capabilities": {
-    "supported": "Pris en charge",
-    "unsupported": "Non pris en charge",
+    "supported": "Disponible",
+    "unsupported": "Indisponible",
     "unknown": "À confirmer",
-    "unsupportedDescription": "L'appareil connecté a déclaré que cette capacité n'est pas prise en charge. Les commandes restent bloquées afin de protéger l'état du bracelet.",
-    "catalogOnly": "Cette fonction est documentée dans le catalogue, mais ne dispose pas encore d'un contrat natif exécutable dans ce bridge."
+    "unsupportedDescription": "Cette mesure n'est pas disponible sur le bracelet connecté.",
+    "catalogOnly": "Cette fonctionnalité n'est pas encore disponible dans cette version de l'application."
   },
   "device": {
     "noDevice": "Aucun appareil",
@@ -50,22 +50,21 @@
   },
   "catalog": {
     "search": "Rechercher une fonctionnalité",
-    "simulation": "Données simulées",
-    "eyebrow": "Catalogue du SDK",
-    "title": "Fonctionnalités par type de données",
+    "eyebrow": "Santé quotidienne",
+    "title": "Mesures",
     "noResults": "Aucun résultat",
     "noResultsDescription": "Essayez un autre terme ou sélectionnez une autre catégorie."
   },
   "activity": {
-    "eyebrow": "Diagnostic",
-    "title": "Activité du SDK",
-    "sdkEvent": "Événement du SDK",
+    "eyebrow": "Informations",
+    "title": "Activité de l'application",
+    "sdkEvent": "Événement",
     "empty": "Les commandes, réponses et erreurs apparaîtront ici."
   },
   "scan": {
     "title": "Connecter le bracelet",
-    "heading": "Appareils H Band à proximité",
-    "description": "Gardez le MF91 à proximité et hors de toute autre session Bluetooth. Sélectionnez-le lorsqu'il apparaît dans la liste.",
+    "heading": "Bracelets à proximité",
+    "description": "Gardez le bracelet à proximité et déconnecté des autres applications. Sélectionnez-le lorsqu'il apparaît dans la liste.",
     "password": "Mot de passe de l'appareil",
     "waiting": "En attente d'appareils…"
   },
@@ -164,16 +163,16 @@
     }
   },
   "measurementLogs": {
-    "eyebrow": "Activité de la mesure",
-    "title": "Journaux de cette mesure",
+    "eyebrow": "Détails",
+    "title": "Événements de la mesure",
     "count": "{{count}} entrées",
-    "description": "Opérations de l'application, réponses du bridge et données réelles reçues de l'appareil.",
+    "description": "Informations reçues du bracelet pendant cette mesure.",
     "empty": "Les événements de cette mesure apparaîtront ici.",
     "operationRequested": "Opération envoyée",
     "operationAccepted": "Opération acceptée",
     "operationFailed": "Échec de l'opération",
     "deviceData": "Données reçues de l'appareil",
-    "bridge": "Réponse du bridge"
+    "bridge": "Confirmation de l'application"
   },
   "measurementFlow": {
     "start": "Démarrer la mesure",
@@ -191,8 +190,19 @@
     "discard": "Ne pas enregistrer",
     "save": "Enregistrer"
   },
+  "monitoring": {
+    "title": "Suivi automatique",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "description": "Le bracelet effectue des mesures pendant la journée et les conserve pour la prochaine synchronisation.",
+    "schedule": "Toutes les {{interval}} min · {{start}}–{{end}}",
+    "deviceSchedule": "Fréquence de mesure définie par le bracelet",
+    "enable": "Activer le suivi",
+    "disable": "Désactiver le suivi",
+    "loading": "Lecture des réglages du bracelet"
+  },
   "history": {
-    "title": "Historique par date",
+    "title": "Votre journée",
     "description": "Les données sont enregistrées sur ce téléphone et actualisées automatiquement depuis le bracelet.",
     "date": "Date",
     "calendarTitle": "Choisir la date",

@@ -36,6 +36,18 @@ export interface HBandBatteryStatus {
   updatedAt: string;
 }
 
+export interface HBandMonitoringSetting {
+  metric: MetricId;
+  enabled: boolean;
+  intervalMinutes: number;
+  startMinute: number;
+  endMinute: number;
+  intervalEditable: boolean;
+  windowEditable: boolean;
+  minimumStepMinutes: number;
+  scheduleAvailable: boolean;
+}
+
 export interface HBandSyncStatus {
   state: 'idle' | 'syncing' | 'complete' | 'partial';
   date?: string;

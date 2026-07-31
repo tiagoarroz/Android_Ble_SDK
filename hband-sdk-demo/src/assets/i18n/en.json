@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "H Band SDK",
-    "subtitle": "MF91 Lab",
+    "title": "H Band",
+    "subtitle": "Your health",
     "language": "Language",
     "languages": {
       "pt": "Portuguese (Portugal)",
@@ -35,11 +35,11 @@
     "error": "Error"
   },
   "capabilities": {
-    "supported": "Supported",
-    "unsupported": "Unsupported",
+    "supported": "Available",
+    "unsupported": "Unavailable",
     "unknown": "To be confirmed",
-    "unsupportedDescription": "The connected device reported that this capability is unsupported. Commands remain disabled to protect the band state.",
-    "catalogOnly": "This function is documented in the catalog but does not yet have an executable native contract in this bridge."
+    "unsupportedDescription": "This measurement is not available on the connected band.",
+    "catalogOnly": "This feature is not yet available in this version of the app."
   },
   "device": {
     "noDevice": "No device",
@@ -50,22 +50,21 @@
   },
   "catalog": {
     "search": "Search for a feature",
-    "simulation": "Simulated data",
-    "eyebrow": "SDK catalogue",
-    "title": "Features by data type",
+    "eyebrow": "Daily health",
+    "title": "Measurements",
     "noResults": "No results",
     "noResultsDescription": "Try another term or select a different category."
   },
   "activity": {
-    "eyebrow": "Diagnostics",
-    "title": "SDK activity",
-    "sdkEvent": "SDK event",
+    "eyebrow": "Information",
+    "title": "App activity",
+    "sdkEvent": "Event",
     "empty": "Commands, responses, and errors will appear here."
   },
   "scan": {
     "title": "Connect band",
-    "heading": "Nearby H Band devices",
-    "description": "Keep the MF91 nearby and disconnected from other Bluetooth sessions. Select it when it appears in the list.",
+    "heading": "Nearby bands",
+    "description": "Keep the band nearby and disconnected from other apps. Select it when it appears in the list.",
     "password": "Device password",
     "waiting": "Waiting for devices…"
   },
@@ -164,16 +163,16 @@
     }
   },
   "measurementLogs": {
-    "eyebrow": "Measurement activity",
-    "title": "Measurement logs",
+    "eyebrow": "Details",
+    "title": "Measurement events",
     "count": "{{count}} entries",
-    "description": "Application operations, bridge responses and real data received from the device.",
+    "description": "Information received from the band during this measurement.",
     "empty": "Events for this measurement will appear here.",
     "operationRequested": "Operation sent",
     "operationAccepted": "Operation accepted",
     "operationFailed": "Operation failed",
     "deviceData": "Data received from device",
-    "bridge": "Bridge response"
+    "bridge": "App confirmation"
   },
   "measurementFlow": {
     "start": "Start measurement",
@@ -191,8 +190,19 @@
     "discard": "Do not save",
     "save": "Save"
   },
+  "monitoring": {
+    "title": "Automatic monitoring",
+    "enabled": "On",
+    "disabled": "Off",
+    "description": "The band takes readings throughout the day and stores them for the next synchronisation.",
+    "schedule": "Every {{interval}} min · {{start}}–{{end}}",
+    "deviceSchedule": "Reading frequency defined by the band",
+    "enable": "Enable monitoring",
+    "disable": "Disable monitoring",
+    "loading": "Reading the band's settings"
+  },
   "history": {
-    "title": "History by date",
+    "title": "Your day",
     "description": "Data is saved on this phone and refreshed automatically from the band.",
     "date": "Date",
     "calendarTitle": "Choose date",

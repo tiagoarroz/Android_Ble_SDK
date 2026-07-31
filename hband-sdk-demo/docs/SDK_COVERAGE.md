@@ -1,16 +1,49 @@
 # Cobertura das métricas
 
-| Métrica | Medição atual | Histórico por data | Formato diário |
-| --- | --- | --- | --- |
-| Frequência cardíaca | bpm, estado e botão único iniciar/parar | Origem diária | Média de 30 min, linha 0–24 h, média, mínimo e máximo |
-| Pressão arterial | Sistólica/diastólica em texto e progresso horizontal | Origem diária | Média horária, duas linhas, média, mínimo e máximo |
-| Oxigénio no sangue | SpO₂ e progresso circular | Origem diária | Média de 10 min, linha 0–24 h, média, mínimo e máximo |
-| Temperatura corporal | Corpo e superfície, uma casa decimal | Origem diária | Média horária, linha 0–24 h, média, mínimo, máximo e seletor corpo/pele |
-| Glicemia | Valores em curso, resultado final e progresso horizontal | Origem diária | Média de 30 min, linha 0–24 h, média, mínimo e máximo |
-| ECG | Traçado de amostras em grelha | Leitor ECG dedicado | Traçado e resultados guardados |
-| Composição corporal | Grelha de componentes e progresso horizontal | Leitor dedicado | Componentes devolvidos pelo dispositivo |
-| Passos | Total, distância e calorias | Origem diária | Barras por hora 0–24 h, total, distância e calorias |
-| Stress | Pontuação, classificação e progresso circular | Origem diária | Média de 30 min, barras 0–24 h, média, mínimo e máximo |
+| Métrica | Medição atual | Histórico por data | Monitorização automática | Formato diário |
+| --- | --- | --- | --- | --- |
+| Frequência cardíaca | bpm, estado e botão único iniciar/parar | Origem diária | Configuração dinâmica do SDK | Média de 30 min, linha 0–24 h, média, mínimo e máximo |
+| Pressão arterial | Sistólica/diastólica em texto e progresso horizontal | Origem diária | Configuração dinâmica do SDK | Média horária, duas linhas, média, mínimo e máximo |
+| Oxigénio no sangue | SpO₂ e progresso circular | Origem diária | Configuração dinâmica do SDK | Média de 10 min, linha 0–24 h, média, mínimo e máximo |
+| Temperatura corporal | Corpo e superfície, uma casa decimal | Origem diária | Configuração dinâmica do SDK | Média horária, linha 0–24 h, média, mínimo, máximo e seletor corpo/pele |
+| Glicemia | Valores em curso, resultado final e progresso horizontal | Origem diária | Configuração dinâmica do SDK | Média de 30 min, linha 0–24 h, média, mínimo e máximo |
+| ECG | Traçado de amostras em grelha | Leitor ECG dedicado | Não exposta pelo SDK automático | Traçado e resultados guardados |
+| Composição corporal | Grelha de componentes e progresso horizontal | Leitor dedicado | Não exposta pelo SDK automático | Componentes devolvidos pelo dispositivo |
+| Passos | Total, distância e calorias | Origem diária | Não é uma medição configurável | Barras por hora 0–24 h, total, distância e calorias |
+| Stress | Pontuação, classificação e progresso circular | Origem diária | Configuração dinâmica do SDK | Média de 30 min, barras 0–24 h, média, mínimo e máximo |
+
+## Monitorização automática
+
+As bridges preferem a lista dinâmica devolvida por dispositivos recentes. No
+Android o contrato é `readAutoMeasureSettingData` / `setAutoMeasureSettingData`;
+no iOS é `veepooSDKReadAutoMonitSwitchInfo` / `veepooSDKSetAutoMonitSwitch`.
+
+A MF91 ensaiada, com firmware `02.73.01`, declara essa API dinâmica como não
+suportada. Tal como a G Band, a aplicação usa então os contratos legados:
+
+- Android: `readCustomSetting` / `changeCustomSetting` para frequência
+  cardíaca, pressão, temperatura, glicemia e stress, mais
+  `readSpo2hAutoDetect` / `settingSpo2hAutoDetect` para oxigénio;
+- iOS: `veepooSDKSettingBaseFunctionType` com os tipos individuais
+  correspondentes.
+
+No Android, a personalização chega em dois callbacks. A bridge só termina o
+comando depois do segundo pacote, evitando iniciar a leitura de oxigénio ou uma
+nova escrita enquanto ainda chegam temperatura, glicemia e stress.
+
+Ao abrir uma métrica, a aplicação:
+
+1. lê os modelos reais suportados pela pulseira;
+2. apresenta estado e, quando o protocolo os fornece, intervalo e janela
+   horária apenas se existir configuração dessa métrica;
+3. ao ativar ou desativar, altera exclusivamente o campo do interruptor;
+4. conserva o intervalo, a janela horária e as restrições recebidas do firmware;
+5. mantém o estado anterior se o SDK rejeitar a escrita.
+
+O enum automático dos SDKs inclui frequência cardíaca, pressão arterial,
+glicemia, stress, oxigénio e temperatura. Inclui ainda tipos que não pertencem
+ao catálogo atual. Passos, ECG e composição corporal não fazem parte desse
+contrato e, por isso, não recebem controlos artificiais na interface.
 
 ## Origem do histórico
 

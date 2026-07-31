@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "H Band SDK",
-    "subtitle": "Laboratorio MF91",
+    "title": "H Band",
+    "subtitle": "Tu salud",
     "language": "Idioma",
     "languages": {
       "pt": "Portugués (Portugal)",
@@ -35,11 +35,11 @@
     "error": "Error"
   },
   "capabilities": {
-    "supported": "Compatible",
-    "unsupported": "No compatible",
+    "supported": "Disponible",
+    "unsupported": "No disponible",
     "unknown": "Por confirmar",
-    "unsupportedDescription": "El dispositivo conectado ha indicado que esta capacidad no es compatible. Los comandos permanecen bloqueados para proteger el estado de la pulsera.",
-    "catalogOnly": "Esta función está documentada en el catálogo, pero todavía no tiene un contrato nativo ejecutable en este bridge."
+    "unsupportedDescription": "Esta medición no está disponible en la pulsera conectada.",
+    "catalogOnly": "Esta función aún no está disponible en esta versión de la aplicación."
   },
   "device": {
     "noDevice": "Ningún dispositivo",
@@ -50,22 +50,21 @@
   },
   "catalog": {
     "search": "Buscar una función",
-    "simulation": "Datos simulados",
-    "eyebrow": "Catálogo del SDK",
-    "title": "Funciones por tipo de datos",
+    "eyebrow": "Salud diaria",
+    "title": "Mediciones",
     "noResults": "Sin resultados",
     "noResultsDescription": "Prueba otro término o selecciona otra categoría."
   },
   "activity": {
-    "eyebrow": "Diagnóstico",
-    "title": "Actividad del SDK",
-    "sdkEvent": "Evento del SDK",
+    "eyebrow": "Información",
+    "title": "Actividad de la aplicación",
+    "sdkEvent": "Evento",
     "empty": "Los comandos, respuestas y errores aparecerán aquí."
   },
   "scan": {
     "title": "Conectar pulsera",
-    "heading": "Dispositivos H Band cercanos",
-    "description": "Mantén la MF91 cerca y fuera de otra sesión Bluetooth. Selecciónala cuando aparezca en la lista.",
+    "heading": "Pulseras cercanas",
+    "description": "Mantén la pulsera cerca y desconectada de otras aplicaciones. Selecciónala cuando aparezca en la lista.",
     "password": "Contraseña del dispositivo",
     "waiting": "Esperando dispositivos…"
   },
@@ -164,16 +163,16 @@
     }
   },
   "measurementLogs": {
-    "eyebrow": "Actividad de la medición",
-    "title": "Registros de esta medición",
+    "eyebrow": "Detalles",
+    "title": "Eventos de la medición",
     "count": "{{count}} entradas",
-    "description": "Operaciones de la aplicación, respuestas del bridge y datos reales recibidos del dispositivo.",
+    "description": "Información recibida de la pulsera durante esta medición.",
     "empty": "Los eventos de esta medición aparecerán aquí.",
     "operationRequested": "Operación enviada",
     "operationAccepted": "Operación aceptada",
     "operationFailed": "La operación ha fallado",
     "deviceData": "Datos recibidos del dispositivo",
-    "bridge": "Respuesta del bridge"
+    "bridge": "Confirmación de la aplicación"
   },
   "measurementFlow": {
     "start": "Iniciar medición",
@@ -191,8 +190,19 @@
     "discard": "No guardar",
     "save": "Guardar"
   },
+  "monitoring": {
+    "title": "Monitorización automática",
+    "enabled": "Activa",
+    "disabled": "Desactivada",
+    "description": "La pulsera realiza mediciones durante el día y las guarda para la próxima sincronización.",
+    "schedule": "Cada {{interval}} min · {{start}}–{{end}}",
+    "deviceSchedule": "Frecuencia de medición definida por la pulsera",
+    "enable": "Activar monitorización",
+    "disable": "Desactivar monitorización",
+    "loading": "Consultando la configuración de la pulsera"
+  },
   "history": {
-    "title": "Historial por fecha",
+    "title": "Tu día",
     "description": "Los datos se guardan en este teléfono y se actualizan automáticamente desde la pulsera.",
     "date": "Fecha",
     "calendarTitle": "Elegir fecha",

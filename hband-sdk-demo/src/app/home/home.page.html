@@ -3,10 +3,7 @@
     <ion-title>
       <span class="brand-lockup">
         <span class="brand-mark"><ion-icon name="pulse-outline"></ion-icon></span>
-        <span>
-          <strong>{{ i18n.translate('app.title') }}</strong>
-          <small>{{ i18n.translate('app.subtitle') }}</small>
-        </span>
+        <strong>{{ i18n.translate('app.title') }}</strong>
       </span>
     </ion-title>
     <ion-buttons slot="end">
@@ -31,43 +28,43 @@
   <main class="demo-shell">
     <section class="hero-panel hero-panel--focused">
       <aside class="connection-card">
-        <div class="connection-orbit" [class.is-connected]="hband.connected()">
-          <span class="orbit-ring orbit-ring--outer"></span>
-          <span class="orbit-ring orbit-ring--inner"></span>
-          <span class="device-glyph"><ion-icon name="watch-outline"></ion-icon></span>
-        </div>
+        <span class="device-glyph" [class.is-connected]="hband.connected()">
+          <ion-icon name="watch-outline"></ion-icon>
+        </span>
         <div class="connection-card__body">
-          <span class="status-row">
-            <span class="status-dot" [class.is-connected]="hband.connected()"></span>
-            {{ statusLabel() }}
-          </span>
           <div class="device-identity">
             <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
-            @if (hband.connected()) {
-              @if (hband.battery()) {
-                <span
-                  class="device-battery"
-                  [attr.data-level]="batteryLevel()"
-                  [attr.aria-label]="i18n.translate('device.battery') + ': ' + batteryPercent() + '%'"
-                >
-                  <ion-icon [name]="batteryIcon()"></ion-icon>
-                  <span>{{ batteryPercent() }}%</span>
-                </span>
+            <div class="device-meta">
+              <span class="status-row">
+                <span class="status-dot" [class.is-connected]="hband.connected()"></span>
+                {{ statusLabel() }}
+              </span>
+              @if (hband.connected()) {
+                @if (hband.battery()) {
+                  <span
+                    class="device-battery"
+                    [attr.data-level]="batteryLevel()"
+                    [attr.aria-label]="i18n.translate('device.battery') + ': ' + batteryPercent() + '%'"
+                  >
+                    <ion-icon [name]="batteryIcon()"></ion-icon>
+                    <span>{{ batteryPercent() }}%</span>
+                  </span>
+                }
               }
-            }
+            </div>
           </div>
-          <div class="connection-card__actions">
-            <ion-button class="connection-action connection-action--primary" (click)="openScan()">
-              <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
-              {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scanBand') }}
+        </div>
+        <div class="connection-card__actions">
+          <ion-button class="connection-action connection-action--primary" (click)="openScan()">
+            <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
+            {{ i18n.translate(hband.connected() ? 'actions.changeDevice' : 'actions.scanBand') }}
+          </ion-button>
+          @if (hband.connected()) {
+            <ion-button class="connection-action connection-action--secondary" fill="outline" (click)="hband.disconnect()">
+              <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+              {{ i18n.translate('actions.disconnect') }}
             </ion-button>
-            @if (hband.connected()) {
-              <ion-button class="connection-action connection-action--secondary" fill="outline" (click)="hband.disconnect()">
-                <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-                {{ i18n.translate('actions.disconnect') }}
-              </ion-button>
-            }
-          </div>
+          }
         </div>
       </aside>
     </section>
@@ -77,7 +74,6 @@
         <span class="history-date-panel__icon"><ion-icon name="calendar-outline"></ion-icon></span>
         <div>
           <strong>{{ i18n.translate('history.title') }}</strong>
-          <p>{{ i18n.translate('history.description') }}</p>
         </div>
       </div>
       <button
@@ -124,7 +120,6 @@
 
     <div class="section-heading">
       <div>
-        <span>{{ i18n.translate('catalog.eyebrow') }}</span>
         <h2>{{ i18n.translate('catalog.title') }}</h2>
       </div>
     </div>
@@ -136,17 +131,12 @@
           [class.feature-card--unsupported]="capability(feature) === 'unsupported'"
           tabindex="0"
           role="button"
-          (click)="selectedFeature.set(feature)"
-          (keydown.enter)="selectedFeature.set(feature)"
+          (click)="openFeature(feature)"
+          (keydown.enter)="openFeature(feature)"
         >
           <header>
             <span class="feature-icon"><ion-icon [name]="feature.icon"></ion-icon></span>
-            @if (capability(feature) !== 'unknown') {
-              <span class="capability-badge" [attr.data-state]="capability(feature)">
-                <ion-icon [name]="statusIcon(feature)"></ion-icon>
-                {{ i18n.translate('capabilities.' + capability(feature)) }}
-              </span>
-            }
+            <ion-icon class="feature-card__open" name="chevron-forward-outline"></ion-icon>
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
           <p>{{ i18n.translate(feature.descriptionKey) }}</p>
@@ -223,20 +213,6 @@
       </ion-header>
       <ion-content>
         <div class="feature-detail feature-history-page">
-          <header class="feature-detail__header">
-            <span class="feature-detail__icon"><ion-icon [name]="feature.icon"></ion-icon></span>
-            <div>
-              @if (capability(feature) !== 'unknown') {
-                <ion-chip [attr.data-state]="capability(feature)">
-                  <ion-icon [name]="statusIcon(feature)"></ion-icon>
-                  <ion-label>{{ i18n.translate('capabilities.' + capability(feature)) }}</ion-label>
-                </ion-chip>
-              }
-              <h2>{{ i18n.translate(feature.titleKey) }}</h2>
-              <p>{{ i18n.translate(feature.descriptionKey) }}</p>
-            </div>
-          </header>
-
           <section class="metric-data-section feature-history-page__data">
             <div class="metric-data-section__heading">
               <h3>{{ i18n.translate('data.history') }}</h3>
@@ -274,35 +250,81 @@
             </div>
           }
 
-          <div class="feature-history-page__actions">
-            @if (measurementAction(feature); as action) {
+          @if (hband.monitoringFor(feature.metric); as monitoring) {
+            <section
+              class="automatic-monitoring-card"
+              [class.is-enabled]="monitoring.enabled"
+            >
+              <div class="automatic-monitoring-card__status">
+                <span class="automatic-monitoring-card__icon">
+                  <ion-icon name="pulse-outline"></ion-icon>
+                </span>
+                <div>
+                  <small>{{ i18n.translate('monitoring.title') }}</small>
+                  <strong>
+                    {{ i18n.translate(monitoring.enabled ? 'monitoring.enabled' : 'monitoring.disabled') }}
+                  </strong>
+                </div>
+              </div>
+              <p>{{ i18n.translate('monitoring.description') }}</p>
+              <div class="automatic-monitoring-card__schedule">
+                <ion-icon name="refresh-outline"></ion-icon>
+                <span>{{ monitoringSchedule(monitoring) }}</span>
+              </div>
               <ion-button
-                class="feature-history-page__measure"
+                class="automatic-monitoring-card__button"
                 expand="block"
-                [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
-                (click)="openMeasurement(feature)"
+                [fill]="monitoring.enabled ? 'outline' : 'solid'"
+                [color]="monitoring.enabled ? 'danger' : 'primary'"
+                [disabled]="hband.busyOperation() !== null"
+                (click)="toggleMonitoring(monitoring)"
               >
-                <ion-icon slot="start" name="pulse-outline"></ion-icon>
-                {{ i18n.translate('measurementFlow.start') }}
+                @if (hband.busyOperation() === 'monitoring.set') {
+                  <ion-spinner slot="start" name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon slot="start" [name]="monitoring.enabled ? 'stop-outline' : 'play-outline'"></ion-icon>
+                }
+                {{ i18n.translate(monitoring.enabled ? 'monitoring.disable' : 'monitoring.enable') }}
               </ion-button>
-            } @else {
-              @for (action of feature.actions; track action.id) {
+            </section>
+          } @else if (hband.busyOperation() === 'monitoring.read') {
+            <section class="automatic-monitoring-card automatic-monitoring-card--loading">
+              <ion-spinner name="crescent"></ion-spinner>
+              <span>{{ i18n.translate('monitoring.loading') }}</span>
+            </section>
+          }
+
+          @if (feature.actions.length) {
+            <div class="feature-history-page__actions">
+              @if (measurementAction(feature); as action) {
                 <ion-button
+                  class="feature-history-page__measure"
                   expand="block"
-                  fill="outline"
                   [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
-                  (click)="run(action, feature)"
+                  (click)="openMeasurement(feature)"
                 >
-                  @if (hband.busyOperation() === action.operation) {
-                    <ion-spinner slot="start" name="crescent"></ion-spinner>
-                  } @else {
-                    <ion-icon slot="start" name="refresh-outline"></ion-icon>
-                  }
-                  {{ actionLabel(action, feature) }}
+                  <ion-icon slot="start" name="pulse-outline"></ion-icon>
+                  {{ i18n.translate('measurementFlow.start') }}
                 </ion-button>
+              } @else {
+                @for (action of feature.actions; track action.id) {
+                  <ion-button
+                    expand="block"
+                    fill="outline"
+                    [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                    (click)="run(action, feature)"
+                  >
+                    @if (hband.busyOperation() === action.operation) {
+                      <ion-spinner slot="start" name="crescent"></ion-spinner>
+                    } @else {
+                      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+                    }
+                    {{ actionLabel(action, feature) }}
+                  </ion-button>
+                }
               }
-            }
-          </div>
+            </div>
+          }
         </div>
       </ion-content>
     }

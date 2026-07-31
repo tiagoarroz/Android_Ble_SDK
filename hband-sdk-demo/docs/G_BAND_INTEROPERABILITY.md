@@ -28,6 +28,20 @@ Na demonstração, o equivalente foi implementado com:
 - união de blocos automáticos, medições manuais e leitores dedicados;
 - calendário com destaque dos dias existentes no arquivo.
 
+## Monitorização automática observada
+
+A G Band apresentou, na MF91 ensaiada, interruptores ativos para frequência
+cardíaca, pressão arterial, oxigénio, glicemia, temperatura e stress. Apresentou
+também HRV e componentes sanguíneos, que não pertencem ao catálogo atual. Não
+apresentou interruptores equivalentes para passos, ECG ou composição corporal.
+
+O firmware `02.73.01` reportou a API automática dinâmica como não suportada; os
+interruptores observados usam os comandos de personalização legados e o comando
+noturno próprio do oxigénio, das 22:00 às 08:00. A aplicação usa a mesma
+distinção, mantendo a API dinâmica para firmwares futuros. Só mostra o botão
+numa métrica que a pulseira tenha devolvido e preserva os restantes campos do
+pacote ao alterar um estado.
+
 ## Histórico acumulado observado
 
 Com a G Band desligada da pulseira, o calendário mostrou dados em 8 e 11 de
