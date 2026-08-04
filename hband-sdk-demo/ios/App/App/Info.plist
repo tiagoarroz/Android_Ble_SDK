@@ -28,6 +28,8 @@
 	<string>A aplicação utiliza Bluetooth para comunicar com a pulseira H Band MF91.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>A aplicação utiliza Bluetooth para comunicar com a pulseira H Band MF91.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>A aplicação utiliza NFC para registar e ligar pulseiras H Band.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>

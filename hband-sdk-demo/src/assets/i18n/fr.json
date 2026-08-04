@@ -74,6 +74,41 @@
       }
     }
   },
+  "nfc": {
+    "hint": "Maintenez le tag contre le téléphone jusqu’à la fin de l’opération.",
+    "write": {
+      "title": "Enregistrer NFC",
+      "prompt": "Approchez un tag NFC pour enregistrer l’identité de ce bracelet.",
+      "success": "Le bracelet a été enregistré sur le tag NFC."
+    },
+    "connect": {
+      "title": "Connecter par NFC",
+      "prompt": "Approchez le tag NFC enregistré pour identifier le bracelet.",
+      "searching": "Tag lu. Recherche du bracelet indiqué par Bluetooth…",
+      "success": "Le bracelet indiqué par le tag NFC est connecté."
+    },
+    "native": {
+      "writePrompt": "Approchez le tag pour enregistrer ce bracelet.",
+      "writeSuccess": "Bracelet enregistré avec succès.",
+      "readPrompt": "Approchez le tag enregistré du bracelet."
+    },
+    "errors": {
+      "NFC_NOT_SUPPORTED": "Ce téléphone ne prend pas en charge le NFC.",
+      "NFC_NOT_ENABLED": "Activez le NFC dans les réglages du téléphone et réessayez.",
+      "NFC_TAG_NOT_NDEF": "Ce tag ne prend pas en charge le format NDEF requis.",
+      "NFC_TAG_READ_ONLY": "Ce tag NFC est en lecture seule.",
+      "NFC_TAG_TOO_SMALL": "Ce tag n’a pas assez d’espace pour enregistrer le bracelet.",
+      "NFC_NO_TEXT_RECORD": "Le tag ne contient pas d’identifiant de bracelet lisible.",
+      "NFC_CANCELLED": "L’opération NFC a été annulée.",
+      "NFC_SESSION_INTERRUPTED": "La session NFC a été interrompue. Réessayez.",
+      "NFC_IO_ERROR": "Impossible de communiquer avec le tag. Maintenez-le à proximité et réessayez.",
+      "INVALID_BAND_TAG": "Ce tag n’a pas été enregistré comme bracelet H Band.",
+      "INVALID_BAND_MAC": "L’adresse Bluetooth du bracelet n’est pas valide.",
+      "BAND_NOT_FOUND": "Le bracelet enregistré est introuvable par Bluetooth. Vérifiez qu’il est à proximité et déconnecté des autres applications.",
+      "BLE_PERMISSION_DENIED": "Autorisez la recherche d’appareils à proximité pour connecter le bracelet.",
+      "NFC_UNKNOWN_ERROR": "Impossible de terminer l’opération NFC. Réessayez."
+    }
+  },
   "catalog": {
     "search": "Rechercher une fonctionnalité",
     "eyebrow": "Santé quotidienne",
@@ -325,6 +360,9 @@
   },
   "actions": {
     "close": "Fermer",
+    "cancel": "Annuler",
+    "registerNfc": "Enregistrer NFC",
+    "connectNfc": "Connecter par NFC",
     "scanBand": "Rechercher un bracelet",
     "scanAgain": "Rechercher à nouveau",
     "changeDevice": "Changer d'appareil",

@@ -74,6 +74,41 @@
       }
     }
   },
+  "nfc": {
+    "hint": "Mantén la etiqueta junto al teléfono hasta que termine la operación.",
+    "write": {
+      "title": "Registrar NFC",
+      "prompt": "Acerca una etiqueta NFC para guardar la identificación de esta pulsera.",
+      "success": "La pulsera se ha registrado en la etiqueta NFC."
+    },
+    "connect": {
+      "title": "Conectar por NFC",
+      "prompt": "Acerca la etiqueta NFC registrada para identificar la pulsera.",
+      "searching": "Etiqueta leída. Buscando la pulsera indicada por Bluetooth…",
+      "success": "La pulsera indicada por la etiqueta NFC está conectada."
+    },
+    "native": {
+      "writePrompt": "Acerca la etiqueta para registrar esta pulsera.",
+      "writeSuccess": "Pulsera registrada correctamente.",
+      "readPrompt": "Acerca la etiqueta registrada de la pulsera."
+    },
+    "errors": {
+      "NFC_NOT_SUPPORTED": "Este teléfono no admite NFC.",
+      "NFC_NOT_ENABLED": "Activa el NFC en los ajustes del teléfono e inténtalo de nuevo.",
+      "NFC_TAG_NOT_NDEF": "Esta etiqueta no admite el formato NDEF necesario.",
+      "NFC_TAG_READ_ONLY": "Esta etiqueta NFC es de solo lectura.",
+      "NFC_TAG_TOO_SMALL": "Esta etiqueta no tiene espacio suficiente para guardar la pulsera.",
+      "NFC_NO_TEXT_RECORD": "La etiqueta no contiene una identificación de pulsera legible.",
+      "NFC_CANCELLED": "La operación NFC se ha cancelado.",
+      "NFC_SESSION_INTERRUPTED": "La sesión NFC se ha interrumpido. Inténtalo de nuevo.",
+      "NFC_IO_ERROR": "No se pudo comunicar con la etiqueta. Mantenla cerca e inténtalo de nuevo.",
+      "INVALID_BAND_TAG": "Esta etiqueta no se registró como una pulsera H Band.",
+      "INVALID_BAND_MAC": "La dirección Bluetooth de la pulsera no es válida.",
+      "BAND_NOT_FOUND": "No se encontró por Bluetooth la pulsera registrada. Comprueba que esté cerca y desconectada de otras aplicaciones.",
+      "BLE_PERMISSION_DENIED": "Autoriza la búsqueda de dispositivos cercanos para conectar la pulsera.",
+      "NFC_UNKNOWN_ERROR": "No se pudo completar la operación NFC. Inténtalo de nuevo."
+    }
+  },
   "catalog": {
     "search": "Buscar una función",
     "eyebrow": "Salud diaria",
@@ -325,6 +360,9 @@
   },
   "actions": {
     "close": "Cerrar",
+    "cancel": "Cancelar",
+    "registerNfc": "Registrar NFC",
+    "connectNfc": "Conectar por NFC",
     "scanBand": "Buscar pulsera",
     "scanAgain": "Buscar de nuevo",
     "changeDevice": "Cambiar dispositivo",

@@ -74,6 +74,41 @@
       }
     }
   },
+  "nfc": {
+    "hint": "Mantenha a tag encostada ao celular até a operação terminar.",
+    "write": {
+      "title": "Registrar NFC",
+      "prompt": "Aproxime uma tag NFC para salvar a identificação desta pulseira.",
+      "success": "A pulseira foi registrada na tag NFC."
+    },
+    "connect": {
+      "title": "Conectar por NFC",
+      "prompt": "Aproxime a tag NFC registrada para identificar a pulseira.",
+      "searching": "Tag lida. Procurando a pulseira indicada por Bluetooth…",
+      "success": "A pulseira indicada pela tag NFC está conectada."
+    },
+    "native": {
+      "writePrompt": "Aproxime a tag para registrar esta pulseira.",
+      "writeSuccess": "Pulseira registrada com sucesso.",
+      "readPrompt": "Aproxime a tag registrada da pulseira."
+    },
+    "errors": {
+      "NFC_NOT_SUPPORTED": "Este celular não suporta NFC.",
+      "NFC_NOT_ENABLED": "Ative o NFC nas configurações do celular e tente novamente.",
+      "NFC_TAG_NOT_NDEF": "Esta tag não suporta o formato NDEF necessário.",
+      "NFC_TAG_READ_ONLY": "Esta tag NFC é somente leitura.",
+      "NFC_TAG_TOO_SMALL": "Esta tag não tem espaço suficiente para salvar a pulseira.",
+      "NFC_NO_TEXT_RECORD": "A tag não contém uma identificação de pulseira legível.",
+      "NFC_CANCELLED": "A operação NFC foi cancelada.",
+      "NFC_SESSION_INTERRUPTED": "A sessão NFC foi interrompida. Tente novamente.",
+      "NFC_IO_ERROR": "Não foi possível comunicar com a tag. Mantenha-a próxima e tente novamente.",
+      "INVALID_BAND_TAG": "Esta tag não foi registrada como uma pulseira H Band.",
+      "INVALID_BAND_MAC": "O endereço Bluetooth da pulseira não é válido.",
+      "BAND_NOT_FOUND": "A pulseira registrada não foi encontrada por Bluetooth. Confirme que está próxima e desconectada de outros aplicativos.",
+      "BLE_PERMISSION_DENIED": "Autorize a busca por dispositivos próximos para conectar a pulseira.",
+      "NFC_UNKNOWN_ERROR": "Não foi possível concluir a operação NFC. Tente novamente."
+    }
+  },
   "catalog": {
     "search": "Procurar uma funcionalidade",
     "eyebrow": "Saúde diária",
@@ -325,6 +360,9 @@
   },
   "actions": {
     "close": "Fechar",
+    "cancel": "Cancelar",
+    "registerNfc": "Registrar NFC",
+    "connectNfc": "Conectar por NFC",
     "scanBand": "Procurar pulseira",
     "scanAgain": "Procurar novamente",
     "changeDevice": "Trocar dispositivo",

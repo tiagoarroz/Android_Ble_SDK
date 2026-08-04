@@ -74,6 +74,41 @@
       }
     }
   },
+  "nfc": {
+    "hint": "Keep the tag against the phone until the operation is complete.",
+    "write": {
+      "title": "Register NFC",
+      "prompt": "Hold an NFC tag near the phone to store this bracelet's identity.",
+      "success": "The bracelet has been registered on the NFC tag."
+    },
+    "connect": {
+      "title": "Connect via NFC",
+      "prompt": "Hold the registered NFC tag near the phone to identify the bracelet.",
+      "searching": "Tag read. Searching for the specified bracelet over Bluetooth…",
+      "success": "The bracelet specified by the NFC tag is connected."
+    },
+    "native": {
+      "writePrompt": "Hold the tag near the phone to register this bracelet.",
+      "writeSuccess": "Bracelet registered successfully.",
+      "readPrompt": "Hold the registered bracelet tag near the phone."
+    },
+    "errors": {
+      "NFC_NOT_SUPPORTED": "This phone does not support NFC.",
+      "NFC_NOT_ENABLED": "Enable NFC in the phone settings and try again.",
+      "NFC_TAG_NOT_NDEF": "This tag does not support the required NDEF format.",
+      "NFC_TAG_READ_ONLY": "This NFC tag is read-only.",
+      "NFC_TAG_TOO_SMALL": "This tag does not have enough space to store the bracelet.",
+      "NFC_NO_TEXT_RECORD": "The tag does not contain a readable bracelet identity.",
+      "NFC_CANCELLED": "The NFC operation was cancelled.",
+      "NFC_SESSION_INTERRUPTED": "The NFC session was interrupted. Try again.",
+      "NFC_IO_ERROR": "The tag could not be read. Keep it close and try again.",
+      "INVALID_BAND_TAG": "This tag was not registered as an H Band bracelet.",
+      "INVALID_BAND_MAC": "The bracelet Bluetooth address is invalid.",
+      "BAND_NOT_FOUND": "The registered bracelet was not found over Bluetooth. Make sure it is nearby and disconnected from other apps.",
+      "BLE_PERMISSION_DENIED": "Allow nearby device scanning to connect the bracelet.",
+      "NFC_UNKNOWN_ERROR": "The NFC operation could not be completed. Try again."
+    }
+  },
   "catalog": {
     "search": "Search for a feature",
     "eyebrow": "Daily health",
@@ -325,6 +360,9 @@
   },
   "actions": {
     "close": "Close",
+    "cancel": "Cancel",
+    "registerNfc": "Register NFC",
+    "connectNfc": "Connect via NFC",
     "scanBand": "Scan for bracelet",
     "scanAgain": "Scan again",
     "changeDevice": "Change device",

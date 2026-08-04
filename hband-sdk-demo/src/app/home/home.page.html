@@ -70,12 +70,32 @@
           </div>
         </div>
         @if (hband.connected()) {
-          <ion-icon class="connection-card__open" name="chevron-forward-outline"></ion-icon>
+          <div class="connection-card__end">
+            <ion-button
+              class="connection-nfc-action"
+              fill="outline"
+              size="small"
+              [disabled]="nfc.busy()"
+              (click)="registerConnectedBandNfc(); $event.stopPropagation()"
+            >
+              <ion-icon slot="start" name="radio-outline"></ion-icon>
+              {{ i18n.translate('actions.registerNfc') }}
+            </ion-button>
+            <ion-icon class="connection-card__open" name="chevron-forward-outline"></ion-icon>
+          </div>
         } @else {
           <div class="connection-card__actions">
             <ion-button class="connection-action connection-action--primary" (click)="openScan(); $event.stopPropagation()">
               <ion-icon slot="start" name="bluetooth-outline"></ion-icon>
               {{ i18n.translate('actions.scanBand') }}
+            </ion-button>
+            <ion-button
+              class="connection-action connection-action--secondary"
+              [disabled]="nfc.busy()"
+              (click)="connectBandByNfc(); $event.stopPropagation()"
+            >
+              <ion-icon slot="start" name="radio-outline"></ion-icon>
+              {{ i18n.translate('actions.connectNfc') }}
             </ion-button>
           </div>
         }
@@ -173,6 +193,49 @@
         <ion-button expand="block" fill="outline" (click)="openScan()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
           {{ i18n.translate('actions.scanAgain') }}
+        </ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="nfc-modal"
+  [isOpen]="nfcModalOpen()"
+  [backdropDismiss]="false"
+  (didDismiss)="onNfcModalDismiss()"
+>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ nfcTitle() }}</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div
+        class="nfc-session"
+        [class.is-success]="nfc.phase() === 'success'"
+        [class.is-error]="nfc.phase() === 'error'"
+      >
+        <span class="nfc-session__icon">
+          @if (nfc.busy()) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon [name]="nfcStatusIcon()"></ion-icon>
+          }
+        </span>
+        <h2>{{ nfcTitle() }}</h2>
+        <p>{{ nfcDescription() }}</p>
+        <div class="nfc-session__hint">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>{{ i18n.translate('nfc.hint') }}</span>
+        </div>
+        <ion-button
+          expand="block"
+          [fill]="nfc.busy() ? 'outline' : 'solid'"
+          (click)="closeNfcModal()"
+        >
+          {{ i18n.translate(nfc.busy() ? 'actions.cancel' : 'actions.close') }}
         </ion-button>
       </div>
     </ion-content>

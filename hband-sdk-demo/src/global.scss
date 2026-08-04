@@ -315,6 +315,25 @@ ion-content {
   transition: color 160ms ease, transform 160ms ease;
 }
 
+.connection-card__end {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.connection-nfc-action {
+  --border-color: rgb(114 235 204 / 38%);
+  --border-radius: 12px;
+  --color: #9af1da;
+  --padding-end: 14px;
+  --padding-start: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  margin: 0;
+  min-height: 40px;
+  text-transform: none;
+}
+
 .connection-action--primary {
   --background: linear-gradient(135deg, #35e0b6, var(--app-mint));
   --background-activated: #22cda3;
@@ -331,6 +350,96 @@ ion-content {
   --border-width: 1px;
   --box-shadow: none;
   --color: #e3edf1;
+}
+
+.nfc-modal {
+  --border-radius: 24px;
+  --height: min(455px, 88vh);
+  --width: min(430px, calc(100vw - 28px));
+
+  ion-toolbar {
+    --background: #0d2230;
+    --color: #f4f8fa;
+  }
+}
+
+.nfc-session {
+  align-content: start;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  padding: 36px 28px 28px;
+  text-align: center;
+
+  h2 {
+    color: #102835;
+    font-size: 23px;
+    margin: 4px 0 0;
+  }
+
+  > p {
+    color: #607784;
+    line-height: 1.55;
+    margin: 0;
+    max-width: 330px;
+  }
+
+  > ion-button {
+    --border-radius: 14px;
+    margin-top: 8px;
+    min-height: 48px;
+    width: 100%;
+  }
+
+  &.is-success .nfc-session__icon {
+    background: rgb(38 215 173 / 13%);
+    color: #159775;
+  }
+
+  &.is-error .nfc-session__icon {
+    background: rgb(218 72 87 / 11%);
+    color: #c83f50;
+  }
+}
+
+.nfc-session__icon {
+  align-items: center;
+  background: rgb(22 112 142 / 10%);
+  border-radius: 22px;
+  color: #177e9f;
+  display: flex;
+  height: 78px;
+  justify-content: center;
+  width: 78px;
+
+  ion-icon {
+    font-size: 40px;
+  }
+
+  ion-spinner {
+    height: 36px;
+    width: 36px;
+  }
+}
+
+.nfc-session__hint {
+  align-items: flex-start;
+  background: #f2f7f8;
+  border-radius: 13px;
+  color: #617782;
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  line-height: 1.4;
+  padding: 11px 12px;
+  text-align: left;
+  width: 100%;
+
+  ion-icon {
+    color: #2787a5;
+    flex: 0 0 auto;
+    font-size: 17px;
+  }
 }
 
 .device-details-modal {
@@ -3345,6 +3454,17 @@ ion-content {
 
       ion-button {
         flex: 1 1 0;
+      }
+    }
+
+    .connection-card__end {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+      margin-top: 5px;
+      width: 100%;
+
+      .connection-nfc-action {
+        flex: 1;
       }
     }
   }

@@ -9,15 +9,16 @@ import {
 import type { DatetimeHighlight } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
-  albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+  albumsOutline, alertCircleOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
   bodyOutline, calendarOutline, chevronForwardOutline,
-  closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
+  checkmarkCircleOutline, closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
   footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-  playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
+  playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
 
 import { DataVisualizerComponent } from '../components/data-visualizer/data-visualizer.component';
+import { BandNfcService } from '../core/band-nfc.service';
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
 import type {
@@ -45,6 +46,7 @@ interface HomeMetricSummary {
 })
 export class HomePage implements OnInit {
   readonly hband = inject(HBandService);
+  readonly nfc = inject(BandNfcService);
   readonly i18n = inject(I18nService);
   readonly features = FEATURE_CATALOG;
   readonly selectedFeature = signal<FeatureDefinition | null>(null);
@@ -54,6 +56,8 @@ export class HomePage implements OnInit {
   readonly savePromptOpen = signal(false);
   readonly savingMeasurement = signal(false);
   readonly scanOpen = signal(false);
+  readonly nfcModalOpen = signal(false);
+  readonly nfcMode = signal<'write' | 'connect'>('write');
   readonly deviceDetailsOpen = signal(false);
   readonly editingDeviceName = signal(false);
   readonly renameDeviceName = signal('');
@@ -68,11 +72,11 @@ export class HomePage implements OnInit {
 
   constructor() {
     addIcons({
-      albumsOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
+      albumsOutline, alertCircleOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
       bodyOutline, calendarOutline, chevronForwardOutline,
-      closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
+      checkmarkCircleOutline, closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
       footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-      playOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
+      playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
     });
 
@@ -110,6 +114,91 @@ export class HomePage implements OnInit {
   async connect(deviceId: string): Promise<void> {
     await this.hband.connect(deviceId, this.password());
     this.scanOpen.set(false);
+  }
+
+  /** Regista na etiqueta apenas a identidade da pulseira ligada neste momento. */
+  async registerConnectedBandNfc(): Promise<void> {
+    const macAddress = this.hband.status().device?.id;
+    if (!this.hband.connected() || !macAddress || this.nfc.busy()) {
+      return;
+    }
+    this.nfcMode.set('write');
+    this.nfc.reset();
+    this.nfcModalOpen.set(true);
+    try {
+      await this.nfc.registerBand(macAddress);
+    } catch {
+      // O serviço conserva um código traduzível para a própria modal.
+    }
+  }
+
+  /**
+   * Lê o MAC validado da etiqueta, procura exatamente esse anúncio BLE e só
+   * depois delega a autenticação no fluxo normal da H Band.
+   */
+  async connectBandByNfc(): Promise<void> {
+    if (this.hband.connected() || this.nfc.busy()) {
+      return;
+    }
+    this.nfcMode.set('connect');
+    this.nfc.reset();
+    this.nfcModalOpen.set(true);
+    try {
+      const macAddress = await this.nfc.readBand();
+      this.nfc.markConnecting();
+      await this.hband.connectByAddress(macAddress, this.password());
+      this.nfc.markSuccess();
+    } catch (error) {
+      if (this.nfc.phase() !== 'error') {
+        this.nfc.markError(error);
+      }
+    }
+  }
+
+  closeNfcModal(): void {
+    this.nfcModalOpen.set(false);
+    void this.nfc.cancel();
+  }
+
+  onNfcModalDismiss(): void {
+    this.nfcModalOpen.set(false);
+    if (this.nfc.busy()) {
+      void this.nfc.cancel();
+    } else {
+      this.nfc.reset();
+    }
+  }
+
+  nfcTitle(): string {
+    return this.i18n.translate(this.nfcMode() === 'write' ? 'nfc.write.title' : 'nfc.connect.title');
+  }
+
+  nfcDescription(): string {
+    const phase = this.nfc.phase();
+    if (phase === 'error') {
+      return this.i18n.translate(`nfc.errors.${this.nfc.errorCode() ?? 'NFC_UNKNOWN_ERROR'}`);
+    }
+    if (phase === 'success') {
+      return this.i18n.translate(this.nfcMode() === 'write'
+        ? 'nfc.write.success'
+        : 'nfc.connect.success');
+    }
+    if (phase === 'connecting') {
+      return this.i18n.translate('nfc.connect.searching');
+    }
+    return this.i18n.translate(this.nfcMode() === 'write'
+      ? 'nfc.write.prompt'
+      : 'nfc.connect.prompt');
+  }
+
+  nfcStatusIcon(): string {
+    if (this.nfc.phase() === 'success') {
+      return 'checkmark-circle-outline';
+    }
+    if (this.nfc.phase() === 'error') {
+      return 'alert-circle-outline';
+    }
+    return 'radio-outline';
   }
 
   /** Abre os detalhes apenas para a pulseira autenticada na sessão atual. */

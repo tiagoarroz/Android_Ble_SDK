@@ -184,6 +184,18 @@ export class HBandService {
     });
   }
 
+  /**
+   * Pesquisa uma pulseira pelo MAC guardado numa tag NFC e só inicia a ligação
+   * depois de o mesmo endereço ter sido anunciado pelo Bluetooth.
+   */
+  async connectByAddress(deviceId: string, password = '0000'): Promise<void> {
+    const discoveredDevice = await this.discoverDevice(deviceId, 12_000);
+    if (!discoveredDevice) {
+      throw new Error('BAND_NOT_FOUND');
+    }
+    await this.connect(discoveredDevice.id, password);
+  }
+
   async disconnect(): Promise<void> {
     this.stopBatteryUpdates();
     if (this.simulation()) {
@@ -1335,12 +1347,17 @@ export class HBandService {
    * Migra sessões antigas que guardavam apenas o MAC. Faz uma pesquisa curta
    * e termina assim que encontra exatamente o endereço recordado.
    */
-  private async discoverRememberedDevice(deviceId: string): Promise<HBandDevice | undefined> {
+  private discoverRememberedDevice(deviceId: string): Promise<HBandDevice | undefined> {
+    return this.discoverDevice(deviceId, 5_000);
+  }
+
+  /** Pesquisa um endereço exato durante a janela indicada e termina o scan. */
+  private async discoverDevice(deviceId: string, timeoutMs: number): Promise<HBandDevice | undefined> {
     let found: HBandDevice | undefined;
     try {
       await this.scan();
       found = await new Promise<HBandDevice | undefined>((resolve) => {
-        const deadline = window.setTimeout(() => finish(), 5_000);
+        const deadline = window.setTimeout(() => finish(), timeoutMs);
         const poll = window.setInterval(() => {
           const device = this.devices().find(
             (item) => item.id.toLowerCase() === deviceId.toLowerCase(),
@@ -1358,10 +1375,12 @@ export class HBandService {
     } catch {
       // O restauro continua com os metadados persistidos quando o scan falha.
     }
-    try {
-      await HBand.stopScan();
-    } catch {
-      // O scan pode já ter terminado pelo timeout do próprio SDK.
+    if (!this.simulation()) {
+      try {
+        await HBand.stopScan();
+      } catch {
+        // O scan pode já ter terminado pelo timeout do próprio SDK.
+      }
     }
     return found;
   }

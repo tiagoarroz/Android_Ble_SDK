@@ -278,6 +278,28 @@ describe('HomePage', () => {
     expect(component.hband.connected()).toBeFalse();
   });
 
+  it('should preserve the exact MAC in a versioned H Band NFC record', () => {
+    const macAddress = '1b:F0:06:e2:86:FC';
+    const record = component.nfc.encodeBand(macAddress);
+
+    expect(record).toBe(`HITECOSYSTEM-HBAND|1|${macAddress}`);
+    expect(component.nfc.decodeBand(record)).toBe(macAddress);
+    expect(() => component.nfc.decodeBand(`OTHER-APP|1|${macAddress}`))
+      .toThrowError('INVALID_BAND_TAG');
+  });
+
+  it('should search and connect only to the MAC read from the NFC tag', async () => {
+    const macAddress = '1B:F0:06:E2:86:FC';
+    const readBand = spyOn(component.nfc, 'readBand').and.resolveTo(macAddress);
+    const connectByAddress = spyOn(component.hband, 'connectByAddress').and.resolveTo();
+
+    await component.connectBandByNfc();
+
+    expect(readBand).toHaveBeenCalledTimes(1);
+    expect(connectByAddress).toHaveBeenCalledOnceWith(macAddress, '0000');
+    expect(component.nfc.phase()).toBe('success');
+  });
+
   it('should migrate an old session by restoring the advertised name instead of the MAC', async () => {
     localStorage.setItem('hband-device-session', JSON.stringify({
       deviceId: '1B:F0:06:E2:86:FC',
