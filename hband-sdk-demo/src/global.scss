@@ -315,25 +315,6 @@ ion-content {
   transition: color 160ms ease, transform 160ms ease;
 }
 
-.connection-card__end {
-  align-items: center;
-  display: flex;
-  gap: 12px;
-}
-
-.connection-nfc-action {
-  --border-color: rgb(114 235 204 / 38%);
-  --border-radius: 12px;
-  --color: #9af1da;
-  --padding-end: 14px;
-  --padding-start: 14px;
-  font-size: 12px;
-  font-weight: 800;
-  margin: 0;
-  min-height: 40px;
-  text-transform: none;
-}
-
 .connection-action--primary {
   --background: linear-gradient(135deg, #35e0b6, var(--app-mint));
   --background-activated: #22cda3;
@@ -444,11 +425,11 @@ ion-content {
 
 .device-details-modal {
   --border-radius: 22px;
-  --height: min(425px, 88vh);
+  --height: min(495px, 88vh);
   --width: min(430px, calc(100vw - 28px));
 
   &.device-details-modal--editing {
-    --height: min(500px, 88vh);
+    --height: min(565px, 88vh);
   }
 
   ion-toolbar {
@@ -649,6 +630,19 @@ ion-content {
   --border-radius: 14px;
   --border-color: #eabfc3;
   --color: #b02b3a;
+  --box-shadow: none;
+  font-size: 13px;
+  font-weight: 780;
+  margin: 10px 0 0;
+  min-height: 48px;
+  width: 100%;
+}
+
+.device-details-nfc {
+  --background: #f3fcf9;
+  --border-color: #9bdcca;
+  --border-radius: 14px;
+  --color: #087c68;
   --box-shadow: none;
   font-size: 13px;
   font-weight: 780;
@@ -3457,16 +3451,6 @@ ion-content {
       }
     }
 
-    .connection-card__end {
-      grid-column: 1 / -1;
-      justify-self: stretch;
-      margin-top: 5px;
-      width: 100%;
-
-      .connection-nfc-action {
-        flex: 1;
-      }
-    }
   }
 
   .history-date-panel {

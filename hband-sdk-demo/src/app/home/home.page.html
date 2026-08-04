@@ -70,19 +70,7 @@
           </div>
         </div>
         @if (hband.connected()) {
-          <div class="connection-card__end">
-            <ion-button
-              class="connection-nfc-action"
-              fill="outline"
-              size="small"
-              [disabled]="nfc.busy()"
-              (click)="registerConnectedBandNfc(); $event.stopPropagation()"
-            >
-              <ion-icon slot="start" name="radio-outline"></ion-icon>
-              {{ i18n.translate('actions.registerNfc') }}
-            </ion-button>
-            <ion-icon class="connection-card__open" name="chevron-forward-outline"></ion-icon>
-          </div>
+          <ion-icon class="connection-card__open" name="chevron-forward-outline"></ion-icon>
         } @else {
           <div class="connection-card__actions">
             <ion-button class="connection-action connection-action--primary" (click)="openScan(); $event.stopPropagation()">
@@ -328,6 +316,17 @@
             </div>
           </section>
         </div>
+
+        <ion-button
+          class="device-details-nfc"
+          expand="block"
+          fill="outline"
+          [disabled]="renamingDevice() || disconnectingDevice() || nfc.busy()"
+          (click)="registerConnectedBandNfc()"
+        >
+          <ion-icon slot="start" name="radio-outline"></ion-icon>
+          {{ i18n.translate('actions.registerNfc') }}
+        </ion-button>
 
         <ion-button
           class="device-details-disconnect"
