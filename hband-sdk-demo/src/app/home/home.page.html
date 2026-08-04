@@ -43,7 +43,11 @@
         <div class="connection-card__body">
           <div class="device-identity">
             <div class="device-name-row">
-              <strong>{{ hband.status().device?.name || i18n.translate('device.noDevice') }}</strong>
+              <strong>
+                {{ hband.status().device
+                  ? (hband.status().device?.name || i18n.translate('device.unknown'))
+                  : i18n.translate('device.noDevice') }}
+              </strong>
             </div>
             <div class="device-meta">
               <span class="status-row">
@@ -229,7 +233,7 @@
                 </div>
                 <small class="device-rename-allowed">{{ i18n.translate('device.rename.allowed') }}</small>
               } @else {
-                <strong>{{ hband.status().device?.name }}</strong>
+                <strong>{{ hband.status().device?.name || i18n.translate('device.unknown') }}</strong>
               }
             </div>
             <button

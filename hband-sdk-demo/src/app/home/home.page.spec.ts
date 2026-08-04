@@ -10,6 +10,7 @@ describe('HomePage', () => {
   let fixture: ComponentFixture<HomePage>;
 
   beforeEach(async () => {
+    localStorage.removeItem('hband-device-session');
     fixture = TestBed.createComponent(HomePage);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -219,11 +220,7 @@ describe('HomePage', () => {
   });
 
   it('should open the connected band details and save its edited name', async () => {
-    component.hband.status.update((status) => ({
-      ...status,
-      state: 'connected',
-      device: { id: 'MF91-TEST', name: 'MF91', model: 'MF91' },
-    }));
+    await component.hband.connect('MF91-TEST');
 
     component.openDeviceDetails();
     component.startDeviceNameEdit();
@@ -235,6 +232,13 @@ describe('HomePage', () => {
     expect(component.editingDeviceName()).toBeFalse();
     expect(component.renameDeviceError()).toBeNull();
     expect(component.deviceModelName()).toBe('MF91');
+    expect(JSON.parse(localStorage.getItem('hband-device-session') ?? '{}')).toEqual(
+      jasmine.objectContaining({
+        deviceId: 'MF91-TEST',
+        name: 'Saude',
+        model: 'MF91',
+      }),
+    );
   });
 
   it('should limit the band name to eight ASCII-safe characters', async () => {
@@ -272,6 +276,63 @@ describe('HomePage', () => {
 
     expect(component.deviceDetailsOpen()).toBeFalse();
     expect(component.hband.connected()).toBeFalse();
+  });
+
+  it('should migrate an old session by restoring the advertised name instead of the MAC', async () => {
+    localStorage.setItem('hband-device-session', JSON.stringify({
+      deviceId: '1B:F0:06:E2:86:FC',
+      password: '0000',
+    }));
+    component.hband.simulation.set(false);
+    let connectOptions: {
+      deviceId: string;
+      password?: string;
+      name?: string;
+      model?: string;
+    } | undefined;
+    const testableService = component.hband as unknown as {
+      nativeConnect(options: {
+        deviceId: string;
+        password?: string;
+        name?: string;
+        model?: string;
+      }): Promise<void>;
+      discoverRememberedDevice(deviceId: string): Promise<{
+        id: string;
+        name: string;
+        model?: string;
+      } | undefined>;
+      restoreDeviceSession(): Promise<void>;
+    };
+    testableService.discoverRememberedDevice = async (deviceId) => ({
+      id: deviceId,
+      name: 'Saude 1',
+      model: 'MF91',
+    });
+    testableService.nativeConnect = async (options) => {
+      connectOptions = options;
+      component.hband.status.update((status) => ({
+        ...status,
+        state: 'connected',
+        device: {
+          id: options.deviceId,
+          name: options.name ?? '',
+          model: options.model,
+        },
+      }));
+    };
+
+    await testableService.restoreDeviceSession();
+
+    expect(connectOptions).toEqual(jasmine.objectContaining({
+      deviceId: '1B:F0:06:E2:86:FC',
+      name: 'Saude 1',
+      model: 'MF91',
+    }));
+    expect(component.hband.status().device?.name).toBe('Saude 1');
+    expect(JSON.parse(localStorage.getItem('hband-device-session') ?? '{}')).toEqual(
+      jasmine.objectContaining({ name: 'Saude 1', model: 'MF91' }),
+    );
   });
 
   it('should highlight every date stored for the current band', () => {

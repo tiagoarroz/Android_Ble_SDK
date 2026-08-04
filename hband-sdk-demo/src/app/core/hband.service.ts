@@ -30,6 +30,8 @@ const CATALOG_METRICS: MetricId[] = [
 interface RememberedDeviceSession {
   deviceId: string;
   password: string;
+  name?: string;
+  model?: string;
 }
 
 class HBandOperationTimeoutError extends Error {
@@ -107,6 +109,12 @@ export class HBandService {
    */
   private nativeExecute = (operation: string, params: Record<string, unknown>) =>
     HBand.execute({ operation, params });
+  private nativeConnect = (options: {
+    deviceId: string;
+    password?: string;
+    name?: string;
+    model?: string;
+  }) => HBand.connect(options);
 
   /**
    * Liga os eventos uma única vez e recupera o estado da bridge nativa.
@@ -156,12 +164,24 @@ export class HBandService {
     this.rememberHistoryDevice(deviceId);
     this.historyDates.set([]);
     await this.refreshHistoryDates();
+    const selectedDevice = this.devices().find((device) => device.id === deviceId);
     if (this.simulation()) {
       this.simulateConnection(deviceId);
-      return;
+    } else {
+      await this.nativeConnect({
+        deviceId,
+        password,
+        name: selectedDevice?.name,
+        model: selectedDevice?.model,
+      });
     }
-    await HBand.connect({ deviceId, password });
-    this.rememberDeviceSession({ deviceId, password });
+    const connectedDevice = this.status().device;
+    this.rememberDeviceSession({
+      deviceId,
+      password,
+      name: this.nonEmpty(connectedDevice?.name) ?? this.nonEmpty(selectedDevice?.name),
+      model: this.nonEmpty(connectedDevice?.model) ?? this.nonEmpty(selectedDevice?.model),
+    });
   }
 
   async disconnect(): Promise<void> {
@@ -194,6 +214,7 @@ export class HBandService {
       ...status,
       device: { ...status.device, name },
     } : status);
+    this.rememberCurrentDeviceMetadata(name);
   }
 
   /**
@@ -1200,6 +1221,32 @@ export class HBandService {
   }
 
   /**
+   * Atualiza apenas os metadados não secretos depois de a pulseira confirmar
+   * um novo nome, conservando a password necessária à ligação automática.
+   */
+  private rememberCurrentDeviceMetadata(name: string): void {
+    const serialized = localStorage.getItem(DEVICE_SESSION_KEY);
+    const device = this.status().device;
+    if (!serialized || !device) {
+      return;
+    }
+    try {
+      const session = JSON.parse(serialized) as Partial<RememberedDeviceSession>;
+      if (session.deviceId !== device.id || typeof session.password !== 'string') {
+        return;
+      }
+      this.rememberDeviceSession({
+        deviceId: device.id,
+        password: session.password,
+        name,
+        model: this.nonEmpty(device.model) ?? this.nonEmpty(session.model),
+      });
+    } catch {
+      // Uma sessão inválida será eliminada pelo restauro normal no próximo arranque.
+    }
+  }
+
+  /**
    * Conserva apenas o identificador não secreto do arquivo selecionado. Assim,
    * desligar voluntariamente a pulseira não torna o histórico inacessível
    * depois de reiniciar a aplicação.
@@ -1258,13 +1305,70 @@ export class HBandService {
         localStorage.removeItem(DEVICE_SESSION_KEY);
         return;
       }
-      await HBand.connect({
+      let discoveredDevice: HBandDevice | undefined;
+      if (!this.nonEmpty(session.name) || session.name === session.deviceId) {
+        discoveredDevice = await this.discoverRememberedDevice(session.deviceId);
+      }
+      await this.nativeConnect({
         deviceId: session.deviceId,
         password: session.password,
+        name: this.nonEmpty(discoveredDevice?.name) ?? this.nonEmpty(session.name),
+        model: this.nonEmpty(discoveredDevice?.model) ?? this.nonEmpty(session.model),
+      });
+      const connectedDevice = this.status().device;
+      this.rememberDeviceSession({
+        deviceId: session.deviceId,
+        password: session.password,
+        name: this.nonEmpty(connectedDevice?.name)
+          ?? this.nonEmpty(discoveredDevice?.name)
+          ?? this.nonEmpty(session.name),
+        model: this.nonEmpty(connectedDevice?.model)
+          ?? this.nonEmpty(discoveredDevice?.model)
+          ?? this.nonEmpty(session.model),
       });
     } catch (error) {
       this.fail('session.restore', error);
     }
+  }
+
+  /**
+   * Migra sessões antigas que guardavam apenas o MAC. Faz uma pesquisa curta
+   * e termina assim que encontra exatamente o endereço recordado.
+   */
+  private async discoverRememberedDevice(deviceId: string): Promise<HBandDevice | undefined> {
+    let found: HBandDevice | undefined;
+    try {
+      await this.scan();
+      found = await new Promise<HBandDevice | undefined>((resolve) => {
+        const deadline = window.setTimeout(() => finish(), 5_000);
+        const poll = window.setInterval(() => {
+          const device = this.devices().find(
+            (item) => item.id.toLowerCase() === deviceId.toLowerCase(),
+          );
+          if (device) {
+            finish(device);
+          }
+        }, 100);
+        const finish = (device?: HBandDevice) => {
+          window.clearTimeout(deadline);
+          window.clearInterval(poll);
+          resolve(device);
+        };
+      });
+    } catch {
+      // O restauro continua com os metadados persistidos quando o scan falha.
+    }
+    try {
+      await HBand.stopScan();
+    } catch {
+      // O scan pode já ter terminado pelo timeout do próprio SDK.
+    }
+    return found;
+  }
+
+  private nonEmpty(value: string | null | undefined): string | undefined {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : undefined;
   }
 
   /**

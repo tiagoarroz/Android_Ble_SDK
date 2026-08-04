@@ -176,6 +176,7 @@ public class HBandPlugin extends Plugin {
     private String connectionState = "idle";
     private String currentAddress;
     private String currentName;
+    private String currentConnectionName;
     private String currentModelName;
     private String currentPassword = "0000";
     private String firmwareVersion;
@@ -328,16 +329,22 @@ public class HBandPlugin extends Plugin {
             return;
         }
         SearchResult discovered = discoveredDevices.get(deviceId);
+        String rememberedName = cleanMetadata(call.getString("name"));
+        String rememberedModel = cleanMetadata(call.getString("model"));
+        String discoveredName = discovered == null ? null : cleanMetadata(discovered.getName());
         currentAddress = deviceId;
-        currentName = discovered != null && discovered.getName() != null
-            ? discovered.getName()
-            : deviceId;
+        currentName = discoveredName != null ? discoveredName : rememberedName;
+        /*
+         * O SDK ainda recebe um identificador na ligação de sessões antigas,
+         * mas esse fallback técnico nunca é exposto como nome da pulseira.
+         */
+        currentConnectionName = currentName != null ? currentName : deviceId;
         /*
          * Conserva separadamente o nome anunciado no primeiro scan. O nome
          * Bluetooth pode ser alterado depois, mas continua a identificar o
          * modelo durante a sessão atual.
          */
-        currentModelName = discovered != null ? discovered.getName() : null;
+        currentModelName = rememberedModel != null ? rememberedModel : discoveredName;
         currentPassword = call.getString("password", "0000");
         pendingConnectCall = call;
         intentionalDisconnect = false;
@@ -354,7 +361,7 @@ public class HBandPlugin extends Plugin {
         manager.stopScanDevice();
         setConnectionState("connecting");
         manager.registerConnectStatusListener(currentAddress, connectStatusListener);
-        manager.connectDevice(currentAddress, currentName, new IConnectResponse() {
+        manager.connectDevice(currentAddress, currentConnectionName, new IConnectResponse() {
             @Override
             public void connectState(int code, BleGattProfile profile, boolean isOadModel) {
                 if (code != Code.REQUEST_SUCCESS) {
@@ -423,6 +430,7 @@ public class HBandPlugin extends Plugin {
                 discoveredDevices.put(result.getAddress(), result);
                 if (result.getName() != null && !result.getName().trim().isEmpty()) {
                     currentName = result.getName();
+                    currentConnectionName = currentName;
                 }
                 manager.stopScanDevice();
                 connectCurrentDevice();
@@ -649,6 +657,7 @@ public class HBandPlugin extends Plugin {
             @Override
             public void onDeviceRenameSuccess(@NonNull String deviceName) {
                 currentName = deviceName;
+                currentConnectionName = deviceName;
                 emitStatus();
                 accept(call, "device.rename");
             }
@@ -2336,7 +2345,7 @@ public class HBandPlugin extends Plugin {
         if (currentAddress != null) {
             JSObject device = new JSObject();
             device.put("id", currentAddress);
-            device.put("name", currentName == null ? currentAddress : currentName);
+            device.put("name", currentName == null ? "" : currentName);
             device.put("model", currentModelName);
             device.put("firmware", firmwareVersion);
             device.put("hardware", hardwareVersion);
@@ -2355,6 +2364,14 @@ public class HBandPlugin extends Plugin {
         device.put("name", result.getName() == null ? "" : result.getName());
         device.put("rssi", result.rssi);
         return device;
+    }
+
+    private String cleanMetadata(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private void setConnectionState(String state) {

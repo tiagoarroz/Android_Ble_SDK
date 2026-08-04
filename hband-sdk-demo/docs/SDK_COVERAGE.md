@@ -67,6 +67,9 @@ restrição evita bloquear a fila BLE ao pedir tipos não suportados.
   até 30 segundos em quedas não intencionais.
 - Quando o adaptador é reativado, a bridge reinicializa o cliente do SDK e
   redescobre apenas o MAC guardado; cada pesquisa tem um watchdog próprio.
+- A sessão local conserva MAC, password, nome confirmado e modelo. Sessões
+  antigas que só contêm o MAC fazem um scan dirigido até cinco segundos para
+  recuperar o nome antes da ligação; o MAC nunca é apresentado como nome.
 - Bateria, hora, atividade e histórico são pedidos em série e cada operação só
   termina quando chega o callback do SDK.
 - Desligar explicitamente cancela a reconexão e termina o serviço.

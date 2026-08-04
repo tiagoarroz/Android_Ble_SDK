@@ -120,7 +120,12 @@ export interface HBandPlugin {
   requestPermissions(): Promise<{ granted: boolean }>;
   startScan(options?: { timeoutMs?: number }): Promise<void>;
   stopScan(): Promise<void>;
-  connect(options: { deviceId: string; password?: string }): Promise<void>;
+  connect(options: {
+    deviceId: string;
+    password?: string;
+    name?: string;
+    model?: string;
+  }): Promise<void>;
   disconnect(): Promise<void>;
   execute(options: HBandOperationOptions): Promise<HBandOperationResult>;
   addListener(eventName: 'deviceFound', listener: (device: HBandDevice) => void): Promise<PluginListenerHandle>;
