@@ -10,8 +10,8 @@ import type { DatetimeHighlight } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
   albumsOutline, alertCircleOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
-  bodyOutline, calendarOutline, chevronForwardOutline,
-  checkmarkCircleOutline, closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
+  bodyOutline, calendarOutline, chevronDownOutline, chevronForwardOutline,
+  checkmarkCircleOutline, closeCircleOutline, closeOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, globeOutline, heartOutline,
   footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
   playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
@@ -73,8 +73,8 @@ export class HomePage implements OnInit {
   constructor() {
     addIcons({
       albumsOutline, alertCircleOutline, analyticsOutline, arrowBackOutline, batteryDeadOutline, batteryFullOutline, batteryHalfOutline, bluetoothOutline,
-      bodyOutline, calendarOutline, chevronForwardOutline,
-      checkmarkCircleOutline, closeCircleOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, heartOutline,
+      bodyOutline, calendarOutline, chevronDownOutline, chevronForwardOutline,
+      checkmarkCircleOutline, closeCircleOutline, closeOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, globeOutline, heartOutline,
       footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
       playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
@@ -698,6 +698,17 @@ export class HomePage implements OnInit {
       ? action.activeLabelKey
       : action.labelKey;
     return this.i18n.translate(labelKey);
+  }
+
+  /**
+   * Mantém o histórico acessível sem ligação, mas impede uma medição nativa que
+   * a pulseira não conseguiria executar. A simulação web continua disponível.
+   */
+  featureActionDisabled(feature: FeatureDefinition, action: FeatureAction): boolean {
+    return (!this.hband.connected() && !this.hband.simulation())
+      || this.capability(feature) === 'unsupported'
+      || !this.hband.operationAvailable(action.operation)
+      || this.hband.busyOperation() !== null;
   }
 
   /**

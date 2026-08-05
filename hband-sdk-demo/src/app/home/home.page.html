@@ -3,23 +3,31 @@
     <ion-title>
       <span class="brand-lockup">
         <span class="brand-mark"><ion-icon name="pulse-outline"></ion-icon></span>
-        <strong>{{ i18n.translate('app.title') }}</strong>
+        <span class="brand-copy">
+          <strong>{{ i18n.translate('app.title') }}</strong>
+          <small>{{ i18n.translate('app.subtitle') }}</small>
+        </span>
       </span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-select
-        class="language-select"
-        interface="popover"
-        [value]="i18n.language()"
-        [attr.aria-label]="i18n.translate('app.language')"
-        (ionChange)="i18n.setLanguage($event.detail.value)"
-      >
-        <ion-select-option value="pt">{{ i18n.translate('app.languages.pt') }}</ion-select-option>
-        <ion-select-option value="br">{{ i18n.translate('app.languages.br') }}</ion-select-option>
-        <ion-select-option value="en">{{ i18n.translate('app.languages.en') }}</ion-select-option>
-        <ion-select-option value="es">{{ i18n.translate('app.languages.es') }}</ion-select-option>
-        <ion-select-option value="fr">{{ i18n.translate('app.languages.fr') }}</ion-select-option>
-      </ion-select>
+      <span class="language-control">
+        <ion-icon name="globe-outline"></ion-icon>
+        <strong>{{ i18n.language().toUpperCase() }}</strong>
+        <ion-icon name="chevron-down-outline"></ion-icon>
+        <ion-select
+          class="language-select"
+          interface="popover"
+          [value]="i18n.language()"
+          [attr.aria-label]="i18n.translate('app.language')"
+          (ionChange)="i18n.setLanguage($event.detail.value)"
+        >
+          <ion-select-option value="pt">{{ i18n.translate('app.languages.pt') }}</ion-select-option>
+          <ion-select-option value="br">{{ i18n.translate('app.languages.br') }}</ion-select-option>
+          <ion-select-option value="en">{{ i18n.translate('app.languages.en') }}</ion-select-option>
+          <ion-select-option value="es">{{ i18n.translate('app.languages.es') }}</ion-select-option>
+          <ion-select-option value="fr">{{ i18n.translate('app.languages.fr') }}</ion-select-option>
+        </ion-select>
+      </span>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -46,7 +54,7 @@
               <strong>
                 {{ hband.status().device
                   ? (hband.status().device?.name || i18n.translate('device.unknown'))
-                  : i18n.translate('device.noDevice') }}
+                  : i18n.translate('device.connectTitle') }}
               </strong>
             </div>
             <div class="device-meta">
@@ -67,6 +75,9 @@
                 }
               }
             </div>
+            @if (!hband.status().device) {
+              <small class="device-helper">{{ i18n.translate('device.connectDescription') }}</small>
+            }
           </div>
         </div>
         @if (hband.connected()) {
@@ -92,7 +103,9 @@
 
     <div class="section-heading">
       <div>
+        <span>{{ i18n.translate('catalog.eyebrow') }}</span>
         <h2>{{ i18n.translate('catalog.title') }}</h2>
+        <p>{{ i18n.translate('history.description') }}</p>
       </div>
     </div>
 
@@ -101,6 +114,7 @@
         <article
           class="feature-card"
           [class.feature-card--unsupported]="capability(feature) === 'unsupported'"
+          [attr.data-metric]="feature.metric"
           tabindex="0"
           role="button"
           (click)="openFeature(feature)"
@@ -108,7 +122,11 @@
         >
           <header>
             <span class="feature-icon"><ion-icon [name]="feature.icon"></ion-icon></span>
-            <ion-icon class="feature-card__open" name="chevron-forward-outline"></ion-icon>
+            @if (capability(feature) === 'unsupported') {
+              <small class="feature-card__availability">{{ i18n.translate('capabilities.unsupported') }}</small>
+            } @else {
+              <ion-icon class="feature-card__open" name="chevron-forward-outline"></ion-icon>
+            }
           </header>
           <h3>{{ i18n.translate(feature.titleKey) }}</h3>
           @if (homeMetricSummary(feature); as summary) {
@@ -247,7 +265,7 @@
             [attr.aria-label]="i18n.translate('actions.close')"
             (click)="closeDeviceDetails()"
           >
-            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -371,7 +389,7 @@
               [attr.aria-label]="i18n.translate('actions.close')"
               (click)="closeFeature()"
             >
-              <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -396,9 +414,12 @@
               </span>
             </button>
 
-            <section class="metric-data-section feature-history-page__data">
+            <section class="metric-data-section feature-history-page__data" [attr.data-metric]="feature.metric">
               <div class="metric-data-section__heading">
-                <h3>{{ i18n.translate('data.history') }}</h3>
+                <div>
+                  <h3>{{ i18n.translate('data.history') }}</h3>
+                  <p>{{ i18n.translate(feature.descriptionKey) }}</p>
+                </div>
               </div>
               @if (hband.historyFor(feature.metric); as history) {
                 <app-data-visualizer
@@ -420,7 +441,7 @@
                   <ion-button
                     class="feature-history-page__measure"
                     expand="block"
-                    [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                    [disabled]="featureActionDisabled(feature, action)"
                     (click)="openMeasurement(feature)"
                   >
                     <ion-icon slot="start" name="pulse-outline"></ion-icon>
@@ -431,7 +452,7 @@
                     <ion-button
                       expand="block"
                       fill="outline"
-                      [disabled]="capability(feature) === 'unsupported' || !hband.operationAvailable(action.operation) || hband.busyOperation() !== null"
+                      [disabled]="featureActionDisabled(feature, action)"
                       (click)="run(action, feature)"
                     >
                       @if (hband.busyOperation() === action.operation) {
@@ -443,6 +464,13 @@
                     </ion-button>
                   }
                 }
+              </div>
+            }
+
+            @if (!hband.connected() && !hband.simulation() && feature.actions.length) {
+              <div class="connection-required-note">
+                <ion-icon name="watch-outline"></ion-icon>
+                <span>{{ i18n.translate('device.measurementRequiresConnection') }}</span>
               </div>
             }
 
@@ -717,49 +745,52 @@
             </div>
           }
 
-          <section class="measurement-log-panel">
-            <header class="measurement-log-panel__header">
+          <details class="measurement-log-disclosure">
+            <summary>
               <div>
                 <span>{{ i18n.translate('measurementLogs.eyebrow') }}</span>
-                <h3>{{ i18n.translate('measurementLogs.title') }}</h3>
+                <strong>{{ i18n.translate('measurementLogs.title') }}</strong>
               </div>
               <ion-badge color="light">
                 {{ i18n.translate('measurementLogs.count', { count: hband.metricLogs(feature.metric).length }) }}
               </ion-badge>
-            </header>
-            <p class="measurement-log-panel__description">
-              {{ i18n.translate('measurementLogs.description') }}
-            </p>
-            @if (hband.metricLogs(feature.metric).length) {
-              <div
-                class="measurement-log-scroll"
-                role="log"
-                aria-live="polite"
-                [attr.aria-label]="i18n.translate('measurementLogs.title')"
-              >
-                @for (entry of hband.metricLogs(feature.metric); track entry.id) {
-                  <article class="measurement-log-entry" [attr.data-level]="entry.level">
-                    <span class="measurement-log-entry__dot"></span>
-                    <div>
-                      <header>
-                        <strong>{{ logTitle(entry) }}</strong>
-                        <time [attr.datetime]="entry.timestamp">{{ entry.timestamp | date:'mediumTime' }}</time>
-                      </header>
-                      @if (entry.operation) {
-                        <code>{{ entry.operation }}</code>
-                      }
-                      <pre>{{ formatLogPayload(entry) }}</pre>
-                    </div>
-                  </article>
-                }
-              </div>
-            } @else {
-              <div class="measurement-log-empty">
-                <ion-icon name="pulse-outline"></ion-icon>
-                <span>{{ i18n.translate('measurementLogs.empty') }}</span>
-              </div>
-            }
-          </section>
+              <ion-icon class="measurement-log-disclosure__chevron" name="chevron-down-outline"></ion-icon>
+            </summary>
+            <section class="measurement-log-panel">
+              <p class="measurement-log-panel__description">
+                {{ i18n.translate('measurementLogs.description') }}
+              </p>
+              @if (hband.metricLogs(feature.metric).length) {
+                <div
+                  class="measurement-log-scroll"
+                  role="log"
+                  aria-live="polite"
+                  [attr.aria-label]="i18n.translate('measurementLogs.title')"
+                >
+                  @for (entry of hband.metricLogs(feature.metric); track entry.id) {
+                    <article class="measurement-log-entry" [attr.data-level]="entry.level">
+                      <span class="measurement-log-entry__dot"></span>
+                      <div>
+                        <header>
+                          <strong>{{ logTitle(entry) }}</strong>
+                          <time [attr.datetime]="entry.timestamp">{{ entry.timestamp | date:'mediumTime' }}</time>
+                        </header>
+                        @if (entry.operation) {
+                          <code>{{ entry.operation }}</code>
+                        }
+                        <pre>{{ formatLogPayload(entry) }}</pre>
+                      </div>
+                    </article>
+                  }
+                </div>
+              } @else {
+                <div class="measurement-log-empty">
+                  <ion-icon name="pulse-outline"></ion-icon>
+                  <span>{{ i18n.translate('measurementLogs.empty') }}</span>
+                </div>
+              }
+            </section>
+          </details>
         </div>
 
         @if (savePromptOpen()) {

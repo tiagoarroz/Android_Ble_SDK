@@ -43,6 +43,9 @@
   },
   "device": {
     "noDevice": "No device",
+    "connectTitle": "Connect your band",
+    "connectDescription": "Connect your band to start tracking your measurements.",
+    "measurementRequiresConnection": "Connect your band to start a measurement.",
     "firmware": "Firmware {{version}}",
     "unknown": "Unnamed device",
     "battery": "Battery",

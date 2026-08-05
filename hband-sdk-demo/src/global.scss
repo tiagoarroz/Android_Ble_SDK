@@ -3491,3 +3491,912 @@ ion-content {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Redesenho de produto
+ * ----------------------------------------------------------------------------
+ * Consolida a hierarquia visual da experiência diária sem alterar os fluxos
+ * BLE: marca e idioma, ligação da pulseira, métricas, histórico e medição.
+ */
+:root {
+  --ion-color-primary: #07846d;
+  --ion-color-primary-rgb: 7, 132, 109;
+  --ion-color-primary-shade: #067460;
+  --ion-color-primary-tint: #20917c;
+  --app-ink: #13231f;
+  --app-ink-soft: #60706b;
+  --app-night: #09221f;
+  --app-night-soft: #12342f;
+  --app-canvas: #f5f8f7;
+  --app-card: #ffffff;
+  --app-border: #dfe8e4;
+  --app-mint: #2ed3ad;
+  --app-mint-soft: #dcf7ef;
+  --app-shadow: 0 18px 48px rgb(18 52 45 / 8%);
+}
+
+body {
+  background: var(--app-canvas);
+}
+
+ion-content {
+  --background:
+    radial-gradient(circle at 100% 0, rgb(46 211 173 / 9%), transparent 22rem),
+    linear-gradient(180deg, #f8fbfa 0%, var(--app-canvas) 38%, #f1f6f4 100%);
+}
+
+ion-button {
+  text-transform: none;
+}
+
+.app-header {
+  ion-toolbar {
+    --background: rgb(255 255 255 / 92%);
+    --border-color: rgb(19 35 31 / 7%);
+    --color: var(--app-ink);
+    --min-height: 68px;
+    backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 8px 28px rgb(15 50 42 / 5%);
+  }
+
+  ion-title {
+    padding-inline: 18px;
+  }
+}
+
+.brand-lockup {
+  gap: 11px;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #31ddb7, #22c9a4);
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgb(22 185 149 / 22%);
+  color: #073c32;
+  height: 42px;
+  width: 42px;
+}
+
+.brand-copy {
+  display: grid;
+  gap: 1px;
+
+  strong {
+    color: var(--app-ink);
+    font-size: 17px;
+    line-height: 1.15;
+  }
+
+  small {
+    color: var(--app-ink-soft);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.2;
+  }
+}
+
+.language-control {
+  align-items: center;
+  background: #edf5f2;
+  border: 1px solid #d9e7e2;
+  border-radius: 999px;
+  color: #31524a;
+  display: inline-flex;
+  gap: 6px;
+  height: 40px;
+  margin-right: 8px;
+  padding: 0 12px;
+  position: relative;
+
+  > ion-icon:first-child {
+    color: var(--ion-color-primary);
+    font-size: 17px;
+  }
+
+  > ion-icon:last-of-type {
+    font-size: 12px;
+  }
+
+  > strong {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+}
+
+.language-select {
+  inset: 0;
+  max-width: none;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.demo-shell {
+  max-width: 940px;
+  padding: 24px 22px calc(56px + env(safe-area-inset-bottom));
+}
+
+.hero-panel--focused {
+  background:
+    radial-gradient(circle at 94% 8%, rgb(66 225 188 / 20%), transparent 15rem),
+    linear-gradient(135deg, #0a2425 0%, #103a36 100%);
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: 26px;
+  box-shadow: 0 22px 50px rgb(9 44 38 / 15%);
+  overflow: hidden;
+  padding: 18px;
+
+  &::before {
+    border-color: rgb(255 255 255 / 6%);
+    height: 260px;
+    right: -115px;
+    top: -170px;
+    width: 260px;
+  }
+
+  .connection-card {
+    column-gap: 16px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 8px;
+  }
+
+  .device-glyph {
+    background: rgb(255 255 255 / 7%);
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 19px;
+    box-shadow: none;
+    height: 62px;
+    width: 62px;
+
+    ion-icon {
+      color: #52e1bd;
+      font-size: 32px;
+    }
+  }
+
+  .device-name-row > strong {
+    font-size: clamp(19px, 3vw, 24px);
+    line-height: 1.08;
+  }
+
+  .connection-card__open {
+    color: #8baea7;
+  }
+}
+
+.device-helper {
+  color: #a7c0ba;
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 7px;
+  max-width: 370px;
+}
+
+.status-row {
+  color: #c5d8d4;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.status-dot {
+  background: #78928c;
+  height: 7px;
+  width: 7px;
+
+  &.is-connected {
+    background: #46ddb8;
+    box-shadow: 0 0 0 4px rgb(70 221 184 / 12%);
+  }
+}
+
+.connection-card__actions {
+  gap: 10px;
+
+  ion-button {
+    --border-radius: 14px;
+    --box-shadow: none;
+    font-size: 12px;
+    font-weight: 760;
+    letter-spacing: -0.01em;
+    min-height: 48px;
+  }
+}
+
+.connection-action--primary {
+  --background: linear-gradient(135deg, #35dcb7, #1fc9a5);
+  --background-hover: #37deb9;
+  --color: #07372e;
+}
+
+.connection-action--secondary {
+  --background: rgb(255 255 255 / 7%);
+  --background-hover: rgb(255 255 255 / 11%);
+  --border-color: rgb(255 255 255 / 9%);
+  --color: #e6f1ee;
+}
+
+.section-heading {
+  margin: 34px 4px 18px;
+
+  > div {
+    max-width: 580px;
+  }
+
+  span {
+    color: var(--ion-color-primary);
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    color: var(--app-ink);
+    font-size: clamp(30px, 5vw, 42px);
+    letter-spacing: -0.052em;
+    line-height: 0.98;
+    margin: 0;
+  }
+
+  p {
+    color: var(--app-ink-soft);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 10px 0 0;
+  }
+}
+
+.feature-grid {
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.feature-card {
+  --metric: #07846d;
+  --metric-soft: #e0f7f0;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--metric) 8%, transparent), transparent 48%),
+    var(--app-card);
+  border: 1px solid #dfe8e4;
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgb(18 52 45 / 5%);
+  min-height: 0;
+  overflow: hidden;
+  padding: 20px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: color-mix(in srgb, var(--metric) 34%, #dfe8e4);
+    box-shadow: 0 20px 42px rgb(18 52 45 / 10%);
+    outline: none;
+    transform: translateY(-2px);
+  }
+
+  &[data-metric='steps'] {
+    --metric: #4a7fd1;
+    --metric-soft: #e8f0fc;
+  }
+
+  &[data-metric='heartRate'] {
+    --metric: #d94f68;
+    --metric-soft: #fdebef;
+  }
+
+  &[data-metric='bloodPressure'] {
+    --metric: #795fc4;
+    --metric-soft: #f0ecfb;
+  }
+
+  &[data-metric='oxygen'] {
+    --metric: #278fbd;
+    --metric-soft: #e4f4fa;
+  }
+
+  &[data-metric='temperature'] {
+    --metric: #d96d4b;
+    --metric-soft: #fcece6;
+  }
+
+  &[data-metric='bloodGlucose'] {
+    --metric: #168a74;
+    --metric-soft: #e0f5ef;
+  }
+
+  &[data-metric='ecg'] {
+    --metric: #c9445c;
+    --metric-soft: #fbe8ec;
+  }
+
+  &[data-metric='bodyComposition'] {
+    --metric: #5a69b3;
+    --metric-soft: #eaedfa;
+  }
+
+  &[data-metric='stress'] {
+    --metric: #568c5a;
+    --metric-soft: #e9f4e8;
+  }
+
+  > header {
+    min-height: 48px;
+  }
+
+  h3 {
+    color: var(--app-ink);
+    font-size: clamp(15px, 2vw, 20px);
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+    margin: 14px 0 0;
+  }
+}
+
+.feature-icon {
+  background: var(--metric-soft);
+  border-radius: 15px;
+  color: var(--metric);
+  height: 48px;
+  width: 48px;
+
+  ion-icon {
+    font-size: 25px;
+  }
+}
+
+.feature-card__open {
+  color: #92a19c;
+  font-size: 22px;
+}
+
+.feature-card__availability {
+  background: #f0f3f2;
+  border-radius: 999px;
+  color: #77847f;
+  font-size: 9px;
+  font-weight: 750;
+  padding: 6px 8px;
+}
+
+.feature-card--unsupported {
+  filter: saturate(0.5);
+
+  .feature-card-summary,
+  h3 {
+    opacity: 0.65;
+  }
+}
+
+.feature-card-summary {
+  margin-top: auto;
+
+  &::before {
+    background: var(--metric);
+    border-radius: 999px;
+    content: '';
+    height: 3px;
+    margin-bottom: 12px;
+    opacity: 0.2;
+    width: 28px;
+  }
+}
+
+.feature-card-summary__value strong {
+  color: var(--app-ink);
+}
+
+.feature-card-summary time,
+.feature-card-summary--empty span {
+  color: #82908b;
+}
+
+.feature-card-summary--empty strong {
+  color: color-mix(in srgb, var(--metric) 65%, #9ba9a4);
+  font-size: 30px;
+  font-weight: 500;
+}
+
+/* As folhas de detalhe partilham a mesma barra, espaçamento e hierarquia. */
+.scan-modal,
+.device-details-modal,
+.feature-modal,
+.measurement-modal,
+.history-calendar-modal {
+  ion-toolbar {
+    --background: rgb(255 255 255 / 96%);
+    --border-color: #e3ebe8;
+    --color: var(--app-ink);
+    --min-height: 62px;
+  }
+
+  ion-title {
+    color: var(--app-ink);
+    font-size: 17px;
+    font-weight: 760;
+    letter-spacing: -0.025em;
+  }
+
+  ion-header ion-button {
+    --color: #3d514c;
+  }
+}
+
+.feature-modal,
+.measurement-modal {
+  --border-radius: 28px;
+  --height: min(820px, 94%);
+  --width: min(620px, 94%);
+}
+
+.scan-modal,
+.device-details-modal,
+.history-calendar-modal {
+  --border-radius: 28px;
+  --height: min(720px, 90%);
+  --width: min(540px, 92%);
+}
+
+.feature-history-page,
+.feature-all-data-page,
+.live-measurement-page,
+.device-details-content,
+.history-calendar-content {
+  background:
+    radial-gradient(circle at 100% 0, rgb(46 211 173 / 7%), transparent 18rem),
+    var(--app-canvas);
+}
+
+.feature-history-page {
+  gap: 16px;
+  padding: 22px 24px calc(32px + env(safe-area-inset-bottom));
+}
+
+.feature-page__date {
+  background: #fff;
+  border-color: #dfe8e4;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgb(18 52 45 / 5%);
+  justify-content: flex-start;
+  margin: 0;
+  min-height: 52px;
+  padding: 9px 14px;
+  width: 100%;
+
+  ion-icon,
+  ion-spinner {
+    color: var(--ion-color-primary);
+  }
+}
+
+.metric-data-section {
+  --metric: var(--ion-color-primary);
+  background: #fff;
+  border: 1px solid #dfe8e4;
+  border-radius: 22px;
+  box-shadow: 0 14px 36px rgb(18 52 45 / 6%);
+
+  &[data-metric='heartRate'],
+  &[data-metric='ecg'] {
+    --metric: #d94f68;
+  }
+
+  &[data-metric='bloodPressure'] {
+    --metric: #795fc4;
+  }
+
+  &[data-metric='oxygen'] {
+    --metric: #278fbd;
+  }
+
+  &[data-metric='temperature'] {
+    --metric: #d96d4b;
+  }
+
+  &[data-metric='steps'] {
+    --metric: #4a7fd1;
+  }
+}
+
+.metric-data-section__heading {
+  border-bottom: 1px solid #edf2f0;
+  padding-bottom: 14px;
+
+  h3 {
+    color: var(--app-ink);
+    font-size: 18px;
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+
+  p {
+    color: var(--app-ink-soft);
+    font-size: 11px;
+    line-height: 1.45;
+    margin: 5px 0 0;
+  }
+}
+
+.detail-empty {
+  color: #80908b;
+
+  ion-icon {
+    color: #a8bbb5;
+  }
+}
+
+.feature-history-page__measure {
+  --background: linear-gradient(135deg, #07846d, #19b08f);
+  --border-radius: 16px;
+  --box-shadow: 0 12px 28px rgb(7 132 109 / 22%);
+  font-size: 14px;
+  font-weight: 760;
+  letter-spacing: -0.01em;
+  min-height: 54px;
+}
+
+.connection-required-note {
+  align-items: center;
+  background: #fff8e8;
+  border: 1px solid #f1dfb5;
+  border-radius: 14px;
+  color: #785d20;
+  display: flex;
+  font-size: 11px;
+  font-weight: 650;
+  gap: 9px;
+  line-height: 1.4;
+  padding: 11px 13px;
+
+  ion-icon {
+    flex: 0 0 auto;
+    font-size: 18px;
+  }
+}
+
+.feature-history-page__all-data,
+.automatic-monitoring-row {
+  background: #fff;
+  border-color: #dfe8e4;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgb(18 52 45 / 4%);
+  min-height: 54px;
+}
+
+.feature-history-page__all-data {
+  color: var(--app-ink);
+
+  > span ion-icon,
+  > ion-icon {
+    color: var(--ion-color-primary);
+  }
+}
+
+.all-data-tabs {
+  background: #e8f0ed;
+  border-radius: 16px;
+  padding: 5px;
+
+  button {
+    border-radius: 12px;
+  }
+
+  button.is-active {
+    box-shadow: 0 6px 18px rgb(18 52 45 / 9%);
+    color: var(--ion-color-primary);
+  }
+}
+
+.all-data-group {
+  border-color: #dfe8e4;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgb(18 52 45 / 5%);
+}
+
+.live-measurement-page {
+  padding: 26px 24px calc(34px + env(safe-area-inset-bottom));
+}
+
+.live-measurement-page__hero {
+  h2 {
+    color: var(--app-ink);
+    font-size: clamp(25px, 4.8vw, 34px);
+  }
+
+  p {
+    color: var(--app-ink-soft);
+    max-width: 390px;
+  }
+}
+
+.live-measurement-page__icon {
+  background: linear-gradient(145deg, #e6faf4, #d3f5eb);
+  border-color: #bde9dc;
+  border-radius: 27px;
+  color: var(--ion-color-primary);
+  height: 104px;
+  width: 104px;
+}
+
+.live-measurement-page__result {
+  border-color: #dfe8e4;
+  border-radius: 22px;
+  box-shadow: 0 14px 38px rgb(18 52 45 / 7%);
+  margin-top: 24px;
+}
+
+.live-measurement-page__toggle {
+  --border-radius: 16px;
+  font-size: 14px;
+  min-height: 54px;
+  min-width: 210px;
+}
+
+/* Os eventos da bridge continuam acessíveis, mas ficam fora do fluxo principal. */
+.measurement-log-disclosure {
+  background: #fff;
+  border: 1px solid #dfe8e4;
+  border-radius: 16px;
+  margin-top: 24px;
+  overflow: hidden;
+
+  > summary {
+    align-items: center;
+    cursor: pointer;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    list-style: none;
+    min-height: 60px;
+    padding: 12px 15px;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    > div {
+      display: grid;
+      gap: 2px;
+    }
+
+    span {
+      color: #7d8b87;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: var(--app-ink);
+      font-size: 13px;
+    }
+
+    ion-badge {
+      --background: #eef4f2;
+      --color: #61716c;
+      font-size: 9px;
+    }
+  }
+
+  &[open] .measurement-log-disclosure__chevron {
+    transform: rotate(180deg);
+  }
+}
+
+.measurement-log-disclosure__chevron {
+  color: #80908b;
+  font-size: 17px;
+  transition: transform 180ms ease;
+}
+
+.measurement-log-panel {
+  border-radius: 0;
+  margin: 0;
+  padding: 16px;
+}
+
+.measurement-log-panel__description {
+  margin-top: 0;
+}
+
+.modal-intro {
+  h2 {
+    color: var(--app-ink);
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    color: var(--app-ink-soft);
+  }
+}
+
+.password-field,
+.device-list,
+.device-details-field {
+  border-color: #dfe8e4;
+  border-radius: 16px;
+}
+
+.device-details-hero {
+  background: linear-gradient(135deg, #0b2726, #15423d);
+  border-radius: 22px;
+}
+
+.measurement-save-prompt > section {
+  border-radius: 24px;
+}
+
+@media (max-width: 560px) {
+  .app-header ion-toolbar {
+    --min-height: 64px;
+  }
+
+  .app-header ion-title {
+    padding-inline: 14px;
+  }
+
+  .brand-mark {
+    border-radius: 12px;
+    height: 38px;
+    width: 38px;
+
+    ion-icon {
+      font-size: 21px;
+    }
+  }
+
+  .brand-copy small {
+    display: none;
+  }
+
+  .language-control {
+    height: 38px;
+    margin-right: 4px;
+    padding-inline: 10px;
+  }
+
+  .demo-shell {
+    padding: 14px 12px calc(36px + env(safe-area-inset-bottom));
+  }
+
+  .hero-panel--focused {
+    border-radius: 22px;
+    padding: 13px;
+
+    .connection-card {
+      column-gap: 12px;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      padding: 7px;
+    }
+
+    .device-glyph {
+      border-radius: 16px;
+      height: 54px;
+      width: 54px;
+
+      ion-icon {
+        font-size: 28px;
+      }
+    }
+
+    .device-name-row > strong {
+      font-size: 18px;
+    }
+
+    .connection-card__actions {
+      grid-column: 1 / -1;
+      margin-top: 12px;
+
+      ion-button {
+        font-size: 11px;
+        min-height: 48px;
+      }
+    }
+  }
+
+  .device-helper {
+    display: -webkit-box;
+    font-size: 10px;
+    line-clamp: 2;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .section-heading {
+    margin: 30px 4px 16px;
+
+    h2 {
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  .feature-grid {
+    gap: 10px;
+  }
+
+  .feature-card {
+    border-radius: 20px;
+    padding: 14px;
+
+    > header {
+      min-height: 40px;
+    }
+
+    h3 {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  }
+
+  .feature-icon {
+    border-radius: 13px;
+    height: 40px;
+    width: 40px;
+
+    ion-icon {
+      font-size: 21px;
+    }
+  }
+
+  .feature-card-summary::before {
+    margin-bottom: 8px;
+  }
+
+  .feature-modal,
+  .measurement-modal {
+    --border-radius: 0;
+    --height: 100%;
+    --width: 100%;
+  }
+
+  .scan-modal,
+  .device-details-modal,
+  .history-calendar-modal {
+    --border-radius: 24px 24px 0 0;
+    --height: 88%;
+    --width: 100%;
+    align-items: end;
+  }
+
+  .feature-history-page {
+    padding: 16px 14px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  .feature-page__date {
+    justify-content: flex-start;
+  }
+
+  .feature-history-page__data,
+  .live-measurement-page__result {
+    padding: 17px;
+  }
+
+  .metric-data-section__heading p {
+    font-size: 10px;
+  }
+
+  .live-measurement-page {
+    padding: 20px 14px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  .live-measurement-page__icon {
+    height: 86px;
+    width: 86px;
+  }
+
+  .live-measurement-page__result {
+    margin-top: 20px;
+  }
+
+  .measurement-log-disclosure {
+    margin-top: 20px;
+  }
+}

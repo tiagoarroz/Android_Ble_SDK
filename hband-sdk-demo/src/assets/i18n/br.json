@@ -43,6 +43,9 @@
   },
   "device": {
     "noDevice": "Nenhum dispositivo",
+    "connectTitle": "Conecte sua pulseira",
+    "connectDescription": "Comece conectando a pulseira para acompanhar suas medições.",
+    "measurementRequiresConnection": "Conecte a pulseira para iniciar uma medição.",
     "firmware": "Firmware {{version}}",
     "unknown": "Dispositivo sem nome",
     "battery": "Bateria",

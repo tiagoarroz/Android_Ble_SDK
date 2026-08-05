@@ -37,6 +37,19 @@ describe('HomePage', () => {
     expect(component.hband.measurementActive(feature.metric)).toBeFalse();
   });
 
+  it('should require a connection for native actions while preserving web simulation', () => {
+    const feature = component.features.find((item) => item.metric === 'heartRate')!;
+    const measurement = feature.actions.find((action) => action.stopOperation)!;
+
+    expect(component.featureActionDisabled(feature, measurement)).toBeFalse();
+
+    component.hband.simulation.set(false);
+    expect(component.featureActionDisabled(feature, measurement)).toBeTrue();
+
+    component.hband.status.update((status) => ({ ...status, state: 'connected' }));
+    expect(component.featureActionDisabled(feature, measurement)).toBeFalse();
+  });
+
   it('should include operation and real payload entries in the metric log', async () => {
     const feature = component.features.find((item) => item.metric === 'heartRate')!;
     const measurement = feature.actions.find((action) => action.stopOperation)!;

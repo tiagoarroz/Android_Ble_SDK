@@ -43,6 +43,9 @@
   },
   "device": {
     "noDevice": "Aucun appareil",
+    "connectTitle": "Connectez votre bracelet",
+    "connectDescription": "Connectez le bracelet pour commencer à suivre vos mesures.",
+    "measurementRequiresConnection": "Connectez le bracelet pour démarrer une mesure.",
     "firmware": "Micrologiciel {{version}}",
     "unknown": "Appareil sans nom",
     "battery": "Batterie",
