@@ -109,6 +109,17 @@ export interface HBandOperationOptions {
   params?: Record<string, unknown>;
 }
 
+/**
+ * Resultado da sessão temporária usada para registar por NFC uma pulseira que
+ * ainda não pertence à sessão atual. `signalling` distingue uma pulseira que
+ * confirmou o pedido de vibração de uma que apenas aceitou a ligação.
+ */
+export interface HBandBandSignal {
+  deviceId: string;
+  signalling: boolean;
+  findSupported: boolean;
+}
+
 export interface HBandOperationResult {
   operation: string;
   accepted: boolean;

@@ -344,6 +344,11 @@ ion-content {
   }
 }
 
+/* O registo de uma pulseira próxima acrescenta o bloco de identidade. */
+.nfc-modal--discover {
+  --height: min(560px, 90vh);
+}
+
 .nfc-session {
   align-content: start;
   display: grid;
@@ -400,6 +405,58 @@ ion-content {
   ion-spinner {
     height: 36px;
     width: 36px;
+  }
+}
+
+/* Identidade da pulseira sinalizada, apresentada antes de aproximar a tag. */
+.nfc-session__band {
+  align-items: center;
+  background: #f2f7f8;
+  border: 1px solid #dfeaec;
+  border-radius: 14px;
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+  width: 100%;
+
+  > ion-icon {
+    color: #177e9f;
+    flex: none;
+    font-size: 24px;
+  }
+
+  div {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  strong {
+    color: #102835;
+    font-size: 14px;
+  }
+
+  span {
+    color: #607784;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+  }
+
+  small {
+    color: #7b909b;
+    font-size: 11px;
+  }
+
+  &.is-signalling {
+    background: rgb(38 215 173 / 10%);
+    border-color: rgb(38 215 173 / 28%);
+
+    > ion-icon {
+      color: #12916f;
+    }
   }
 }
 
@@ -1951,9 +2008,34 @@ ion-content {
 }
 
 .history-calendar-modal {
-  --border-radius: 22px;
-  --height: min(620px, 88vh);
-  --width: min(430px, calc(100vw - 30px));
+  --backdrop-opacity: 1;
+  --border-radius: 24px;
+  --box-shadow: 0 32px 90px rgb(3 24 20 / 42%);
+  --height: min(500px, calc(100% - 32px));
+  --width: min(420px, calc(100% - 24px));
+
+  /*
+   * O backdrop é aplicado diretamente ao Shadow Part do Ionic para garantir
+   * contraste mesmo quando o calendário é aberto sobre outra modal.
+   */
+  &::part(backdrop) {
+    backdrop-filter: blur(4px);
+    background: rgb(4 24 20 / 58%);
+    opacity: 1;
+  }
+
+  &::part(content) {
+    background: #f8fbfa;
+    border: 1px solid rgb(255 255 255 / 70%);
+    box-shadow:
+      0 32px 90px rgb(3 24 20 / 42%),
+      0 8px 24px rgb(3 24 20 / 18%);
+    overflow: hidden;
+  }
+
+  ion-content {
+    --background: #f8fbfa;
+  }
 }
 
 .history-calendar-content {
@@ -3623,6 +3705,8 @@ ion-button {
   border: 1px solid rgb(255 255 255 / 7%);
   border-radius: 26px;
   box-shadow: 0 22px 50px rgb(9 44 38 / 15%);
+  /* O painel passou a ter duas linhas e o espaçamento é dado por cada bloco. */
+  gap: 0;
   overflow: hidden;
   padding: 18px;
 
@@ -3714,6 +3798,41 @@ ion-button {
   --background-hover: rgb(255 255 255 / 11%);
   --border-color: rgb(255 255 255 / 9%);
   --color: #e6f1ee;
+}
+
+/*
+ * O registo de uma pulseira alheia fica fora do cartão de ligação: é uma ação
+ * de preparação de etiquetas e não uma forma de iniciar a sessão atual.
+ */
+.band-provisioning {
+  border-top: 1px solid rgb(255 255 255 / 8%);
+  margin-top: 14px;
+  padding: 12px 8px 2px;
+
+  small {
+    color: #9dbdb6;
+    display: block;
+    font-size: 11px;
+    line-height: 1.45;
+    padding: 0 4px;
+  }
+}
+
+.band-provisioning__action {
+  --border-radius: 13px;
+  --color: #7fe6c9;
+  --color-activated: #4fd8b3;
+  --color-hover: #96ecd5;
+  --padding-start: 6px;
+  font-size: 12px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+  margin: 0 0 2px;
+  min-height: 38px;
+
+  ion-icon {
+    font-size: 17px;
+  }
 }
 
 .section-heading {
@@ -3872,16 +3991,6 @@ ion-button {
 
 .feature-card-summary {
   margin-top: auto;
-
-  &::before {
-    background: var(--metric);
-    border-radius: 999px;
-    content: '';
-    height: 3px;
-    margin-bottom: 12px;
-    opacity: 0.2;
-    width: 28px;
-  }
 }
 
 .feature-card-summary__value strong {
@@ -3912,6 +4021,11 @@ ion-button {
     --min-height: 62px;
   }
 
+  ion-content
+  {
+    background: radial-gradient(circle at 100% 0,rgba(46,211,173,.07),transparent 18rem),var(--app-canvas)
+  }
+
   ion-title {
     color: var(--app-ink);
     font-size: 17px;
@@ -3932,8 +4046,7 @@ ion-button {
 }
 
 .scan-modal,
-.device-details-modal,
-.history-calendar-modal {
+.device-details-modal {
   --border-radius: 28px;
   --height: min(720px, 90%);
   --width: min(540px, 92%);
@@ -3943,11 +4056,11 @@ ion-button {
 .feature-all-data-page,
 .live-measurement-page,
 .device-details-content,
-.history-calendar-content {
-  background:
-    radial-gradient(circle at 100% 0, rgb(46 211 173 / 7%), transparent 18rem),
-    var(--app-canvas);
-}
+// .history-calendar-content {
+//   background:
+//     radial-gradient(circle at 100% 0, rgb(46 211 173 / 7%), transparent 18rem),
+//     var(--app-canvas);
+// }
 
 .feature-history-page {
   gap: 16px;
@@ -4358,12 +4471,19 @@ ion-button {
   }
 
   .scan-modal,
-  .device-details-modal,
-  .history-calendar-modal {
+  .device-details-modal {
     --border-radius: 24px 24px 0 0;
     --height: 88%;
     --width: 100%;
     align-items: end;
+  }
+
+  /* O calendário mantém-se centrado e destacado do detalhe que o abriu. */
+  .history-calendar-modal {
+    --border-radius: 24px;
+    --height: min(500px, calc(100% - 32px));
+    --width: calc(100% - 24px);
+    align-items: center;
   }
 
   .feature-history-page {

@@ -13,7 +13,7 @@ import {
   bodyOutline, calendarOutline, chevronDownOutline, chevronForwardOutline,
   checkmarkCircleOutline, closeCircleOutline, closeOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, globeOutline, heartOutline,
   footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-  playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
+  playOutline, radioOutline, refreshOutline, saveOutline, searchOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
   waterOutline,
 } from 'ionicons/icons';
 
@@ -22,8 +22,9 @@ import { BandNfcService } from '../core/band-nfc.service';
 import { FEATURE_CATALOG } from '../core/feature-catalog';
 import { HBandService } from '../core/hband.service';
 import type {
-  DataValue, FeatureAction, FeatureDefinition, HBandDataEvent, HBandHistoryRecord,
-  HBandLogEntry, HBandMonitoringSetting, HBandReadingSource, MetricId,
+  DataValue, FeatureAction, FeatureDefinition, HBandDataEvent, HBandDevice,
+  HBandHistoryRecord, HBandLogEntry, HBandMonitoringSetting, HBandReadingSource,
+  MetricId,
 } from '../core/hband.types';
 import { I18nService } from '../core/i18n.service';
 
@@ -57,7 +58,9 @@ export class HomePage implements OnInit {
   readonly savingMeasurement = signal(false);
   readonly scanOpen = signal(false);
   readonly nfcModalOpen = signal(false);
-  readonly nfcMode = signal<'write' | 'connect'>('write');
+  readonly nfcMode = signal<'write' | 'connect' | 'discover'>('write');
+  readonly nearbyBand = signal<HBandDevice | null>(null);
+  readonly nearbyBandSignalling = signal(false);
   readonly deviceDetailsOpen = signal(false);
   readonly editingDeviceName = signal(false);
   readonly renameDeviceName = signal('');
@@ -69,6 +72,7 @@ export class HomePage implements OnInit {
   readonly selectedDate = signal(this.localDate(new Date()));
   readonly today = this.localDate(new Date());
   private measurementWasActive = false;
+  private nearbyRegistration = 0;
 
   constructor() {
     addIcons({
@@ -76,7 +80,7 @@ export class HomePage implements OnInit {
       bodyOutline, calendarOutline, chevronDownOutline, chevronForwardOutline,
       checkmarkCircleOutline, closeCircleOutline, closeOutline, cloudOfflineOutline, createOutline, fitnessOutline, flashOutline, globeOutline, heartOutline,
       footstepsOutline, informationCircleOutline, leafOutline, medicalOutline, pulseOutline,
-      playOutline, radioOutline, refreshOutline, saveOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
+      playOutline, radioOutline, refreshOutline, saveOutline, searchOutline, speedometerOutline, stopOutline, syncOutline, thermometerOutline, trashOutline, watchOutline,
       waterOutline,
     });
 
@@ -133,6 +137,66 @@ export class HomePage implements OnInit {
   }
 
   /**
+   * Regista uma pulseira que não pertence à sessão atual. A pulseira mais
+   * próxima é identificada pelo sinal, ligada temporariamente e mandada
+   * vibrar, para que a pessoa confirme fisicamente qual das pulseiras
+   * próximas vai ficar associada à tag que aproxima em seguida.
+   */
+  async registerNearbyBandNfc(): Promise<void> {
+    if (this.hband.connected() || this.nfc.busy()) {
+      return;
+    }
+    const token = this.nearbyRegistration + 1;
+    this.nearbyRegistration = token;
+    this.nfcMode.set('discover');
+    this.nfc.reset();
+    this.nearbyBand.set(null);
+    this.nearbyBandSignalling.set(false);
+    this.nfcModalOpen.set(true);
+    try {
+      this.nfc.markDiscovering();
+      const band = await this.hband.findStrongestBand();
+      if (!this.nearbyRegistrationActive(token)) {
+        return;
+      }
+      if (!band) {
+        throw new Error('NO_BAND_NEARBY');
+      }
+      this.nearbyBand.set(band);
+      const signal = await this.hband.startBandSignal(band.id, this.password());
+      if (!this.nearbyRegistrationActive(token)) {
+        return;
+      }
+      this.nearbyBandSignalling.set(signal.signalling);
+      /*
+       * A escrita só começa depois de a pulseira estar a vibrar: o alerta
+       * nativo pede exatamente a pulseira que a pessoa acabou de ver reagir.
+       */
+      await this.nfc.registerBand(band.id, 'nfc.native.discoverPrompt');
+    } catch (error) {
+      if (this.nfc.phase() !== 'error') {
+        this.nfc.markError(error);
+      }
+    } finally {
+      /*
+       * A sessão temporária é sempre terminada, incluindo quando a pessoa
+       * cancela ou a tag falha, para não deixar a pulseira ligada e a vibrar.
+       */
+      if (this.nearbyBand()) {
+        await this.hband.stopBandSignal().catch(() => undefined);
+      }
+    }
+  }
+
+  /**
+   * Uma etapa só continua enquanto a modal correspondente estiver aberta e
+   * nenhum registo posterior a tiver substituído.
+   */
+  private nearbyRegistrationActive(token: number): boolean {
+    return this.nearbyRegistration === token && this.nfcModalOpen();
+  }
+
+  /**
    * Lê o MAC validado da etiqueta, procura exatamente esse anúncio BLE e só
    * depois delega a autenticação no fluxo normal da H Band.
    */
@@ -156,11 +220,13 @@ export class HomePage implements OnInit {
   }
 
   closeNfcModal(): void {
+    this.nearbyRegistration += 1;
     this.nfcModalOpen.set(false);
     void this.nfc.cancel();
   }
 
   onNfcModalDismiss(): void {
+    this.nearbyRegistration += 1;
     this.nfcModalOpen.set(false);
     if (this.nfc.busy()) {
       void this.nfc.cancel();
@@ -169,26 +235,45 @@ export class HomePage implements OnInit {
     }
   }
 
+  /** Cada modo de NFC tem a sua própria árvore de mensagens traduzidas. */
+  private nfcModeKey(): string {
+    switch (this.nfcMode()) {
+      case 'write':
+        return 'nfc.write';
+      case 'connect':
+        return 'nfc.connect';
+      default:
+        return 'nfc.discover';
+    }
+  }
+
   nfcTitle(): string {
-    return this.i18n.translate(this.nfcMode() === 'write' ? 'nfc.write.title' : 'nfc.connect.title');
+    return this.i18n.translate(`${this.nfcModeKey()}.title`);
   }
 
   nfcDescription(): string {
     const phase = this.nfc.phase();
+    const mode = this.nfcModeKey();
     if (phase === 'error') {
       return this.i18n.translate(`nfc.errors.${this.nfc.errorCode() ?? 'NFC_UNKNOWN_ERROR'}`);
     }
     if (phase === 'success') {
-      return this.i18n.translate(this.nfcMode() === 'write'
-        ? 'nfc.write.success'
-        : 'nfc.connect.success');
+      return this.i18n.translate(`${mode}.success`);
     }
     if (phase === 'connecting') {
       return this.i18n.translate('nfc.connect.searching');
     }
-    return this.i18n.translate(this.nfcMode() === 'write'
-      ? 'nfc.write.prompt'
-      : 'nfc.connect.prompt');
+    if (phase === 'discovering') {
+      return this.i18n.translate('nfc.discover.searching');
+    }
+    /*
+     * Uma pulseira que não confirmou a vibração não pode ser identificada
+     * pelo gesto, pelo que a mensagem passa a apontar o nome e o endereço.
+     */
+    if (this.nfcMode() === 'discover' && !this.nearbyBandSignalling()) {
+      return this.i18n.translate('nfc.discover.promptWithoutSignal');
+    }
+    return this.i18n.translate(`${mode}.prompt`);
   }
 
   nfcStatusIcon(): string {
@@ -198,7 +283,20 @@ export class HomePage implements OnInit {
     if (this.nfc.phase() === 'error') {
       return 'alert-circle-outline';
     }
+    if (this.nfc.phase() === 'discovering') {
+      return 'search-outline';
+    }
     return 'radio-outline';
+  }
+
+  /** Identificação apresentada na modal enquanto a pulseira está a vibrar. */
+  nearbyBandLabel(): string {
+    const band = this.nearbyBand();
+    if (!band) {
+      return '';
+    }
+    const name = band.name?.trim();
+    return name ? name : this.i18n.translate('device.unknown');
   }
 
   /** Abre os detalhes apenas para a pulseira autenticada na sessão atual. */

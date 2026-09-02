@@ -40,6 +40,20 @@ declarar e se a MF91 tiver os contactos/sensores necessários.
 - confirmar que a fila não inicia duas operações demoradas em paralelo;
 - recolher logs nativos e capturas da interface para cada falha.
 
+## Registo NFC de pulseira próxima
+
+Com duas MF91 ligadas e sem sessão ativa na aplicação:
+
+- confirmar que a pulseira escolhida é a que está mais perto do telemóvel;
+- confirmar a vibração e o ecrã aceso apenas nessa pulseira;
+- escrever a etiqueta e voltar a lê-la com «Ligar por NFC»;
+- confirmar que a aplicação continua sem sessão depois do registo, sem
+  notificação de serviço nem sincronização de histórico;
+- repetir o registo numa segunda pulseira sem reiniciar a aplicação;
+- cancelar a operação durante a pesquisa e durante a espera pela etiqueta,
+  confirmando que a pulseira deixa de vibrar e fica desligada;
+- registar o comportamento quando o firmware não confirma a vibração.
+
 ## Critério de conclusão
 
 Um fluxo só é considerado validado quando existe evidência no dispositivo

@@ -90,10 +90,20 @@
       "searching": "Etiqueta leída. Buscando la pulsera indicada por Bluetooth…",
       "success": "La pulsera indicada por la etiqueta NFC está conectada."
     },
+    "discover": {
+      "title": "Registrar pulsera cercana",
+      "description": "Hace vibrar la pulsera con la señal más fuerte antes de escribir la etiqueta.",
+      "searching": "Buscando por Bluetooth la pulsera con la señal más fuerte…",
+      "prompt": "Acerque al teléfono la pulsera que vibró para registrarla en esta etiqueta NFC.",
+      "promptWithoutSignal": "No se pudo hacer vibrar esta pulsera. Confirme el nombre y la dirección mostrados antes de acercar la etiqueta NFC.",
+      "success": "La pulsera cercana quedó registrada en la etiqueta NFC.",
+      "signal": "Señal {{rssi}} dBm"
+    },
     "native": {
       "writePrompt": "Acerca la etiqueta para registrar esta pulsera.",
       "writeSuccess": "Pulsera registrada correctamente.",
-      "readPrompt": "Acerca la etiqueta registrada de la pulsera."
+      "readPrompt": "Acerca la etiqueta registrada de la pulsera.",
+      "discoverPrompt": "Acerque la etiqueta a la pulsera que vibró."
     },
     "errors": {
       "NFC_NOT_SUPPORTED": "Este teléfono no admite NFC.",
@@ -109,6 +119,9 @@
       "INVALID_BAND_MAC": "La dirección Bluetooth de la pulsera no es válida.",
       "BAND_NOT_FOUND": "No se encontró por Bluetooth la pulsera registrada. Comprueba que esté cerca y desconectada de otras aplicaciones.",
       "BLE_PERMISSION_DENIED": "Autoriza la búsqueda de dispositivos cercanos para conectar la pulsera.",
+      "NO_BAND_NEARBY": "No se encontró ninguna pulsera cerca. Acerque la pulsera al teléfono e inténtelo de nuevo.",
+      "PROVISIONING_SESSION_BUSY": "Finalice la sesión de la pulsera conectada antes de registrar otra pulsera.",
+      "BAND_SIGNAL_FAILED": "No se pudo preparar la pulsera encontrada. Confirme que está cerca y desconectada de otras aplicaciones.",
       "NFC_UNKNOWN_ERROR": "No se pudo completar la operación NFC. Inténtalo de nuevo."
     }
   },
@@ -366,6 +379,7 @@
     "cancel": "Cancelar",
     "registerNfc": "Registrar NFC",
     "connectNfc": "Conectar por NFC",
+    "registerNearbyNfc": "Registrar NFC de pulsera cercana",
     "scanBand": "Buscar pulsera",
     "scanAgain": "Buscar de nuevo",
     "changeDevice": "Cambiar dispositivo",

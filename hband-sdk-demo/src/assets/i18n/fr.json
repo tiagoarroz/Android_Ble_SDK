@@ -90,10 +90,20 @@
       "searching": "Tag lu. Recherche du bracelet indiqué par Bluetooth…",
       "success": "Le bracelet indiqué par le tag NFC est connecté."
     },
+    "discover": {
+      "title": "Enregistrer un bracelet proche",
+      "description": "Fait vibrer le bracelet au signal le plus fort avant d’écrire le tag.",
+      "searching": "Recherche par Bluetooth du bracelet au signal le plus fort…",
+      "prompt": "Approchez du téléphone le bracelet qui a vibré pour l’enregistrer sur ce tag NFC.",
+      "promptWithoutSignal": "Ce bracelet n’a pas pu être mis en vibration. Vérifiez le nom et l’adresse affichés avant d’approcher le tag NFC.",
+      "success": "Le bracelet proche est enregistré sur le tag NFC.",
+      "signal": "Signal {{rssi}} dBm"
+    },
     "native": {
       "writePrompt": "Approchez le tag pour enregistrer ce bracelet.",
       "writeSuccess": "Bracelet enregistré avec succès.",
-      "readPrompt": "Approchez le tag enregistré du bracelet."
+      "readPrompt": "Approchez le tag enregistré du bracelet.",
+      "discoverPrompt": "Approchez le tag du bracelet qui a vibré."
     },
     "errors": {
       "NFC_NOT_SUPPORTED": "Ce téléphone ne prend pas en charge le NFC.",
@@ -109,6 +119,9 @@
       "INVALID_BAND_MAC": "L’adresse Bluetooth du bracelet n’est pas valide.",
       "BAND_NOT_FOUND": "Le bracelet enregistré est introuvable par Bluetooth. Vérifiez qu’il est à proximité et déconnecté des autres applications.",
       "BLE_PERMISSION_DENIED": "Autorisez la recherche d’appareils à proximité pour connecter le bracelet.",
+      "NO_BAND_NEARBY": "Aucun bracelet n’a été trouvé à proximité. Rapprochez le bracelet du téléphone et réessayez.",
+      "PROVISIONING_SESSION_BUSY": "Terminez la session du bracelet connecté avant d’enregistrer un autre bracelet.",
+      "BAND_SIGNAL_FAILED": "Le bracelet trouvé n’a pas pu être préparé. Vérifiez qu’il est proche et déconnecté des autres applications.",
       "NFC_UNKNOWN_ERROR": "Impossible de terminer l’opération NFC. Réessayez."
     }
   },
@@ -366,6 +379,7 @@
     "cancel": "Annuler",
     "registerNfc": "Enregistrer NFC",
     "connectNfc": "Connecter par NFC",
+    "registerNearbyNfc": "Enregistrer le NFC d’un bracelet proche",
     "scanBand": "Rechercher un bracelet",
     "scanAgain": "Rechercher à nouveau",
     "changeDevice": "Changer d'appareil",

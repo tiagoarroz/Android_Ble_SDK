@@ -10,6 +10,7 @@ const MAC_ADDRESS_PATTERN = /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/;
 
 export type BandNfcPhase =
   | 'idle'
+  | 'discovering'
   | 'waitingRead'
   | 'waitingWrite'
   | 'connecting'
@@ -23,7 +24,9 @@ export class BandNfcService {
   readonly errorCode = signal<string | null>(null);
   readonly isNative = Capacitor.isNativePlatform();
 
-  readonly busy = () => ['waitingRead', 'waitingWrite', 'connecting'].includes(this.phase());
+  readonly busy = () => [
+    'discovering', 'waitingRead', 'waitingWrite', 'connecting',
+  ].includes(this.phase());
 
   /**
    * O texto NDEF é deliberadamente curto e versionado. O prefixo impede que
@@ -50,13 +53,21 @@ export class BandNfcService {
     return parts[2];
   }
 
-  async registerBand(macAddress: string): Promise<void> {
+  /**
+   * O texto do alerta nativo é parametrizável porque o registo de uma pulseira
+   * já ligada e o de uma pulseira apenas sinalizada pedem gestos diferentes à
+   * pessoa que aproxima a tag.
+   */
+  async registerBand(
+    macAddress: string,
+    alertMessageKey = 'nfc.native.writePrompt',
+  ): Promise<void> {
     this.begin('waitingWrite');
     try {
       await this.ensureAvailable();
       await BandNfc.write({
         text: this.encodeBand(macAddress),
-        alertMessage: this.i18n.translate('nfc.native.writePrompt'),
+        alertMessage: this.i18n.translate(alertMessageKey),
         successMessage: this.i18n.translate('nfc.native.writeSuccess'),
       });
       this.phase.set('success');
@@ -82,6 +93,12 @@ export class BandNfcService {
 
   markConnecting(): void {
     this.phase.set('connecting');
+    this.errorCode.set(null);
+  }
+
+  /** Assinala a pesquisa Bluetooth que precede o registo de uma pulseira. */
+  markDiscovering(): void {
+    this.phase.set('discovering');
     this.errorCode.set(null);
   }
 
@@ -136,6 +153,7 @@ export class BandNfcService {
       'NFC_CANCELLED', 'NFC_SESSION_INTERRUPTED', 'NFC_IO_ERROR',
       'INVALID_BAND_TAG', 'INVALID_BAND_MAC',
       'BAND_NOT_FOUND', 'BLE_PERMISSION_DENIED',
+      'NO_BAND_NEARBY', 'PROVISIONING_SESSION_BUSY', 'BAND_SIGNAL_FAILED',
     ].find((code) => raw.includes(code));
     this.errorCode.set(knownCode ?? 'NFC_UNKNOWN_ERROR');
     this.phase.set('error');

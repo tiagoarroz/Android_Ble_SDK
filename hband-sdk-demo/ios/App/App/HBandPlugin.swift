@@ -31,6 +31,14 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
     private var autoMonitoringSettings: [String: VPAutoMonitTestModel] = [:]
     private var legacyMonitoringStates: [String: Bool] = [:]
     private var pendingConnectCall: CAPPluginCall?
+    /*
+     * Sessão temporária usada apenas para identificar fisicamente uma pulseira
+     * que não pertence à sessão da aplicação. Nada aqui altera o estado, o
+     * dispositivo ou o arquivo publicados pela sessão normal.
+     */
+    private var provisioningAddress: String?
+    private var pendingProvisioningCall: CAPPluginCall?
+    private var provisioningSignalFallback: DispatchWorkItem?
     private var pendingPassword = "0000"
     private var lastRSSI: Int?
     private let isoFormatter = ISO8601DateFormatter()
@@ -121,7 +129,9 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("OPERATION_REQUIRED")
             return
         }
-        if !manager.isConnected && !operation.hasPrefix("session.") {
+        if !manager.isConnected
+            && !operation.hasPrefix("session.")
+            && !operation.hasPrefix("provisioning.") {
             call.reject("DEVICE_NOT_CONNECTED")
             return
         }
@@ -142,6 +152,10 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
             authenticateCurrentDevice(call: call, operation: operation)
         case "device.profile":
             syncProfile(call, operation: operation)
+        case "provisioning.signal.start":
+            startProvisioningSignal(call)
+        case "provisioning.signal.stop":
+            stopProvisioningSignal(call)
         case "device.rename":
             renameDevice(call, operation: operation)
         case "monitoring.read":
@@ -242,6 +256,194 @@ public final class HBandPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("DEVICE_RENAME_FAILED")
             }
         }
+    }
+
+    /**
+     * Liga e autentica temporariamente uma pulseira que não pertence à sessão
+     * da aplicação, apenas para a mandar vibrar. `connectionState` e
+     * `connectedDevice` não são alterados, pelo que a interface continua a
+     * apresentar exatamente a sessão que existia antes do registo.
+     */
+    private func startProvisioningSignal(_ call: CAPPluginCall) {
+        guard !manager.isConnected, pendingProvisioningCall == nil else {
+            call.reject("PROVISIONING_SESSION_BUSY")
+            return
+        }
+        let params = call.getObject("params")
+        guard let deviceID = params?["deviceId"] as? String, !deviceID.isEmpty else {
+            call.reject("DEVICE_ID_REQUIRED")
+            return
+        }
+        guard let device = devices[deviceID] else {
+            call.reject("DEVICE_NOT_FOUND")
+            return
+        }
+        let password = params?["password"] as? String ?? "0000"
+        manager.veepooSDKStopScanDevice()
+        provisioningAddress = deviceID
+        pendingProvisioningCall = call
+        emitLog(
+            level: "info",
+            message: "Provisioning session opening for \(deviceID)",
+            operation: "provisioning.signal.start"
+        )
+        manager.veepooSDKConnectDevice(device) { [weak self] state in
+            guard let self else { return }
+            switch state {
+            case .BleConnectSuccess:
+                self.authenticateProvisioningDevice(deviceID, password: password)
+            case .BleConnecting, .BleVerifyPasswordSuccess:
+                /*
+                 * A sinalização é iniciada apenas pelo resultado da própria
+                 * verificação de password, evitando duas sequências para o
+                 * mesmo pedido.
+                 */
+                break
+            default:
+                self.failProvisioningSignal("BAND_SIGNAL_FAILED: state \(state.rawValue)")
+            }
+        }
+    }
+
+    private func authenticateProvisioningDevice(_ address: String, password: String) {
+        manager.veepooSDKSynchronousPassword(
+            with: .VerifyPasswordType,
+            password: password
+        ) { [weak self] result in
+            guard let self else { return }
+            if result.rawValue == 1 || result.rawValue == 6 {
+                self.signalProvisioningDevice(address)
+            } else {
+                self.failProvisioningSignal("BAND_SIGNAL_FAILED: password \(result.rawValue)")
+            }
+        }
+    }
+
+    /**
+     * Pede a vibração e o ecrã aceso da pulseira encontrada. O comando é
+     * enviado mesmo quando a capacidade não foi anunciada, porque o próprio
+     * SDK responde com o estado de função não suportada.
+     */
+    private func signalProvisioningDevice(_ address: String) {
+        guard pendingProvisioningCall != nil else {
+            return
+        }
+        let capabilitySupported = (manager.peripheralModel?.searchDeviceFunction ?? 0) > 0
+        let fallback = DispatchWorkItem { [weak self] in
+            self?.resolveProvisioningSignal(
+                address,
+                signalling: false,
+                findSupported: capabilitySupported
+            )
+        }
+        provisioningSignalFallback = fallback
+        manager.peripheralManage.veepooSDK_searchDeviceFuntion(withState: true) {
+            [weak self] _, state in
+            guard let self else { return }
+            switch state {
+            case .unsupported:
+                self.resolveProvisioningSignal(address, signalling: false, findSupported: false)
+            case .enter:
+                self.resolveProvisioningSignal(address, signalling: true, findSupported: true)
+            default:
+                self.resolveProvisioningSignal(
+                    address,
+                    signalling: false,
+                    findSupported: capabilitySupported
+                )
+            }
+        }
+        /*
+         * O comando já foi entregue à pulseira. Sem nenhum estado de procura,
+         * a sessão continua utilizável para escrever a etiqueta e a interface
+         * passa a pedir a confirmação pelo endereço apresentado.
+         */
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: fallback)
+    }
+
+    private func resolveProvisioningSignal(
+        _ address: String,
+        signalling: Bool,
+        findSupported: Bool
+    ) {
+        provisioningSignalFallback?.cancel()
+        provisioningSignalFallback = nil
+        guard let call = pendingProvisioningCall else {
+            return
+        }
+        pendingProvisioningCall = nil
+        emitLog(
+            level: signalling ? "success" : "warning",
+            message: signalling
+                ? "Provisioning band \(address) is signalling"
+                : "Provisioning band \(address) did not confirm signalling",
+            operation: "provisioning.signal.start"
+        )
+        call.resolve([
+            "operation": "provisioning.signal.start",
+            "accepted": true,
+            "data": [
+                "deviceId": address,
+                "signalling": signalling,
+                "findSupported": findSupported
+            ]
+        ])
+    }
+
+    private func failProvisioningSignal(_ message: String) {
+        provisioningSignalFallback?.cancel()
+        provisioningSignalFallback = nil
+        let call = pendingProvisioningCall
+        pendingProvisioningCall = nil
+        emitLog(level: "error", message: message, operation: "provisioning.signal.start")
+        releaseProvisioningSession()
+        call?.reject(message)
+    }
+
+    /**
+     * Termina a vibração e a sessão temporária. A camada Angular executa esta
+     * operação em qualquer desfecho, incluindo cancelamento ou falha da
+     * etiqueta, para não deixar a pulseira ligada nem a sinalizar.
+     */
+    private func stopProvisioningSignal(_ call: CAPPluginCall) {
+        provisioningSignalFallback?.cancel()
+        provisioningSignalFallback = nil
+        if let pending = pendingProvisioningCall {
+            /*
+             * A fila Angular impede que este comando chegue durante um pedido
+             * de sinalização em curso. Uma chamada que ainda esteja pendente
+             * ficou sem callback do SDK e é encerrada aqui, para que a próxima
+             * tentativa não seja recusada como sessão ocupada.
+             */
+            pendingProvisioningCall = nil
+            pending.reject("BAND_SIGNAL_FAILED: session released before completing")
+        }
+        guard provisioningAddress != nil else {
+            accept(call, operation: "provisioning.signal.stop")
+            return
+        }
+        if manager.isConnected {
+            manager.peripheralManage.veepooSDK_searchDeviceFuntion(withState: false) { _, _ in }
+        }
+        releaseProvisioningSession()
+        /*
+         * O corte não depende do callback do comando de procura: a sessão
+         * termina com a desconexão pedida imediatamente a seguir.
+         */
+        accept(call, operation: "provisioning.signal.stop")
+    }
+
+    private func releaseProvisioningSession() {
+        guard provisioningAddress != nil else {
+            return
+        }
+        provisioningAddress = nil
+        manager.veepooSDKDisconnectDevice()
+        emitLog(
+            level: "info",
+            message: "Provisioning session closed",
+            operation: "provisioning.signal.stop"
+        )
     }
 
     private func handleConnectionState(_ state: DeviceConnectState) {

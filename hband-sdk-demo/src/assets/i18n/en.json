@@ -90,10 +90,20 @@
       "searching": "Tag read. Searching for the specified bracelet over Bluetooth…",
       "success": "The bracelet specified by the NFC tag is connected."
     },
+    "discover": {
+      "title": "Register nearby band",
+      "description": "Vibrates the band with the strongest signal before writing the tag.",
+      "searching": "Searching over Bluetooth for the band with the strongest signal…",
+      "prompt": "Hold the band that vibrated against the phone to register it on this NFC tag.",
+      "promptWithoutSignal": "This band could not be made to vibrate. Check the name and address shown before holding the NFC tag close.",
+      "success": "The nearby band was registered on the NFC tag.",
+      "signal": "Signal {{rssi}} dBm"
+    },
     "native": {
       "writePrompt": "Hold the tag near the phone to register this bracelet.",
       "writeSuccess": "Bracelet registered successfully.",
-      "readPrompt": "Hold the registered bracelet tag near the phone."
+      "readPrompt": "Hold the registered bracelet tag near the phone.",
+      "discoverPrompt": "Hold the tag close to the band that vibrated."
     },
     "errors": {
       "NFC_NOT_SUPPORTED": "This phone does not support NFC.",
@@ -109,6 +119,9 @@
       "INVALID_BAND_MAC": "The bracelet Bluetooth address is invalid.",
       "BAND_NOT_FOUND": "The registered bracelet was not found over Bluetooth. Make sure it is nearby and disconnected from other apps.",
       "BLE_PERMISSION_DENIED": "Allow nearby device scanning to connect the bracelet.",
+      "NO_BAND_NEARBY": "No band was found nearby. Move the band closer to the phone and try again.",
+      "PROVISIONING_SESSION_BUSY": "End the connected band session before registering another band.",
+      "BAND_SIGNAL_FAILED": "The band that was found could not be prepared. Check that it is close and disconnected from other apps.",
       "NFC_UNKNOWN_ERROR": "The NFC operation could not be completed. Try again."
     }
   },
@@ -366,6 +379,7 @@
     "cancel": "Cancel",
     "registerNfc": "Register NFC",
     "connectNfc": "Connect via NFC",
+    "registerNearbyNfc": "Register nearby band NFC",
     "scanBand": "Scan for bracelet",
     "scanAgain": "Scan again",
     "changeDevice": "Change device",

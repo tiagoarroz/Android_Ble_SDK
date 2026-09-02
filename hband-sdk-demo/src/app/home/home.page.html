@@ -99,6 +99,21 @@
           </div>
         }
       </aside>
+      @if (!hband.connected()) {
+        <div class="band-provisioning">
+          <ion-button
+            class="band-provisioning__action"
+            expand="block"
+            fill="clear"
+            [disabled]="nfc.busy()"
+            (click)="registerNearbyBandNfc()"
+          >
+            <ion-icon slot="start" name="search-outline"></ion-icon>
+            {{ i18n.translate('actions.registerNearbyNfc') }}
+          </ion-button>
+          <small>{{ i18n.translate('nfc.discover.description') }}</small>
+        </div>
+      }
     </section>
 
     <div class="section-heading">
@@ -207,6 +222,7 @@
 
 <ion-modal
   class="nfc-modal"
+  [class.nfc-modal--discover]="nfcMode() === 'discover'"
   [isOpen]="nfcModalOpen()"
   [backdropDismiss]="false"
   (didDismiss)="onNfcModalDismiss()"
@@ -232,6 +248,18 @@
         </span>
         <h2>{{ nfcTitle() }}</h2>
         <p>{{ nfcDescription() }}</p>
+        @if (nfcMode() === 'discover' && nearbyBand(); as band) {
+          <div class="nfc-session__band" [class.is-signalling]="nearbyBandSignalling()">
+            <ion-icon [name]="nearbyBandSignalling() ? 'flash-outline' : 'watch-outline'"></ion-icon>
+            <div>
+              <strong>{{ nearbyBandLabel() }}</strong>
+              <span>{{ band.id }}</span>
+              @if (band.rssi !== undefined) {
+                <small>{{ i18n.translate('nfc.discover.signal', { rssi: band.rssi }) }}</small>
+              }
+            </div>
+          </div>
+        }
         <div class="nfc-session__hint">
           <ion-icon name="information-circle-outline"></ion-icon>
           <span>{{ i18n.translate('nfc.hint') }}</span>

@@ -4,9 +4,9 @@ import { Capacitor } from '@capacitor/core';
 import { HBand } from './hband.plugin';
 import { HistoryRepositoryService } from './history-repository.service';
 import type {
-  HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord, HBandLogEntry,
-  HBandHistoryState, HBandMonitoringSetting, HBandReadingSource, HBandStatus,
-  HBandSyncStatus, MetricId,
+  HBandBandSignal, HBandBatteryStatus, HBandDataEvent, HBandDevice, HBandHistoryRecord,
+  HBandLogEntry, HBandHistoryState, HBandMonitoringSetting, HBandReadingSource,
+  HBandStatus, HBandSyncStatus, MetricId,
 } from './hband.types';
 
 const INITIAL_STATUS: HBandStatus = {
@@ -22,6 +22,16 @@ const HISTORY_DEVICE_KEY = 'hband-history-device';
 const BATTERY_REFRESH_INTERVAL_MS = 60_000;
 const CONTROL_OPERATION_TIMEOUT_MS = 10_000;
 const HISTORY_OPERATION_TIMEOUT_MS = 45_000;
+/*
+ * Uma sessão temporária de registo inclui ligação, autenticação e o comando de
+ * vibração, pelo que precisa da mesma folga concedida às leituras longas.
+ */
+const PROVISIONING_OPERATION_TIMEOUT_MS = 45_000;
+/*
+ * O RSSI só é comparável depois de recolher anúncios de todas as pulseiras
+ * próximas durante a mesma janela.
+ */
+const NEARBY_SCAN_WINDOW_MS = 6_000;
 const CATALOG_METRICS: MetricId[] = [
   'steps', 'heartRate', 'bloodPressure', 'oxygen', 'temperature',
   'bloodGlucose', 'ecg', 'bodyComposition', 'stress',
@@ -194,6 +204,53 @@ export class HBandService {
       throw new Error('BAND_NOT_FOUND');
     }
     await this.connect(discoveredDevice.id, password);
+  }
+
+  /**
+   * Recolhe anúncios durante uma janela fixa e devolve a pulseira com o sinal
+   * mais forte. Não inicia sessão: o registo por NFC de uma pulseira alheia
+   * precisa apenas de a identificar antes de a fazer vibrar.
+   */
+  async findStrongestBand(windowMs = NEARBY_SCAN_WINDOW_MS): Promise<HBandDevice | undefined> {
+    await this.scan();
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, windowMs);
+    });
+    if (!this.simulation()) {
+      try {
+        await HBand.stopScan();
+      } catch {
+        // A pesquisa pode já ter terminado pelo timeout do próprio SDK.
+      }
+    }
+    /*
+     * A lista é conservada por ordem decrescente de RSSI em `upsertDevice`,
+     * pelo que a primeira entrada é a pulseira mais próxima do telemóvel.
+     */
+    return this.devices()[0];
+  }
+
+  /**
+   * Liga e autentica temporariamente uma pulseira apenas para a fazer vibrar.
+   * A bridge não publica o estado `connected`, não inicia o serviço de sessão
+   * e não altera o arquivo local, para que a pulseira ligada — ou a ausência
+   * dela — se mantenha exatamente como estava antes do registo.
+   */
+  async startBandSignal(deviceId: string, password = '0000'): Promise<HBandBandSignal> {
+    const result = await this.executeForResult('provisioning.signal.start', {
+      deviceId,
+      password,
+    });
+    return {
+      deviceId: typeof result?.['deviceId'] === 'string' ? result['deviceId'] : deviceId,
+      signalling: result?.['signalling'] === true,
+      findSupported: result?.['findSupported'] === true,
+    };
+  }
+
+  /** Para a vibração e termina a sessão temporária, mesmo que já tenha caído. */
+  async stopBandSignal(): Promise<void> {
+    await this.execute('provisioning.signal.stop');
   }
 
   async disconnect(): Promise<void> {
@@ -419,6 +476,18 @@ export class HBandService {
    * concorrentes sobre a mesma pulseira.
    */
   execute(operation: string, params: Record<string, unknown> = {}): Promise<void> {
+    return this.executeForResult(operation, params).then(() => undefined);
+  }
+
+  /**
+   * Igual a `execute`, mas conserva o payload devolvido pela bridge. Só as
+   * operações que precisam de uma resposta imediata, e não de um evento de
+   * dados, usam esta variante.
+   */
+  executeForResult(
+    operation: string,
+    params: Record<string, unknown> = {},
+  ): Promise<Record<string, unknown> | undefined> {
     const task = async () => {
       const metric = this.metricForOperation(operation, params);
       if (metric) {
@@ -435,11 +504,9 @@ export class HBandService {
         kind: 'operation',
       });
       try {
-        if (this.simulation()) {
-          this.simulateOperation(operation, params);
-        } else {
-          await this.executeNativeWithTimeout(operation, params);
-        }
+        const result = this.simulation()
+          ? this.simulateOperation(operation, params)
+          : await this.executeNativeWithTimeout(operation, params);
         this.appendLog({
           id: this.nextLogId(operation),
           timestamp: new Date().toISOString(),
@@ -449,6 +516,7 @@ export class HBandService {
           metric,
           kind: 'operation',
         });
+        return result;
       } catch (error) {
         this.fail(operation, error, metric);
         throw error;
@@ -457,7 +525,7 @@ export class HBandService {
       }
     };
     this.queue = this.queue.then(task, task);
-    return this.queue.then(() => undefined);
+    return this.queue as Promise<Record<string, unknown> | undefined>;
   }
 
   /**
@@ -468,10 +536,8 @@ export class HBandService {
   private executeNativeWithTimeout(
     operation: string,
     params: Record<string, unknown>,
-  ): Promise<void> {
-    const timeoutMs = operation.startsWith('history.')
-      ? HISTORY_OPERATION_TIMEOUT_MS
-      : CONTROL_OPERATION_TIMEOUT_MS;
+  ): Promise<Record<string, unknown> | undefined> {
+    const timeoutMs = this.operationTimeout(operation);
     return new Promise((resolve, reject) => {
       let settled = false;
       const timeout = setTimeout(() => {
@@ -482,13 +548,13 @@ export class HBandService {
         reject(new HBandOperationTimeoutError(operation, timeoutMs));
       }, timeoutMs);
       void this.nativeExecute(operation, params).then(
-        () => {
+        (result) => {
           if (settled) {
             return;
           }
           settled = true;
           clearTimeout(timeout);
-          resolve();
+          resolve(result?.data);
         },
         (error) => {
           if (settled) {
@@ -500,6 +566,16 @@ export class HBandService {
         },
       );
     });
+  }
+
+  private operationTimeout(operation: string): number {
+    if (operation.startsWith('history.')) {
+      return HISTORY_OPERATION_TIMEOUT_MS;
+    }
+    if (operation.startsWith('provisioning.')) {
+      return PROVISIONING_OPERATION_TIMEOUT_MS;
+    }
+    return CONTROL_OPERATION_TIMEOUT_MS;
   }
 
   private isOperationTimeout(error: unknown): boolean {
@@ -1102,7 +1178,10 @@ export class HBandService {
     this.battery.set({ percent: 82, lowBattery: false, updatedAt: new Date().toISOString() });
   }
 
-  private simulateOperation(operation: string, params: Record<string, unknown>): void {
+  private simulateOperation(
+    operation: string,
+    params: Record<string, unknown>,
+  ): Record<string, unknown> | undefined {
     const now = new Date().toISOString();
     const live: Record<string, HBandDataEvent> = {
       'measure.heartRate.start': { type: 'heartRate', metric: 'heartRate', timestamp: now, values: { bpm: 74 }, samples: [69, 71, 73, 72, 75, 77, 74] },
@@ -1190,10 +1269,21 @@ export class HBandService {
       }
       return;
     }
+    if (operation === 'provisioning.signal.start') {
+      return {
+        deviceId: String(params['deviceId'] ?? ''),
+        signalling: true,
+        findSupported: true,
+      };
+    }
+    if (operation === 'provisioning.signal.stop') {
+      return undefined;
+    }
     const event = live[operation];
     if (event) {
       this.storeData(event);
     }
+    return undefined;
   }
 
   private simulatedHistory(metric: MetricId, date: string): HBandHistoryRecord[] {

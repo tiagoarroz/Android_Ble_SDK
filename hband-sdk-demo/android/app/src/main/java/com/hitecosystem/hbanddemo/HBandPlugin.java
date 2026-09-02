@@ -47,6 +47,7 @@ import com.veepoo.protocol.listener.data.IECGDetectListener;
 import com.veepoo.protocol.listener.data.IECGReadDataListener;
 import com.veepoo.protocol.listener.data.IECGReadIdListener;
 import com.veepoo.protocol.listener.data.IFatigueDataListener;
+import com.veepoo.protocol.listener.data.IFindDevicelistener;
 import com.veepoo.protocol.listener.data.IGsrDetectListener;
 import com.veepoo.protocol.listener.data.IHeartDataListener;
 import com.veepoo.protocol.listener.data.IOriginDataListener;
@@ -174,6 +175,16 @@ public class HBandPlugin extends Plugin {
         null
     );
     private String connectionState = "idle";
+    /*
+     * Endereço de uma sessão temporária usada apenas para identificar
+     * fisicamente uma pulseira que não pertence à sessão da aplicação. Enquanto
+     * estiver preenchido, a religação automática e o serviço de sessão ficam
+     * deliberadamente inativos.
+     */
+    private String provisioningAddress;
+    private PluginCall pendingProvisioningCall;
+    private final Handler provisioningHandler = new Handler(Looper.getMainLooper());
+    private Runnable provisioningSignalFallback;
     private String currentAddress;
     private String currentName;
     private String currentConnectionName;
@@ -471,6 +482,254 @@ public class HBandPlugin extends Plugin {
     }
 
     /**
+     * Liga e autentica temporariamente uma pulseira que não pertence à sessão
+     * da aplicação, apenas para a mandar vibrar. Nada nesta sequência publica
+     * o estado `connected`, inicia o serviço de sessão ou conserva a pulseira:
+     * o registo por NFC precisa somente de a identificar fisicamente.
+     */
+    private void startProvisioningSignal(PluginCall call) {
+        if (manager.isCurrentDeviceConnected() || pendingProvisioningCall != null) {
+            call.reject("PROVISIONING_SESSION_BUSY");
+            return;
+        }
+        JSObject params = call.getObject("params");
+        String requestedId = params == null ? null : params.getString("deviceId");
+        if (requestedId == null || requestedId.trim().isEmpty()) {
+            call.reject("DEVICE_ID_REQUIRED");
+            return;
+        }
+        final String deviceId = requestedId.trim();
+        final String password = params.getString("password", "0000");
+        SearchResult discovered = discoveredDevices.get(deviceId);
+        String discoveredName = discovered == null ? null : cleanMetadata(discovered.getName());
+        /*
+         * O SDK exige um identificador na ligação; um endereço sem nome
+         * anunciado continua a servir esse parâmetro técnico.
+         */
+        final String connectionName = discoveredName != null ? discoveredName : deviceId;
+        provisioningAddress = deviceId;
+        pendingProvisioningCall = call;
+        manager.stopScanDevice();
+        emitLog("info", "Provisioning session opening for " + deviceId, "provisioning.signal.start");
+        manager.connectDevice(deviceId, connectionName, new IConnectResponse() {
+            @Override
+            public void connectState(int code, BleGattProfile profile, boolean isOadModel) {
+                if (code != Code.REQUEST_SUCCESS) {
+                    failProvisioningSignal("BAND_SIGNAL_FAILED: connect " + code);
+                }
+            }
+        }, new INotifyResponse() {
+            @Override
+            public void notifyState(int state) {
+                if (state != Code.REQUEST_SUCCESS) {
+                    failProvisioningSignal("BAND_SIGNAL_FAILED: notify " + state);
+                    return;
+                }
+                authenticateProvisioningDevice(deviceId, password);
+            }
+        });
+    }
+
+    /**
+     * Autentica a pulseira temporária sem tocar nas capacidades, na versão de
+     * firmware ou no estado guardados para a sessão normal da aplicação.
+     */
+    private void authenticateProvisioningDevice(String address, String password) {
+        final AtomicBoolean findUnsupported = new AtomicBoolean(false);
+        manager.confirmDevicePwd(writeResponse, new IPwdDataListener() {
+            @Override
+            public void onPwdDataChange(PwdData pwdData) {
+                EPwdStatus status = pwdData.getmStatus();
+                if (status == EPwdStatus.CHECK_FAIL || status == EPwdStatus.SETTING_FAIL) {
+                    failProvisioningSignal("BAND_SIGNAL_FAILED: password");
+                    return;
+                }
+                signalProvisioningDevice(address, !findUnsupported.get());
+            }
+
+            @Override
+            public void onConnectionConfirmTimeout() {
+                failProvisioningSignal("BAND_SIGNAL_FAILED: confirm timeout");
+            }
+        }, new IDeviceFuctionDataListener() {
+            @Override
+            public void onFunctionSupportDataChange(FunctionDeviceSupportData data) {
+                /*
+                 * Estas capacidades pertencem a uma pulseira alheia e não
+                 * substituem as publicadas pela sessão atual. Só o suporte de
+                 * vibração é conservado, e apenas quando o firmware o nega
+                 * explicitamente, porque o pacote pode chegar depois da
+                 * confirmação da password.
+                 */
+                findUnsupported.set(data.getFindDeviceByPhone() == EFunctionStatus.UNSUPPORT);
+            }
+
+            @Override public void onDeviceFunctionPackage1Report(DeviceFunctionPackage1 data) {}
+            @Override public void onDeviceFunctionPackage2Report(DeviceFunctionPackage2 data) {}
+            @Override public void onDeviceFunctionPackage3Report(DeviceFunctionPackage3 data) {}
+            @Override public void onDeviceFunctionPackage4Report(DeviceFunctionPackage4 data) {}
+            @Override public void onDeviceFunctionPackage5Report(DeviceFunctionPackage5 data) {}
+        }, new ISocialMsgDataListener() {
+            @Override public void onSocialMsgSupportDataChange(FunctionSocailMsgData data) {}
+            @Override public void onSocialMsgSupportDataChange2(FunctionSocailMsgData data) {}
+        }, password, true);
+    }
+
+    /**
+     * Pede a vibração e o ecrã aceso da pulseira encontrada. O comando é
+     * enviado mesmo quando a capacidade não foi anunciada: o próprio SDK
+     * responde `unSupportFindDeviceByPhone` nesse caso.
+     */
+    private void signalProvisioningDevice(String address, boolean capabilitySupported) {
+        final AtomicBoolean findSupported = new AtomicBoolean(capabilitySupported);
+        provisioningSignalFallback = () -> resolveProvisioningSignal(
+            address,
+            false,
+            findSupported.get()
+        );
+        manager.startFindDeviceByPhone(writeResponse, new IFindDevicelistener() {
+            @Override
+            public void unSupportFindDeviceByPhone() {
+                findSupported.set(false);
+                resolveProvisioningSignal(address, false, false);
+            }
+
+            @Override
+            public void findedDevice() {
+                resolveProvisioningSignal(address, true, true);
+            }
+
+            @Override
+            public void unFindDevice() {
+                resolveProvisioningSignal(address, false, findSupported.get());
+            }
+
+            @Override
+            public void findingDevice() {
+                resolveProvisioningSignal(address, true, true);
+            }
+        });
+        /*
+         * A escrita já foi entregue à pulseira. Se o SDK não publicar nenhum
+         * estado de procura, a sessão continua utilizável para escrever a
+         * etiqueta e a interface passa a pedir a confirmação pelo endereço em
+         * vez de pedir a pulseira que vibrou.
+         */
+        provisioningHandler.postDelayed(provisioningSignalFallback, 2_500L);
+    }
+
+    private void resolveProvisioningSignal(
+        String address,
+        boolean signalling,
+        boolean findSupported
+    ) {
+        if (provisioningSignalFallback != null) {
+            provisioningHandler.removeCallbacks(provisioningSignalFallback);
+            provisioningSignalFallback = null;
+        }
+        PluginCall call = pendingProvisioningCall;
+        pendingProvisioningCall = null;
+        if (call == null) {
+            return;
+        }
+        JSObject data = new JSObject();
+        data.put("deviceId", address);
+        data.put("signalling", signalling);
+        data.put("findSupported", findSupported);
+        JSObject result = new JSObject();
+        result.put("operation", "provisioning.signal.start");
+        result.put("accepted", true);
+        result.put("data", data);
+        emitLog(
+            signalling ? "success" : "warning",
+            "Provisioning band " + address + (signalling ? " is signalling" : " did not confirm signalling"),
+            "provisioning.signal.start"
+        );
+        call.resolve(result);
+    }
+
+    private void failProvisioningSignal(String message) {
+        if (provisioningSignalFallback != null) {
+            provisioningHandler.removeCallbacks(provisioningSignalFallback);
+            provisioningSignalFallback = null;
+        }
+        PluginCall call = pendingProvisioningCall;
+        pendingProvisioningCall = null;
+        emitLog("error", message, "provisioning.signal.start");
+        releaseProvisioningSession();
+        if (call != null) {
+            call.reject(message);
+        }
+    }
+
+    /**
+     * Termina a vibração e a sessão temporária. É sempre executada pela
+     * camada Angular, incluindo depois de um cancelamento ou de uma falha na
+     * etiqueta, para que a pulseira não fique ligada nem a sinalizar.
+     */
+    private void stopProvisioningSignal(PluginCall call) {
+        if (provisioningSignalFallback != null) {
+            provisioningHandler.removeCallbacks(provisioningSignalFallback);
+            provisioningSignalFallback = null;
+        }
+        if (pendingProvisioningCall != null) {
+            /*
+             * A fila Angular impede que este comando chegue durante um pedido
+             * de sinalização em curso. Uma chamada que ainda esteja pendente
+             * ficou sem callback do SDK e é encerrada aqui, para que a próxima
+             * tentativa não seja recusada como sessão ocupada.
+             */
+            PluginCall pending = pendingProvisioningCall;
+            pendingProvisioningCall = null;
+            pending.reject("BAND_SIGNAL_FAILED: session released before completing");
+        }
+        if (provisioningAddress == null) {
+            accept(call, "provisioning.signal.stop");
+            return;
+        }
+        if (manager.isCurrentDeviceConnected()) {
+            try {
+                manager.stopFindDeviceByPhone(writeResponse, new IFindDevicelistener() {
+                    @Override public void unSupportFindDeviceByPhone() {}
+                    @Override public void findedDevice() {}
+                    @Override public void unFindDevice() {}
+                    @Override public void findingDevice() {}
+                });
+            } catch (RuntimeException error) {
+                emitLog("warning", "Stop find device failed: " + error, "provisioning.signal.stop");
+            }
+        }
+        releaseProvisioningSession();
+        /*
+         * O corte não depende de um callback do comando de procura: a sessão
+         * termina com a desconexão, que é pedida imediatamente a seguir.
+         */
+        accept(call, "provisioning.signal.stop");
+    }
+
+    private void releaseProvisioningSession() {
+        final String releasing = provisioningAddress;
+        if (releasing == null) {
+            return;
+        }
+        manager.disconnectWatch(code -> emitLog(
+            "info",
+            "Provisioning session closed: " + code,
+            "provisioning.signal.stop"
+        ));
+        /*
+         * O endereço é conservado por um instante depois do pedido de corte
+         * para que um evento tardio desta pulseira não seja confundido com a
+         * queda da sessão normal da aplicação.
+         */
+        provisioningHandler.postDelayed(() -> {
+            if (releasing.equals(provisioningAddress)) {
+                provisioningAddress = null;
+            }
+        }, 1_500L);
+    }
+
+    /**
      * Encaminha apenas contratos cujos parâmetros foram confirmados no demo oficial.
      */
     @PluginMethod
@@ -480,7 +739,11 @@ public class HBandPlugin extends Plugin {
             call.reject("OPERATION_REQUIRED");
             return;
         }
-        if (!manager.isCurrentDeviceConnected() && !operation.startsWith("session.")) {
+        if (
+            !manager.isCurrentDeviceConnected()
+            && !operation.startsWith("session.")
+            && !operation.startsWith("provisioning.")
+        ) {
             call.reject("DEVICE_NOT_CONNECTED");
             return;
         }
@@ -505,6 +768,12 @@ public class HBandPlugin extends Plugin {
                 return;
             case "device.profile":
                 syncProfile(call);
+                return;
+            case "provisioning.signal.start":
+                startProvisioningSignal(call);
+                return;
+            case "provisioning.signal.stop":
+                stopProvisioningSignal(call);
                 return;
             case "device.rename":
                 renameDevice(call);
@@ -2291,6 +2560,14 @@ public class HBandPlugin extends Plugin {
     private final IABleConnectStatusListener connectStatusListener = new IABleConnectStatusListener() {
         @Override
         public void onConnectStatusChanged(String mac, int status) {
+            /*
+             * Uma sessão temporária de registo usa o mesmo canal do SDK. Os
+             * seus eventos nunca devem alterar o estado publicado da sessão
+             * normal nem acionar a religação automática.
+             */
+            if (provisioningAddress != null && provisioningAddress.equalsIgnoreCase(mac)) {
+                return;
+            }
             if (status == Constants.STATUS_CONNECTED) {
                 if (!"connected".equals(connectionState) && !"authenticating".equals(connectionState)) {
                     setConnectionState("connecting");
@@ -2309,7 +2586,7 @@ public class HBandPlugin extends Plugin {
      * ligação quando a pulseira fica temporariamente fora de alcance.
      */
     private void scheduleReconnect() {
-        if (intentionalDisconnect || currentAddress == null) {
+        if (intentionalDisconnect || currentAddress == null || provisioningAddress != null) {
             return;
         }
         long delayMs = Math.min(30_000L, 3_000L * (1L << Math.min(reconnectAttempts, 3)));

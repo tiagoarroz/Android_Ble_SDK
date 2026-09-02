@@ -2,7 +2,7 @@ import {
   ComponentFixture, TestBed, fakeAsync, flushMicrotasks, tick,
 } from '@angular/core/testing';
 
-import type { HBandDataEvent } from '../core/hband.types';
+import type { HBandBandSignal, HBandDataEvent } from '../core/hband.types';
 import { HomePage } from './home.page';
 
 describe('HomePage', () => {
@@ -647,6 +647,145 @@ describe('HomePage', () => {
     expect(component.historyMetadata()).toContain('histórico de ECG');
     expect(component.historyStatusIcon()).toBe('close-circle-outline');
   });
+
+  it('should signal the strongest band before writing its tag and always release it', async () => {
+    const order: string[] = [];
+    spyOn(component.hband, 'findStrongestBand').and.callFake(async () => {
+      order.push('scan');
+      return { id: '1B:F0:06:E2:86:FC', name: 'MF91', rssi: -42 };
+    });
+    spyOn(component.hband, 'startBandSignal').and.callFake(async (deviceId: string) => {
+      order.push('signal');
+      return { deviceId, signalling: true, findSupported: true };
+    });
+    spyOn(component.hband, 'stopBandSignal').and.callFake(async () => {
+      order.push('stop');
+    });
+    const write = spyOn(component.nfc, 'registerBand').and.callFake(async () => {
+      order.push('write');
+      component.nfc.markSuccess();
+    });
+
+    await component.registerNearbyBandNfc();
+
+    expect(order).toEqual(['scan', 'signal', 'write', 'stop']);
+    expect(write).toHaveBeenCalledWith('1B:F0:06:E2:86:FC', 'nfc.native.discoverPrompt');
+    expect(component.nearbyBand()?.id).toBe('1B:F0:06:E2:86:FC');
+    expect(component.nearbyBandSignalling()).toBeTrue();
+  });
+
+  it('should report an empty search without opening an NFC session', async () => {
+    spyOn(component.hband, 'findStrongestBand').and.resolveTo(undefined);
+    const signal = spyOn(component.hband, 'startBandSignal');
+    const write = spyOn(component.nfc, 'registerBand');
+
+    await component.registerNearbyBandNfc();
+
+    expect(signal).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
+    expect(component.nfc.errorCode()).toBe('NO_BAND_NEARBY');
+    expect(component.nfcDescription()).toContain('Não foi encontrada nenhuma pulseira');
+  });
+
+  it('should abandon a registration cancelled during the Bluetooth search', async () => {
+    spyOn(component.hband, 'findStrongestBand').and.callFake(async () => {
+      component.closeNfcModal();
+      return { id: '1B:F0:06:E2:86:FC', name: 'MF91' };
+    });
+    const signal = spyOn(component.hband, 'startBandSignal');
+    const stop = spyOn(component.hband, 'stopBandSignal');
+    const write = spyOn(component.nfc, 'registerBand');
+
+    await component.registerNearbyBandNfc();
+
+    expect(signal).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
+    expect(stop).not.toHaveBeenCalled();
+  });
+
+  it('should ask for confirmation by address when the vibration is not confirmed', async () => {
+    spyOn(component.hband, 'findStrongestBand').and.resolveTo({
+      id: 'AA:BB:CC:DD:EE:FF',
+      name: 'MF91',
+    });
+    spyOn(component.hband, 'startBandSignal').and.resolveTo({
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      signalling: false,
+      findSupported: false,
+    });
+    spyOn(component.hband, 'stopBandSignal').and.resolveTo();
+    // Reproduz a transição de fase que a escrita real faz ao esperar pela tag.
+    spyOn(component.nfc, 'registerBand').and.callFake(async () => {
+      component.nfc.phase.set('waitingWrite');
+    });
+
+    await component.registerNearbyBandNfc();
+
+    expect(component.nearbyBandSignalling()).toBeFalse();
+    expect(component.nfcDescription()).toContain('Confirme o nome e o endereço');
+  });
+
+  it('should keep the bridge payload of a provisioning session', fakeAsync(() => {
+    component.hband.simulation.set(false);
+    const testableService = component.hband as unknown as {
+      nativeExecute(
+        operation: string,
+        params: Record<string, unknown>,
+      ): Promise<{
+        operation: string;
+        accepted: boolean;
+        data?: Record<string, unknown>;
+      }>;
+    };
+    let requestedOperation: string | undefined;
+    testableService.nativeExecute = async (operation) => {
+      requestedOperation = operation;
+      return {
+        operation,
+        accepted: true,
+        data: { deviceId: 'AA:BB:CC:DD:EE:FF', signalling: true, findSupported: true },
+      };
+    };
+    let signal: HBandBandSignal | undefined;
+
+    void component.hband.startBandSignal('AA:BB:CC:DD:EE:FF').then((result) => {
+      signal = result;
+    });
+    flushMicrotasks();
+
+    expect(requestedOperation).toBe('provisioning.signal.start');
+    expect(signal).toEqual({
+      deviceId: 'AA:BB:CC:DD:EE:FF',
+      signalling: true,
+      findSupported: true,
+    });
+  }));
+
+  it('should allow a provisioning session the longer connection window', fakeAsync(() => {
+    component.hband.simulation.set(false);
+    const testableService = component.hband as unknown as {
+      nativeExecute(
+        operation: string,
+        params: Record<string, unknown>,
+      ): Promise<{ operation: string; accepted: boolean }>;
+    };
+    testableService.nativeExecute = () => new Promise(() => undefined);
+    let rejectedError: unknown;
+
+    void component.hband.startBandSignal('AA:BB:CC:DD:EE:FF').catch((error) => {
+      rejectedError = error;
+    });
+    flushMicrotasks();
+
+    tick(10_000);
+    flushMicrotasks();
+    expect(rejectedError).toBeUndefined();
+
+    tick(35_000);
+    flushMicrotasks();
+    expect((rejectedError as Error).message).toContain('SDK_OPERATION_TIMEOUT');
+    expect(component.hband.busyOperation()).toBeNull();
+  }));
 
   /**
    * Injeta callbacks equivalentes aos eventos nativos sem expor a operação
